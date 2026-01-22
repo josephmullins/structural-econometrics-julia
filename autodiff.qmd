@@ -115,7 +115,7 @@ result.minimizer
 
 Consider a simple probit model:
 
-$$ D = \mathbf{1}\{X\beta - \nu \geq 0\},\qquad \nu \sim \mathcal{N}(0,\sigma^2) $$
+$$ D = \mathbf{1}\{X\beta - \nu \geq 0\},\qquad \nu \sim \mathcal{N}(0,1) $$
 
 Here is code to simulate data for this model:
 
@@ -132,12 +132,8 @@ end
 # a quick test of the function:
 N = 1000
 X = [ones(N) 2*rand(Normal(),N)]
-γ = [0.1, 0.5]
-φ = 1.
-α = 0.6
-σ_ϵ = 0.5
 
-D = sim_data(X ; γ)
+D = sim_data(X ; γ);
 
 ```
 
@@ -193,7 +189,9 @@ function deriv_ll(D,X,γ)
     return dll
 end
 dx = zeros(2)
+# forward mode
 auto_deriv_ll(D,X,γ) = ForwardDiff.gradient(x->log_likelihood(D,X,x),γ)
+# reverse mode
 auto_deriv2_ll(D,X,γ,dx) = Enzyme.autodiff(Reverse, x->log_likelihood(D,X,x), Active, Duplicated(γ, dx))
 
 d1 = deriv_ll(D,X,γ)
@@ -211,7 +209,7 @@ Ok so we're confident that these functions work as intended, but how do they com
 @time auto_deriv2_ll(D,X,γ,dx);
 ```
 
-Both are quite quick but you can see that we're not losing much with automatic differentiation. In my experience, the gap between the two methods can narrow for more complicated functions.
+All are quite quick and you can see that we're not losing much with automatic differentiation. In my experience, the gap between the two methods can narrow for more complicated functions.
 
 So now let's try implementing the maximum likelihood estimator using two different gradient-based algorithms: Newton's Method (which uses the Hessian), and the Broyden–Fletcher–Goldfarb–Shannon (BFGS) algorithm (which updates search direction using changes in the first derivative). 
 
