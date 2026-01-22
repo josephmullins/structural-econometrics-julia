@@ -34,8 +34,6 @@ format:
   html:
     theme: cosmo
     fig-format: png
-  pdf:
-    documentclass: scrreprt
 
 
 

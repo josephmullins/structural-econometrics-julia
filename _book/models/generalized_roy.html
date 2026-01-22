@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>2&nbsp; The Generalized Roy Model – Structural Econometrics with Julia</title>
+<title>1&nbsp; The Generalized Roy Model – Structural Econometrics with Julia</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -164,7 +164,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../models.html">Five Prototype Models</a></li><li class="breadcrumb-item"><a href="../models/generalized_roy.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../models.html">Five Prototype Models</a></li><li class="breadcrumb-item"><a href="../models/generalized_roy.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -195,12 +195,6 @@ window.Quarto = {
  <span class="menu-text">Preface</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
-  </div>
-</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../models.html" class="sidebar-item-text sidebar-link">
@@ -213,31 +207,31 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../models/generalized_roy.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../models/search.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Job Search Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Job Search Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../models/savings.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">A Life-Cycle Savings Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">A Life-Cycle Savings Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../models/entry-exit.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../models/dynamic-labor-supply.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">A Simple Labor Supply Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A Simple Labor Supply Model</span></span></a>
   </div>
 </li>
       </ul>
@@ -264,6 +258,35 @@ window.Quarto = {
  <span class="menu-text">References</span></a>
   </div>
 </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../autodiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Automatic Differentiation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Performance Tips</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -274,24 +297,24 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">2.1</span> Overview</a></li>
-  <li><a href="#the-model" id="toc-the-model" class="nav-link" data-scroll-target="#the-model"><span class="header-section-number">2.2</span> The Model</a></li>
-  <li><a href="#potential-outcomes-and-observability" id="toc-potential-outcomes-and-observability" class="nav-link" data-scroll-target="#potential-outcomes-and-observability"><span class="header-section-number">2.3</span> Potential Outcomes and Observability</a>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1.1</span> Overview</a></li>
+  <li><a href="#the-model" id="toc-the-model" class="nav-link" data-scroll-target="#the-model"><span class="header-section-number">1.2</span> The Model</a></li>
+  <li><a href="#potential-outcomes-and-observability" id="toc-potential-outcomes-and-observability" class="nav-link" data-scroll-target="#potential-outcomes-and-observability"><span class="header-section-number">1.3</span> Potential Outcomes and Observability</a>
   <ul class="collapse">
-  <li><a href="#what-we-observe-vs.-what-we-want" id="toc-what-we-observe-vs.-what-we-want" class="nav-link" data-scroll-target="#what-we-observe-vs.-what-we-want"><span class="header-section-number">2.3.1</span> What We Observe vs.&nbsp;What We Want</a></li>
-  <li><a href="#treatment-effects-of-interest" id="toc-treatment-effects-of-interest" class="nav-link" data-scroll-target="#treatment-effects-of-interest"><span class="header-section-number">2.3.2</span> Treatment Effects of Interest</a></li>
-  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation"><span class="header-section-number">2.3.3</span> Simulation</a></li>
+  <li><a href="#what-we-observe-vs.-what-we-want" id="toc-what-we-observe-vs.-what-we-want" class="nav-link" data-scroll-target="#what-we-observe-vs.-what-we-want"><span class="header-section-number">1.3.1</span> What We Observe vs.&nbsp;What We Want</a></li>
+  <li><a href="#treatment-effects-of-interest" id="toc-treatment-effects-of-interest" class="nav-link" data-scroll-target="#treatment-effects-of-interest"><span class="header-section-number">1.3.2</span> Treatment Effects of Interest</a></li>
+  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation"><span class="header-section-number">1.3.3</span> Simulation</a></li>
   </ul></li>
-  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">2.4</span> Further Reading</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">1.4</span> Further Reading</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../models.html">Five Prototype Models</a></li><li class="breadcrumb-item"><a href="../models/generalized_roy.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../models.html">Five Prototype Models</a></li><li class="breadcrumb-item"><a href="../models/generalized_roy.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></h1>
+<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></h1>
 </div>
 
 
@@ -308,8 +331,8 @@ window.Quarto = {
 </header>
 
 
-<section id="overview" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">2.1</span> Overview</h2>
+<section id="overview" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1.1</span> Overview</h2>
 <p>The generalized Roy model is a framework for understanding selection into treatment based on heterogeneous gains. Theoretically, it is about the simplest model of choice one could write down, but it has surprisingly deep empirical content.</p>
 <p><span class="citation" data-cites="Roy">Roy (<a href="../references.html#ref-Roy" role="doc-biblioref">1951</a>)</span> used a version of this model to study occupational choice and introduce the concept of <em>selection</em>. It lies at the heart of most econometric treatments of selection and causal inference <span class="citation" data-cites="HeckmanVytlacil2005 heckman1990">(<a href="../references.html#ref-HeckmanVytlacil2005" role="doc-biblioref">J. Heckman and Vytlacil 2005</a>; <a href="../references.html#ref-heckman1990" role="doc-biblioref">J. J. Heckman and Honore 1990</a>)</span>.</p>
 <p>Originally developed to study occupational choice, it has become the canonical model for analyzing treatment effects when individuals select into treatment based on anticipated outcomes.</p>
@@ -323,8 +346,8 @@ window.Quarto = {
 <p>These ideas are central to modern applied microeconometrics and connect directly to some later identification examples we consider.</p>
 <hr>
 </section>
-<section id="the-model" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="the-model"><span class="header-section-number">2.2</span> The Model</h2>
+<section id="the-model" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="the-model"><span class="header-section-number">1.2</span> The Model</h2>
 <p>The model is very simple. Let <span class="math inline">\(D\in\{0,1\}\)</span> be a treatment or choice made by each individual in an economy. Individuals make the choice / take the treatment if the utility they derive from <span class="math inline">\(D=1\)</span> exceeds that if <span class="math inline">\(D=1\)</span>. Let <span class="math inline">\(Z\)</span> be a vector of observables that influences payoffs. The <strong>selection equation</strong> is:</p>
 <p><span class="math display">\[ D = \mathbf{1}\{\mu_{d}(Z) - V \geq 0\} \]</span></p>
 <p>where <span class="math inline">\(\mu_{d}(Z)\)</span> is a deterministic function of <span class="math inline">\(Z\)</span> and <span class="math inline">\(V\)</span> is a random variable that is unobserved to the econometrician. Some other notes:</p>
@@ -347,10 +370,10 @@ Y_0 &amp;= \mu_0(X) + U_0
 <p><strong>A canonical example</strong> of this model is the returns to schooling, where <span class="math inline">\(D\in\{0,1\}\)</span> is the decision to attend college.</p>
 <hr>
 </section>
-<section id="potential-outcomes-and-observability" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="potential-outcomes-and-observability"><span class="header-section-number">2.3</span> Potential Outcomes and Observability</h2>
-<section id="what-we-observe-vs.-what-we-want" class="level3" data-number="2.3.1">
-<h3 data-number="2.3.1" class="anchored" data-anchor-id="what-we-observe-vs.-what-we-want"><span class="header-section-number">2.3.1</span> What We Observe vs.&nbsp;What We Want</h3>
+<section id="potential-outcomes-and-observability" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="potential-outcomes-and-observability"><span class="header-section-number">1.3</span> Potential Outcomes and Observability</h2>
+<section id="what-we-observe-vs.-what-we-want" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="what-we-observe-vs.-what-we-want"><span class="header-section-number">1.3.1</span> What We Observe vs.&nbsp;What We Want</h3>
 <p><strong>Observable:</strong></p>
 <ul>
 <li>Treatment status: <span class="math inline">\(D\)</span></li>
@@ -364,8 +387,8 @@ Y_0 &amp;= \mu_0(X) + U_0
 </ul>
 <p><strong>Fundamental Problem of Causal Inference:</strong> We never observe both <span class="math inline">\(Y_1\)</span> and <span class="math inline">\(Y_0\)</span> for the same individual.</p>
 </section>
-<section id="treatment-effects-of-interest" class="level3" data-number="2.3.2">
-<h3 data-number="2.3.2" class="anchored" data-anchor-id="treatment-effects-of-interest"><span class="header-section-number">2.3.2</span> Treatment Effects of Interest</h3>
+<section id="treatment-effects-of-interest" class="level3" data-number="1.3.2">
+<h3 data-number="1.3.2" class="anchored" data-anchor-id="treatment-effects-of-interest"><span class="header-section-number">1.3.2</span> Treatment Effects of Interest</h3>
 <ol type="1">
 <li><p><strong>Individual Treatment Effect (ITE):</strong> <span class="math display">\[\Delta_i = Y_{1i} - Y_{0i}\]</span> Never observed for any individual.</p></li>
 <li><p><strong>Average Treatment Effect (ATE):</strong> <span class="math display">\[\text{ATE} = E[\Delta] = E[Y_1 - Y_0]\]</span> Average gain if we <strong>randomly</strong> assigned everyone to treatment.</p></li>
@@ -373,8 +396,8 @@ Y_0 &amp;= \mu_0(X) + U_0
 <li><p><strong>Average Treatment on the Untreated (ATU):</strong> <span class="math display">\[\text{ATU} = E[\Delta | D=0] = E[Y_1 - Y_0 | D=0]\]</span> Average gain for those who <strong>chose not</strong> to be treated.</p></li>
 </ol>
 </section>
-<section id="simulation" class="level3" data-number="2.3.3">
-<h3 data-number="2.3.3" class="anchored" data-anchor-id="simulation"><span class="header-section-number">2.3.3</span> Simulation</h3>
+<section id="simulation" class="level3" data-number="1.3.3">
+<h3 data-number="1.3.3" class="anchored" data-anchor-id="simulation"><span class="header-section-number">1.3.3</span> Simulation</h3>
 <p>Here is code to simulate data from a generalized Roy model under the assumption that (<span class="math inline">\(U_0,U_1\)</span>) are jointly normally distributed and are the sole source of selection on gains.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span>, <span class="bu">DataFrames</span>, <span class="bu">Statistics</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -445,8 +468,8 @@ Selection bias: 0.210</code></pre>
 <hr>
 </section>
 </section>
-<section id="further-reading" class="level2" data-number="2.4">
-<h2 data-number="2.4" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">2.4</span> Further Reading</h2>
+<section id="further-reading" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">1.4</span> Further Reading</h2>
 <p><strong>Foundational papers:</strong></p>
 <ul>
 <li><strong>Roy (1951)</strong>: “Some Thoughts on the Distribution of Earnings” - Original occupational choice model</li>
@@ -904,7 +927,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   </div>
   <div class="nav-page nav-page-next">
       <a href="../models/search.html" class="pagination-link" aria-label="Job Search Model">
-        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Job Search Model</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Job Search Model</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
