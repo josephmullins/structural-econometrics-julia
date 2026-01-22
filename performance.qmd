@@ -1,0 +1,110 @@
+# Performance Tips
+
+Julia can be extremely fast, but achieving good performance requires understanding a few key principles. This appendix provides a brief summary; see the [official Performance Tips](https://docs.julialang.org/en/v1/manual/performance-tips/) for comprehensive guidance.
+
+## The Golden Rules
+
+### 1. Avoid Global Variables
+
+Global variables with non-constant types force the compiler to generate slow, generic code.
+
+```julia
+# Bad
+data = [1.0, 2.0, 3.0]
+f() = sum(data)  # `data` could change type
+
+# Good: use const
+const DATA = [1.0, 2.0, 3.0]
+f() = sum(DATA)
+
+# Good: pass as argument
+f(data) = sum(data)
+```
+
+### 2. Write Type-Stable Functions
+
+A function is type-stable if the output type can be inferred from the input types. Type instability forces runtime dispatch.
+
+```julia
+# Bad: returns Int or Float64 depending on value
+function unstable(x)
+    if x > 0
+        return 1
+    else
+        return 0.0
+    end
+end
+
+# Good: consistent return type
+function stable(x)
+    if x > 0
+        return 1.0
+    else
+        return 0.0
+    end
+end
+```
+
+Use `@code_warntype` to check for type instabilities (look for red `Any` or `Union` types).
+
+### 3. Pre-allocate Arrays
+
+Avoid creating arrays inside loops. Pre-allocate and use in-place operations.
+
+```julia
+# Bad: allocates on every iteration
+function bad_example(n)
+    result = 0.0
+    for i in 1:n
+        v = zeros(100)  # allocation!
+        v .= rand(100)
+        result += sum(v)
+    end
+    result
+end
+
+# Good: pre-allocate
+function good_example(n)
+    result = 0.0
+    v = zeros(100)
+    for i in 1:n
+        rand!(v)  # in-place
+        result += sum(v)
+    end
+    result
+end
+```
+
+### 4. Use `@views` for Array Slices
+
+Array slices create copies by default. Use `@views` or `view()` to avoid allocation.
+
+```julia
+A = rand(1000, 1000)
+
+# Bad: creates a copy
+f(A[1:100, :])
+
+# Good: creates a view
+f(@views A[1:100, :])
+```
+
+## Quick Profiling
+
+Use `@time` for basic timing (run twice—first call includes compilation):
+
+```julia
+@time my_function(args)  # compile
+@time my_function(args)  # actual timing
+```
+
+For more detailed analysis:
+- `BenchmarkTools.jl`: Accurate microbenchmarks with `@btime`
+- `Profile` (stdlib): Sampling profiler
+- `ProfileView.jl`: Flame graph visualization
+
+## Further Resources
+
+- [Julia Performance Tips](https://docs.julialang.org/en/v1/manual/performance-tips/) — the official guide, essential reading
+- [Julia Academy performance course](https://juliaacademy.com/) — free video tutorials
+- [BenchmarkTools.jl documentation](https://juliaci.github.io/BenchmarkTools.jl/stable/)

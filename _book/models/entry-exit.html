@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4&nbsp; Firm Entry-Exit Model – Structural Econometrics with Julia</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../models/dynamic-labor-supply.html" rel="next">
+<link href="../models/savings.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-626149efe8f5d16e1d391ba177679bf0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../models.html">Five Prototype Models</a></li><li class="breadcrumb-item"><a href="../models/entry-exit.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Structural Econometrics with Julia</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Five Prototype Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/generalized_roy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Job Search Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/savings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">A Life-Cycle Savings Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/entry-exit.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/dynamic-labor-supply.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A Simple Labor Supply Model</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">How and Why to Use Models</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Identification and Credible Inference</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Extremum Estimators</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Discrete Choice</span></span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../autodiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Automatic Differentiation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Performance Tips</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">4.1</span> Overview</a></li>
+  <li><a href="#model-ingredients" id="toc-model-ingredients" class="nav-link" data-scroll-target="#model-ingredients"><span class="header-section-number">4.2</span> Model Ingredients</a></li>
+  <li><a href="#solving-the-firms-problem" id="toc-solving-the-firms-problem" class="nav-link" data-scroll-target="#solving-the-firms-problem"><span class="header-section-number">4.3</span> Solving the firm’s problem</a></li>
+  <li><a href="#equilibrium" id="toc-equilibrium" class="nav-link" data-scroll-target="#equilibrium"><span class="header-section-number">4.4</span> Equilibrium</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../models.html">Five Prototype Models</a></li><li class="breadcrumb-item"><a href="../models/entry-exit.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">4.1</span> Overview</h2>
+<p>This section presents a symmetric duopoly model of firm entry and exit decisions. Firms make discrete choices about market participation based on profitability and fixed costs. This model illustrates static discrete choice with strategic interactions and is used in Chapter 5 to demonstrate discrete choice estimation methods.</p>
+<hr>
+</section>
+<section id="model-ingredients" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="model-ingredients"><span class="header-section-number">4.2</span> Model Ingredients</h2>
+<p>Here are the basic ingredients of the model:</p>
+<ul>
+<li>There are two firms indexed by <span class="math inline">\(f\in\{0,1\}\)</span></li>
+<li>There are <span class="math inline">\(M\)</span> markets indexed by <span class="math inline">\(m\)</span></li>
+<li>Time is discrete and indexed by <span class="math inline">\(t\)</span></li>
+<li>Each firm makes an <em>entry decision</em> every period. We let <span class="math inline">\(j\in\{0,1\}\)</span> index this decision to enter or not. Let <span class="math inline">\(j(f,m,t)\)</span> indicate the choice of firm <span class="math inline">\(f\)</span> in market <span class="math inline">\(m\)</span> in period <span class="math inline">\(t\)</span>.</li>
+<li>We let <span class="math inline">\(a_{f,m,t}=j(f,m,t-1)\)</span> indicate whether firm <span class="math inline">\(f\)</span> is active in market <span class="math inline">\(m\)</span> in period <span class="math inline">\(t\)</span>, which means they entered in the previous period.</li>
+<li>Let <span class="math inline">\(x_{m}\)</span> be a market-level observable that shifts the profitability of operations in market <span class="math inline">\(m\)</span>.</li>
+<li>In addition to the observed states, each firm draws a pair of idiosyncatic shocks to payoffs in each period, <span class="math inline">\(\epsilon_{f}=[\epsilon_{f0},\epsilon_{f1}]\)</span> that is <em>private information</em> to the firm and is iid over markets, firms, and time periods.</li>
+<li>Firms make their decisions in each period <em>simultaneously</em></li>
+</ul>
+<p>To simplify notation, suppress dependance of outcomes on the market <span class="math inline">\(m\)</span> and time period <span class="math inline">\(t\)</span>. Because we are writing a symmetric model, we will also suppress dependence on <span class="math inline">\(f\)</span>. The <em>deterministic</em> component of the payoff to entering is a function of the market primitives (<span class="math inline">\(x\)</span>), the firm’s activity status (<span class="math inline">\(a\)</span>), and the other firm’s entry decision <span class="math inline">\(j^\prime\)</span>:</p>
+<p><span class="math display">\[ u_{1}(x,a,j^{\prime}) = \phi_{0} + \phi_{1}x - \phi_{2}j^\prime - \phi_{3}(1-a) \]</span></p>
+<p>The payoff to not entering is simply:</p>
+<p><span class="math display">\[{u}_{0}(x,a) = \phi_{4}a \]</span></p>
+<p>Before characterizing the solution to the firm’s problem, let’s code up these payoff functions:</p>
+<div id="88e60487" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">u1</span>(x,a,j′,ϕ) <span class="op">=</span> ϕ[<span class="fl">1</span>] <span class="op">+</span> ϕ[<span class="fl">2</span>]<span class="op">*</span>x <span class="op">-</span> ϕ[<span class="fl">3</span>]j′ <span class="op">+</span> ϕ[<span class="fl">4</span>]<span class="fu">*</span>(<span class="fl">1</span><span class="op">-</span>a)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">u0</span>(a,ϕ) <span class="op">=</span> a <span class="op">*</span> ϕ[<span class="fl">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>u0 (generic function with 1 method)</code></pre>
+</div>
+</div>
+</section>
+<section id="solving-the-firms-problem" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="solving-the-firms-problem"><span class="header-section-number">4.3</span> Solving the firm’s problem</h2>
+<p>Let <span class="math inline">\(j^*(x,a,a',\epsilon)\)</span> be the firm’s optimal decision given the state and the idiosyncratic shock. We will focus on <em>symmetric equilibria</em> so this policy function is sufficient to describe the behavior of both firms.</p>
+<p>The value to either firm of arriving in a period with state <span class="math inline">\((x,a,a')\)</span> can be written recursively as:</p>
+<p><span class="math display">\[
+\begin{split}
+V(x,a,a') = \mathbb{E}_{\epsilon,\epsilon'}\max\{u_{1}(x,a,j^*(x,a,a',\epsilon'))+\epsilon_{1} + \beta V(x,1,j^*(x,a,a',\epsilon')), \\ u_{0}(x,a) + \epsilon_{0} + \beta V(x,0,j^*(x,a,a',\epsilon'))\}
+\end{split}
+\]</span></p>
+<p>Define the optimal choice probability in equilibrium as:</p>
+<p><span class="math display">\[ p(x,a,a') = \int_{\epsilon}j^*(x,a,a',\epsilon)dF(\epsilon) \]</span></p>
+<p>With this in hand we can integrate out the other firm’s shocks <span class="math inline">\(\epsilon\)</span>’ to get:</p>
+<p><span class="math display">\[
+\begin{split}
+V(x,a,a') = \mathbb{E}_{\epsilon}\max\{\phi_{0}+\phi_{1}x - \phi_{2}p(x,a',a) +\epsilon_{1} + \beta [p(x,a',a)V(x,1,1) + (1-p(x,a',a))V(x,1,0)], \\
+a \phi_{4} + \epsilon_{0} + \beta [p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0)]\}
+\end{split}
+\]</span></p>
+<p>Define the choice-specific values as:</p>
+<p><span class="math display">\[ v_{1}(x,a,a') = \phi_{0}+\phi_{1}x - \phi_{2}p(x,a',a) + \beta [p(x,a',a)V(x,1,1) + (1-p(x,a',a))V(x,1,0)] \]</span></p>
+<p>and</p>
+<p><span class="math display">\[ v_{0}(x,a,a') = a \phi_{4} + \beta [p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0)] \]</span></p>
+<p>So assuming that <span class="math inline">\(\epsilon\)</span> is distributed as type I extreme value random variable with location parameter 0 and scale parameter 1 we get analytical expressions for the choice probabilities and the expected value of the maximum:</p>
+<p><span class="math display">\[ V(x) = \gamma + \log\left(\exp(v_{0}(x,a,a'))+\exp(v_{1}(x,a,a'))\right)\]</span></p>
+<p>where <span class="math inline">\(\gamma\)</span> is the <a href="https://en.wikipedia.org/wiki/Euler%27s_constant">Euler-Mascheroni constant</a> and</p>
+<p><span class="math display">\[ p(x,a,a') = \frac{\exp(v_{1}(x,a,a'))}{\exp(v_{0}(x,a,a'))+\exp(v_{1}(x,a,a'))} \]</span></p>
+<p>Before we define equilibrium and think about solving the model, let’s quickly write up the mapping between the other firm’s choice probabilities and the choice values:</p>
+<div id="3060e109" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixing x, assume that V is stored as a 2 x 2 array</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The argument p is the current guess of p(x,a',a)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">choice_values</span>(x,a,p,V,ϕ,β)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    v0 <span class="op">=</span> <span class="fu">u0</span>(a,ϕ) <span class="op">+</span> β <span class="op">*</span> p <span class="op">*</span> V[<span class="fl">1</span>,<span class="fl">2</span>] <span class="op">+</span> β <span class="op">*</span> (<span class="fl">1</span><span class="op">-</span>p) <span class="op">*</span> V[<span class="fl">1</span>,<span class="fl">1</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    v1 <span class="op">=</span> <span class="fu">u1</span>(x,a,p,ϕ) <span class="op">+</span> β <span class="op">*</span> p <span class="op">*</span> V[<span class="fl">2</span>,<span class="fl">2</span>] <span class="op">+</span> β <span class="op">*</span> (<span class="fl">1</span><span class="op">-</span>p) <span class="op">*</span> V[<span class="fl">2</span>,<span class="fl">1</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> v0,v1</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>choice_values (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>In principle we could iterate on this mapping to find (for a fixed <span class="math inline">\(p\)</span>), the firm’s optimal solution. But that won’t be an efficient way to try and solve for the equilibrium.</p>
+</section>
+<section id="equilibrium" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="equilibrium"><span class="header-section-number">4.4</span> Equilibrium</h2>
+<p>The solution concept for this model is <em>Markov Perfect Equilibrium</em>. Fixing the market <span class="math inline">\(x\)</span>, here the equilibrium be characterized as a fixed point in the value function <span class="math inline">\(V\)</span> and choice probabilities, <span class="math inline">\(p\)</span>. In words, equilibrium is summarized by a <span class="math inline">\(V\)</span> and a <span class="math inline">\(p\)</span> such that:</p>
+<ol type="1">
+<li>Given <span class="math inline">\(p\)</span>, <span class="math inline">\(V\)</span> is a fixed point in the recursive formulation of values; and</li>
+<li><span class="math inline">\(p\)</span> are the optimal choice probabilities of each firm given <span class="math inline">\(V\)</span> and given the other firm’s choice probabilities are <span class="math inline">\(p\)</span>.</li>
+</ol>
+<p>How should we solve for this symmetric equilibrium? We could try iterating on <span class="math inline">\(V\)</span> and <span class="math inline">\(p\)</span> as follows:</p>
+<div id="9d2bb462" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># V is a 2x2 array with values</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># p is a 2x2 array with choice probabilities</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">iterate_model</span>(V,p,x,ϕ,β)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    Vnew <span class="op">=</span> <span class="fu">copy</span>(V)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    pnew <span class="op">=</span> <span class="fu">copy</span>(p)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> a′ <span class="kw">in</span> <span class="fu">axes</span>(V,<span class="fl">2</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> a <span class="kw">in</span> <span class="fu">axes</span>(V,<span class="fl">1</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            p′ <span class="op">=</span> p[a′,a]</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            v0,v1 <span class="op">=</span> <span class="fu">choice_values</span>(x,a<span class="op">-</span><span class="fl">1</span>,p′,V,ϕ,β)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            pnew[a,a′] <span class="op">=</span> <span class="fu">exp</span>(v1) <span class="op">/</span> (<span class="fu">exp</span>(v0)<span class="fu">+exp</span>(v1))</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>            Vnew[a,a′] <span class="op">=</span> <span class="fu">log</span>(<span class="fu">exp</span>(v0)<span class="fu">+exp</span>(v1))</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Vnew,pnew</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">solve_by_iteration</span>(x,ϕ,β; max_iter <span class="op">=</span> <span class="fl">1000</span>, verbose <span class="op">=</span> <span class="cn">false</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    V0 <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>,<span class="fl">2</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    p0 <span class="op">=</span> <span class="fu">fill</span>(<span class="fl">0.1</span>,<span class="fl">2</span>,<span class="fl">2</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    err <span class="op">=</span> <span class="cn">Inf</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    iter <span class="op">=</span> <span class="fl">1</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> err<span class="op">&gt;</span><span class="fl">1e-10</span> <span class="op">&amp;&amp;</span> iter<span class="op">&lt;</span>max_iter</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        V1,p1 <span class="op">=</span> <span class="fu">iterate_model</span>(V0,p0,x,ϕ,β)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> <span class="fu">maximum</span>(<span class="fu">abs</span>.(V1 <span class="op">.-</span> V0))</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="fu">mod</span>(iter,<span class="fl">100</span>)<span class="op">==</span><span class="fl">0</span> <span class="op">&amp;&amp;</span> verbose</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>            <span class="fu">println</span>(<span class="st">"Iteration </span><span class="sc">$</span>iter<span class="st">, error is </span><span class="sc">$</span>err<span class="st">"</span>)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        V0 <span class="op">=</span> V1</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        p0 <span class="op">=</span> p1</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        iter <span class="op">+=</span> <span class="fl">1</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> V0,p0</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>β <span class="op">=</span> <span class="fl">0.95</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>ϕ <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> [<span class="fl">1</span>.,<span class="fl">0.1</span>,<span class="fl">0.5</span>,<span class="fl">2</span>.,<span class="fl">0.5</span>]</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_by_iteration</span>(<span class="fl">0</span>.,ϕ,β; verbose <span class="op">=</span> <span class="cn">true</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Iteration 100, error is 0.04823924738592211
+Iteration 200, error is 0.001242310554474102
+Iteration 300, error is 5.032709619001707e-5
+Iteration 400, error is 2.123540213005981e-6
+Iteration 500, error is 8.863101186307176e-8
+Iteration 600, error is 3.693557459882868e-9
+Iteration 700, error is 1.538467131467769e-10</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>([69.73147518902888 70.96824731388737; 68.46263413289174 67.89546273371974], [0.9107652821657111 0.990549524651413; 0.052475860075290155 0.27729654446688445])</code></pre>
+</div>
+</div>
+<p>This seems to work! But notice that it takes a while for the iteration to converge. Also, unlike the single agent case, there is no guarantee that this iteration is always a contraction.</p>
+<p>We can also solve this model relatively easily using Newton’s Method and the magic of <a href="../autodiff.html">Automatic Differentiation</a>. To do this, we’ll solve over the pair of choice-specific values <span class="math inline">\(v_{0}\)</span> and <span class="math inline">\(v_{1}\)</span> (these encode both values and choice probabilities) and store these values as a vector instead of an array:</p>
+<div id="9f859b0d" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span>, <span class="bu">LinearAlgebra</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># this function returns V as a 2 x 2 array given the vector of choice specific values in V</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">calc_V</span>(v)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> <span class="fu">LinearIndices</span>((<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    [<span class="fu">log</span>(<span class="fu">exp</span>(v[idx[<span class="fl">1</span>,<span class="fl">1</span><span class="op">+</span>a,<span class="fl">1</span><span class="op">+</span>a′]]) <span class="op">+</span> <span class="fu">exp</span>(v[idx[<span class="fl">2</span>,<span class="fl">1</span><span class="op">+</span>a,<span class="fl">1</span><span class="op">+</span>a′]])) for a <span class="kw">in</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, a′ <span class="kw">in</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>]</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># this function returns choice probabilities as a 2x2 array given the vector v</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">calc_p</span>(v)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> <span class="fu">LinearIndices</span>((<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>))</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span><span class="fu">+exp</span>(v[idx[<span class="fl">1</span>,<span class="fl">1</span><span class="op">+</span>a,<span class="fl">1</span><span class="op">+</span>a′]] <span class="op">-</span> v[idx[<span class="fl">2</span>,<span class="fl">1</span><span class="op">+</span>a,<span class="fl">1</span><span class="op">+</span>a′]])) for a <span class="kw">in</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, a′ <span class="kw">in</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>]</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">iterate_model_v</span>(v,x,ϕ,β)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> <span class="fu">LinearIndices</span>((<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>)) <span class="co">#&lt;- this is for convenient indexing over v</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    vnew <span class="op">=</span> <span class="fu">copy</span>(v)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> <span class="fu">calc_V</span>(v)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> a′ <span class="kw">in</span> <span class="fu">axes</span>(idx,<span class="fl">3</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> a <span class="kw">in</span> <span class="fu">axes</span>(idx,<span class="fl">2</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>            i0′ <span class="op">=</span> idx[<span class="fl">1</span>,a′,a] <span class="co">#&lt;- this locates the position in v for v_{0}(x,a',a)</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>            i1′ <span class="op">=</span> idx[<span class="fl">2</span>,a′,a] <span class="co">#&lt;- this locates the position in v for v_{1}(x,a',a)</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>            p <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu">exp</span>(v[i0′] <span class="op">-</span> v[i1′]))</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>            v0,v1 <span class="op">=</span> <span class="fu">choice_values</span>(x,a<span class="op">-</span><span class="fl">1</span>,p,V,ϕ,β)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>            vnew[idx[<span class="fl">1</span>,a,a′]] <span class="op">=</span> v0</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>            vnew[idx[<span class="fl">2</span>,a,a′]] <span class="op">=</span> v1</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> vnew</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="fu">F</span>(v,x,ϕ,β) <span class="op">=</span> v <span class="op">.-</span> <span class="fu">iterate_model_v</span>(v,x,ϕ,β)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">solve_model_newton</span>(x,ϕ,β;max_iter <span class="op">=</span> <span class="fl">10</span>, verbose <span class="op">=</span> <span class="cn">false</span>)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    v <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">8</span>)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dF</span>(v) <span class="op">=</span> ForwardDiff.<span class="fu">jacobian</span>(<span class="fu">y-&gt;F</span>(y,x,ϕ,β),v)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    err <span class="op">=</span> <span class="cn">Inf</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    iter <span class="op">=</span> <span class="fl">1</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> (err<span class="op">&gt;</span><span class="fl">1e-10</span>) <span class="op">&amp;&amp;</span> (iter<span class="op">&lt;</span>max_iter)</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        Fv <span class="op">=</span> <span class="fu">F</span>(v,x,ϕ,β)</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>        dFv <span class="op">=</span> <span class="fu">dF</span>(v)</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>        vnew <span class="op">=</span> v <span class="op">-</span> <span class="fu">inv</span>(dFv) <span class="op">*</span> Fv</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> <span class="fu">maximum</span>(<span class="fu">abs</span>.(Fv))</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> verbose</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>            <span class="fu">println</span>(<span class="st">"Iteration </span><span class="sc">$</span>iter<span class="st">, error is </span><span class="sc">$</span>err<span class="st">"</span>)</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>        iter <span class="op">+=</span> <span class="fl">1</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> vnew</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> v</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_model_newton</span>(<span class="fl">0</span>.,ϕ,β;verbose <span class="op">=</span> <span class="cn">true</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Iteration 1, error is 6.158489821531948
+Iteration 2, error is 1.776646323755557
+Iteration 3, error is 0.056247498263360285
+Iteration 4, error is 0.0002843462895327775
+Iteration 5, error is 3.447298979608604e-8
+Iteration 6, error is 2.842170943040401e-14</code></pre>
+</div>
+</div>
+<p>Let’s try timing each solution method to quickly compare:</p>
+<div id="a5a21070" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_model_newton</span>(<span class="fl">0</span>.,ϕ,β)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_by_iteration</span>(<span class="fl">0</span>.,ϕ,β)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">solve_model_newton</span>(<span class="fl">0</span>.,ϕ,β)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">solve_by_iteration</span>(<span class="fl">0</span>.,ϕ,β)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  0.000037 seconds (230 allocations: 54.688 KiB)
+  0.000104 seconds (4.29 k allocations: 234.531 KiB)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>([69.73147518902888 70.96824731388737; 68.46263413289174 67.89546273371974], [0.9107652821657111 0.990549524651413; 0.052475860075290155 0.27729654446688445])</code></pre>
+</div>
+</div>
+<p>In this case Newton’s method is faster. Let’s double check that both methods return the same answer:</p>
+<div id="8c9adeae" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>v0 <span class="op">=</span> <span class="fu">solve_model_newton</span>(<span class="fl">0</span>.,ϕ,β)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>V0,p <span class="op">=</span> <span class="fu">solve_by_iteration</span>(<span class="fl">0</span>.,ϕ,β)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>p1 <span class="op">=</span> <span class="fu">calc_p</span>(v0)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>[p p1]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>2×4 Matrix{Float64}:
+ 0.910765   0.99055   0.910765   0.99055
+ 0.0524759  0.277297  0.0524759  0.277297</code></pre>
+</div>
+</div>
+<p>Looks good! We can re-use this code when we get to thinking about estimation later on. To do this we will have to solve the model for different values of <span class="math inline">\(x_{m}\)</span>, but that can be done by using this code and iterating (potentially in parallel) over different values of <span class="math inline">\(x\)</span>.</p>
+<p>If you play around with parameters, you will see how convergence times may change and that solution methods are not always stable, especially when choice probabilities in equilibrium are very close to one or zero.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../models/savings.html" class="pagination-link" aria-label="A Life-Cycle Savings Model">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">A Life-Cycle Savings Model</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../models/dynamic-labor-supply.html" class="pagination-link" aria-label="A Simple Labor Supply Model">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A Simple Labor Supply Model</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

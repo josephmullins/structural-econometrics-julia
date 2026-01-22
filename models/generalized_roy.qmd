@@ -1,0 +1,187 @@
+# The Generalized Roy Model
+
+## Overview
+
+The generalized Roy model is a framework for understanding selection into treatment based on heterogeneous gains. Theoretically, it is about the simplest model of choice one could write down, but it has surprisingly deep empirical content.
+
+@Roy used a version of this model to study occupational choice and introduce the concept of *selection*. It lies at the heart of most econometric treatments of selection and causal inference [@HeckmanVytlacil2005; @heckman1990].
+
+Originally developed to study occupational choice, it has become the canonical model for analyzing treatment effects when individuals select into treatment based on anticipated outcomes.
+
+This model introduces fundamental concepts:
+
+- Selection on unobservables
+- Treatment effect heterogeneity
+- Marginal treatment effects (MTE)
+- Local average treatment effects (LATE)
+
+These ideas are central to modern applied microeconometrics and connect directly to some later identification examples we consider.
+
+---
+
+## The Model
+
+The model is very simple. Let $D\in\{0,1\}$ be a treatment or choice made by each individual in an economy. Individuals make the choice / take the treatment if the utility they derive from $D=1$ exceeds that if $D=1$. Let $Z$ be a vector of observables that influences payoffs. The **selection equation** is:
+
+$$ D = \mathbf{1}\{\mu_{d}(Z) - V \geq 0\} $$
+
+where $\mu_{d}(Z)$ is a deterministic function of $Z$ and $V$ is a random variable that is unobserved to the econometrician. Some other notes:
+
+- The term $\mu_{d}(Z)-V$ can be interpreted as the difference in utilities and the function $\mu_{d}$ can be viewed with the usual welfarist interpretations.
+- In this sense, the selection equation is essentially a *binary choice model*.
+- This model already builds in some special structure: the unobservables that dermine choices ($V$) are *additively separable* with respect to the observable factors $Z$. We'll return to this in future sections on identification.
+
+The selection equation is paired with a pair of **potential outcome** equations:
+
+\begin{align}
+Y_1 &= \mu_1(X) + U_1 \\
+Y_0 &= \mu_0(X) + U_0
+\end{align}
+
+where:
+
+- $X\subset Z$ are observed characteristics
+- $U_1, U_0$ are unobserved components that determine outcomes
+
+**Key assumption:** $(U_1, U_0, V)$ are jointly distributed, potentially correlated. We'll later return to the implications of this assumption.
+
+**A canonical example** of this model is the returns to schooling, where $D\in\{0,1\}$ is the decision to attend college.
+
+---
+
+## Potential Outcomes and Observability
+
+### What We Observe vs. What We Want
+
+**Observable:**
+
+- Treatment status: $D$
+- Actual outcome: $Y_{D}$
+- Covariates: $X, Z$
+
+**Not observable:**
+
+- Counterfactual outcomes: we don't see $Y_{1-D}$
+- Individual treatment effects: $\Delta = Y_{1} - Y_{0}$
+
+**Fundamental Problem of Causal Inference:** We never observe both $Y_1$ and $Y_0$ for the same individual.
+
+### Treatment Effects of Interest
+
+1. **Individual Treatment Effect (ITE):**
+   $$\Delta_i = Y_{1i} - Y_{0i}$$
+   Never observed for any individual.
+
+2. **Average Treatment Effect (ATE):**
+   $$\text{ATE} = E[\Delta] = E[Y_1 - Y_0]$$
+   Average gain if we **randomly** assigned everyone to treatment.
+
+3. **Average Treatment on the Treated (ATT):**
+   $$\text{ATT} = E[\Delta | D=1] = E[Y_1 - Y_0 | D=1]$$
+   Average gain for those who **actually chose** treatment.
+
+4. **Average Treatment on the Untreated (ATU):**
+   $$\text{ATU} = E[\Delta | D=0] = E[Y_1 - Y_0 | D=0]$$
+   Average gain for those who **chose not** to be treated.
+
+
+### Simulation
+
+Here is code to simulate data from a generalized Roy model under the assumption that ($U_0,U_1$) are jointly normally distributed and are the sole source of selection on gains.
+
+```julia
+using Distributions, DataFrames, Statistics
+
+# Simulate Roy model with heterogeneous returns
+function simulate_roy_model(n=10000)
+    # Parameters
+    α₁, α₀ = 3.0, 2.5  # Mean log wages
+    σᵤ = 0.3           # Std dev of unobservables
+    ρ = 0.5            # Correlation between U₁ and U₀
+
+    # Generate correlated unobservables
+    # (U₁, U₀) ~ Bivariate Normal
+    Σ = [1.0 ρ; ρ 1.0] * σᵤ^2
+    U = rand(MvNormal([0.0, 0.0], Σ), n)'
+    U₁ = U[:, 1]
+    U₀ = U[:, 2]
+
+    # Individual treatment effects
+    Δ = (α₁ - α₀) .+ (U₁ .- U₀)
+
+    # Generate instrument Z (e.g., family income, distance to college)
+    Z = rand(Normal(0, 1), n)
+
+    # Selection: D = 1 if gain > cost
+    # Cost depends on Z and unobserved V
+    V = rand(Normal(0, 0.5), n)
+    cost_threshold = 0.3 .- 0.4 * Z  # Lower cost if Z is high
+    D = (Δ .+ V) .> cost_threshold
+
+    # Observed outcomes
+    Y₁ = α₁ .+ U₁
+    Y₀ = α₀ .+ U₀
+    Y = D .* Y₁ .+ (1 .- D) .* Y₀
+
+    return DataFrame(
+        Y₁ = Y₁,
+        Y₀ = Y₀,
+        Y = Y,
+        D = D,
+        Δ = Δ,
+        Z = Z
+    )
+end
+
+# Simulate data
+df = simulate_roy_model(10000)
+
+# Calculate different treatment effects
+ATE = mean(df.Δ)
+ATT = mean(df[df.D .== 1, :Δ])
+ATU = mean(df[df.D .== 0, :Δ])
+
+# Naive comparison
+naive = mean(df[df.D .== 1, :Y]) - mean(df[df.D .== 0, :Y])
+
+println("True ATE: ", round(ATE, digits=3))
+println("True ATT: ", round(ATT, digits=3))
+println("True ATU: ", round(ATU, digits=3))
+println("Naive estimator: ", round(naive, digits=3))
+println("Selection bias: ", round(naive - ATE, digits=3))
+```
+
+**Output:**
+```
+True ATE: 0.502
+True ATT: 0.647
+True ATU: 0.291
+Naive estimator: 0.712
+Selection bias: 0.210
+```
+
+**Interpretation:**
+- ATT > ATE > ATU: Those who select college have higher returns
+- Naive estimator overestimates ATE due to positive selection bias
+- Selection on gains: people with high $\Delta$ choose treatment
+
+---
+
+
+## Further Reading
+
+**Foundational papers:**
+
+- **Roy (1951)**: "Some Thoughts on the Distribution of Earnings" - Original occupational choice model
+- **Heckman and Honoré (1990)**: "The Empirical Content of the Roy Model" - Identification analysis
+- **Imbens and Angrist (1994)**: "Identification and Estimation of Local Average Treatment Effects" - LATE framework
+
+**Modern treatments:**
+
+- **Heckman and Vytlacil (2005)**: "Structural Equations, Treatment Effects, and Econometric Policy Evaluation" - Unifying MTE framework
+- **Heckman et al. (2006)**: "Understanding Instrumental Variables in Models with Essential Heterogeneity" - Extensions and applications
+
+**Empirical applications:**
+
+- **Willis and Rosen (1979)**: "Education and Self-Selection" - Returns to schooling
+- **Carneiro et al. (2011)**: "Estimating Marginal Returns to Education" - MTE estimation

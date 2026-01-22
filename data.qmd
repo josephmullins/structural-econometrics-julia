@@ -1,0 +1,17 @@
+# Data
+
+For the practical applications in this course we will use three datasets:
+
+1. [Monthly CPS data](/data/cps_00019.csv) from IPUMS.
+2. [County-level panel data](/data/clubstore_county.csv) on entry and exit of club stores from @dearing-blevins-2024
+3. PSID [panel data](/data/abb_aea_data.csv) on earnings, consumption, and assets from @ABB_2018
+
+These data are included in the [course git repo](https://github.com/josephmullins/structural-econometrics-julia), and you should be able to run all of the example code in this class using the relative file paths in the git repo if you clone it. Alternatively you can download these datasets and save them wherever you wish, but you will need to edit file paths accordingly.
+
+## A Disclaimer for IPUMS CPS data
+
+These data are a subsample of the IPUMS CPS data available from cps.ipums.org. Any use of these data should be cited as follows:
+
+  Sarah Flood, Miriam King, Renae Rodgers, Steven Ruggles, J. Robert Warren, Daniel Backman, Annie Chen, Grace Cooper, Stephanie Richards, Megan Schouweiler, and Michael Westberry. IPUMS CPS: Version 11.0 [dataset]. Minneapolis, MN: IPUMS, 2023. <https://doi.org/10.18128/D030.V11.0> 
+
+The CPS data file is intended only for exercises as part of ECON8208. Individuals are not to redistribute the data without permission. Contact <ipums@umn.edu> for redistribution requests. For all other uses of these data, please access data directly via [cps.ipums.org](http://cps.ipums.org/).

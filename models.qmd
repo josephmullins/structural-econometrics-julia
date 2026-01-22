@@ -1,0 +1,5 @@
+# Five Prototype Models
+
+This chapter introduces four prototype structural models that we will use throughout the course to illustrate econometric methods. These models serve as running examples for identification strategies, estimation techniques, and computational methods. 
+
+For the purposes of some examples, we may at times perturb particular aspects of these assumptions. Our first task however is simply to familiarize ourselves with the general structure of the models, along with some numerical methods for solving them.

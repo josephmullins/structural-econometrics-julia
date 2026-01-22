@@ -1,0 +1,41 @@
+project:
+  type: book
+
+book:
+  title: "Structural Econometrics with Julia"
+  author: "Joseph Mullins"
+  chapters:
+    - index.qmd
+    #- intro.qmd
+    - part: models.qmd
+      chapters:
+      - models/generalized_roy.qmd
+      - models/search.qmd
+      - models/savings.qmd
+      - models/entry-exit.qmd
+      - models/dynamic-labor-supply.qmd
+    - part: why_models.qmd
+    - part: identification.qmd
+    - part: extremum-estimators.qmd
+    - part: discrete-choice.qmd
+    #- summary.qmd
+    - references.qmd
+  appendices:
+    - data.qmd
+    - autodiff.qmd
+    - performance.qmd
+
+bibliography: references.bib
+
+execute:
+  freeze: auto
+
+format:
+  html:
+    theme: cosmo
+    fig-format: png
+  pdf:
+    documentclass: scrreprt
+
+
+

@@ -1,0 +1,437 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Structural Econometrics with Julia",
+    "section": "",
+    "text": "Preface",
+    "crumbs": [
+      "Preface"
+    ]
+  },
+  {
+    "objectID": "intro.html",
+    "href": "intro.html",
+    "title": "1  Introduction",
+    "section": "",
+    "text": "This is a book created from markdown and executable code.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introduction</span>"
+    ]
+  },
+  {
+    "objectID": "models.html",
+    "href": "models.html",
+    "title": "Five Prototype Models",
+    "section": "",
+    "text": "This chapter introduces four prototype structural models that we will use throughout the course to illustrate econometric methods. These models serve as running examples for identification strategies, estimation techniques, and computational methods.\nFor the purposes of some examples, we may at times perturb particular aspects of these assumptions. Our first task however is simply to familiarize ourselves with the general structure of the models, along with some numerical methods for solving them.",
+    "crumbs": [
+      "Five Prototype Models"
+    ]
+  },
+  {
+    "objectID": "models/generalized_roy.html",
+    "href": "models/generalized_roy.html",
+    "title": "2  The Generalized Roy Model",
+    "section": "",
+    "text": "2.1 Overview\nThe generalized Roy model is a framework for understanding selection into treatment based on heterogeneous gains. Theoretically, it is about the simplest model of choice one could write down, but it has surprisingly deep empirical content.\nRoy (1951) used a version of this model to study occupational choice and introduce the concept of selection. It lies at the heart of most econometric treatments of selection and causal inference (J. Heckman and Vytlacil 2005; J. J. Heckman and Honore 1990).\nOriginally developed to study occupational choice, it has become the canonical model for analyzing treatment effects when individuals select into treatment based on anticipated outcomes.\nThis model introduces fundamental concepts:\nThese ideas are central to modern applied microeconometrics and connect directly to some later identification examples we consider.",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>The Generalized Roy Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/generalized_roy.html#overview",
+    "href": "models/generalized_roy.html#overview",
+    "title": "2  The Generalized Roy Model",
+    "section": "",
+    "text": "Selection on unobservables\nTreatment effect heterogeneity\nMarginal treatment effects (MTE)\nLocal average treatment effects (LATE)",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>The Generalized Roy Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/generalized_roy.html#the-model",
+    "href": "models/generalized_roy.html#the-model",
+    "title": "2  The Generalized Roy Model",
+    "section": "2.2 The Model",
+    "text": "2.2 The Model\nThe model is very simple. Let \\(D\\in\\{0,1\\}\\) be a treatment or choice made by each individual in an economy. Individuals make the choice / take the treatment if the utility they derive from \\(D=1\\) exceeds that if \\(D=1\\). Let \\(Z\\) be a vector of observables that influences payoffs. The selection equation is:\n\\[ D = \\mathbf{1}\\{\\mu_{d}(Z) - V \\geq 0\\} \\]\nwhere \\(\\mu_{d}(Z)\\) is a deterministic function of \\(Z\\) and \\(V\\) is a random variable that is unobserved to the econometrician. Some other notes:\n\nThe term \\(\\mu_{d}(Z)-V\\) can be interpreted as the difference in utilities and the function \\(\\mu_{d}\\) can be viewed with the usual welfarist interpretations.\nIn this sense, the selection equation is essentially a binary choice model.\nThis model already builds in some special structure: the unobservables that dermine choices (\\(V\\)) are additively separable with respect to the observable factors \\(Z\\). We’ll return to this in future sections on identification.\n\nThe selection equation is paired with a pair of potential outcome equations:\n\\[\\begin{align}\nY_1 &= \\mu_1(X) + U_1 \\\\\nY_0 &= \\mu_0(X) + U_0\n\\end{align}\\]\nwhere:\n\n\\(X\\subset Z\\) are observed characteristics\n\\(U_1, U_0\\) are unobserved components that determine outcomes\n\nKey assumption: \\((U_1, U_0, V)\\) are jointly distributed, potentially correlated. We’ll later return to the implications of this assumption.\nA canonical example of this model is the returns to schooling, where \\(D\\in\\{0,1\\}\\) is the decision to attend college.",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>The Generalized Roy Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/generalized_roy.html#potential-outcomes-and-observability",
+    "href": "models/generalized_roy.html#potential-outcomes-and-observability",
+    "title": "2  The Generalized Roy Model",
+    "section": "2.3 Potential Outcomes and Observability",
+    "text": "2.3 Potential Outcomes and Observability\n\n2.3.1 What We Observe vs. What We Want\nObservable:\n\nTreatment status: \\(D\\)\nActual outcome: \\(Y_{D}\\)\nCovariates: \\(X, Z\\)\n\nNot observable:\n\nCounterfactual outcomes: we don’t see \\(Y_{1-D}\\)\nIndividual treatment effects: \\(\\Delta = Y_{1} - Y_{0}\\)\n\nFundamental Problem of Causal Inference: We never observe both \\(Y_1\\) and \\(Y_0\\) for the same individual.\n\n\n2.3.2 Treatment Effects of Interest\n\nIndividual Treatment Effect (ITE): \\[\\Delta_i = Y_{1i} - Y_{0i}\\] Never observed for any individual.\nAverage Treatment Effect (ATE): \\[\\text{ATE} = E[\\Delta] = E[Y_1 - Y_0]\\] Average gain if we randomly assigned everyone to treatment.\nAverage Treatment on the Treated (ATT): \\[\\text{ATT} = E[\\Delta | D=1] = E[Y_1 - Y_0 | D=1]\\] Average gain for those who actually chose treatment.\nAverage Treatment on the Untreated (ATU): \\[\\text{ATU} = E[\\Delta | D=0] = E[Y_1 - Y_0 | D=0]\\] Average gain for those who chose not to be treated.\n\n\n\n2.3.3 Simulation\nHere is code to simulate data from a generalized Roy model under the assumption that (\\(U_0,U_1\\)) are jointly normally distributed and are the sole source of selection on gains.\nusing Distributions, DataFrames, Statistics\n\n# Simulate Roy model with heterogeneous returns\nfunction simulate_roy_model(n=10000)\n    # Parameters\n    α₁, α₀ = 3.0, 2.5  # Mean log wages\n    σᵤ = 0.3           # Std dev of unobservables\n    ρ = 0.5            # Correlation between U₁ and U₀\n\n    # Generate correlated unobservables\n    # (U₁, U₀) ~ Bivariate Normal\n    Σ = [1.0 ρ; ρ 1.0] * σᵤ^2\n    U = rand(MvNormal([0.0, 0.0], Σ), n)'\n    U₁ = U[:, 1]\n    U₀ = U[:, 2]\n\n    # Individual treatment effects\n    Δ = (α₁ - α₀) .+ (U₁ .- U₀)\n\n    # Generate instrument Z (e.g., family income, distance to college)\n    Z = rand(Normal(0, 1), n)\n\n    # Selection: D = 1 if gain &gt; cost\n    # Cost depends on Z and unobserved V\n    V = rand(Normal(0, 0.5), n)\n    cost_threshold = 0.3 .- 0.4 * Z  # Lower cost if Z is high\n    D = (Δ .+ V) .&gt; cost_threshold\n\n    # Observed outcomes\n    Y₁ = α₁ .+ U₁\n    Y₀ = α₀ .+ U₀\n    Y = D .* Y₁ .+ (1 .- D) .* Y₀\n\n    return DataFrame(\n        Y₁ = Y₁,\n        Y₀ = Y₀,\n        Y = Y,\n        D = D,\n        Δ = Δ,\n        Z = Z\n    )\nend\n\n# Simulate data\ndf = simulate_roy_model(10000)\n\n# Calculate different treatment effects\nATE = mean(df.Δ)\nATT = mean(df[df.D .== 1, :Δ])\nATU = mean(df[df.D .== 0, :Δ])\n\n# Naive comparison\nnaive = mean(df[df.D .== 1, :Y]) - mean(df[df.D .== 0, :Y])\n\nprintln(\"True ATE: \", round(ATE, digits=3))\nprintln(\"True ATT: \", round(ATT, digits=3))\nprintln(\"True ATU: \", round(ATU, digits=3))\nprintln(\"Naive estimator: \", round(naive, digits=3))\nprintln(\"Selection bias: \", round(naive - ATE, digits=3))\nOutput:\nTrue ATE: 0.502\nTrue ATT: 0.647\nTrue ATU: 0.291\nNaive estimator: 0.712\nSelection bias: 0.210\nInterpretation: - ATT &gt; ATE &gt; ATU: Those who select college have higher returns - Naive estimator overestimates ATE due to positive selection bias - Selection on gains: people with high \\(\\Delta\\) choose treatment",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>The Generalized Roy Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/generalized_roy.html#further-reading",
+    "href": "models/generalized_roy.html#further-reading",
+    "title": "2  The Generalized Roy Model",
+    "section": "2.4 Further Reading",
+    "text": "2.4 Further Reading\nFoundational papers:\n\nRoy (1951): “Some Thoughts on the Distribution of Earnings” - Original occupational choice model\nHeckman and Honoré (1990): “The Empirical Content of the Roy Model” - Identification analysis\nImbens and Angrist (1994): “Identification and Estimation of Local Average Treatment Effects” - LATE framework\n\nModern treatments:\n\nHeckman and Vytlacil (2005): “Structural Equations, Treatment Effects, and Econometric Policy Evaluation” - Unifying MTE framework\nHeckman et al. (2006): “Understanding Instrumental Variables in Models with Essential Heterogeneity” - Extensions and applications\n\nEmpirical applications:\n\nWillis and Rosen (1979): “Education and Self-Selection” - Returns to schooling\nCarneiro et al. (2011): “Estimating Marginal Returns to Education” - MTE estimation\n\n\n\n\n\nHeckman, James J, and Bo E Honore. 1990. “The Empirical Content of the Roy Model.” Econometrica: Journal of the Econometric Society, 1121–49.\n\n\nHeckman, James, and Edward Vytlacil. 2005. “Structural equations, treatment effects, and econometric policy evaluation.” Econometrica 73 (3): 669–738.\n\n\nRoy, A. D. 1951. “Some Thoughts on the Distribution of Earnings.” Oxford Economic Papers 3 (2): 135–46. http://www.jstor.org/stable/2662082.",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>The Generalized Roy Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/search.html",
+    "href": "models/search.html",
+    "title": "2  Job Search Model",
+    "section": "",
+    "text": "2.1 Overview\nThis section presents a simple model of undirected job search. The model demonstrates how workers optimally choose which job offers to accept based on a reservation wage strategy.",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Job Search Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/search.html#economic-environment",
+    "href": "models/search.html#economic-environment",
+    "title": "2  Job Search Model",
+    "section": "2.2 Economic Environment",
+    "text": "2.2 Economic Environment\nTime is discrete and indexed by \\(t\\) over an infinite horizon. Workers move between employment and unemployment, have linear utility, and cannot save.\n\n2.2.1 Parameters\n\n\n\n\n\n\n\nParameter\nDescription\n\n\n\n\n\\(\\lambda\\)\nThe probability an unemployed worker receives a job offer\n\n\n\\(\\delta\\)\nThe probability an employed worker loses their job\n\n\n\\(F_{W}\\)\nThe distribution of wage offers\n\n\n\\(1-\\beta\\)\nThe exponential rate of discounting\n\n\n\\(b\\)\nPer-period utility when unemployed",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Job Search Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/search.html#recursive-formulation",
+    "href": "models/search.html#recursive-formulation",
+    "title": "2  Job Search Model",
+    "section": "2.3 Recursive Formulation",
+    "text": "2.3 Recursive Formulation\nThe classic approach to solve this model is to write the values of unemployment and employment recursively. For example:\n\\[ U = b + \\beta[(1-\\lambda)U + \\lambda\\int\\max\\{V(w),U\\}dF_{W}(w)] \\] \\[ V(w) = w + \\beta[(1-\\delta)V(w) + \\delta U] \\]",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Job Search Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/search.html#model-solution",
+    "href": "models/search.html#model-solution",
+    "title": "2  Job Search Model",
+    "section": "2.4 Model solution",
+    "text": "2.4 Model solution\nOne can show that the optimal decision rule of the worker is characterized by a reservation wage \\(w^*\\), defined as \\(V(w^*)=U\\). We can also differentiate the expression for \\(V(w)\\) to get:\n\\[ V'(w) = \\frac{1}{1 - \\beta(1-\\delta)} \\]\nand applying integration by parts gives:\n\\[ U = b + \\beta[U + \\lambda\\int_{w^*}\\frac{1-F_{W}(w)}{1-\\beta(1-\\delta)}dw] \\]\nNow applying the definition of the reservation wage gives the reservation wage equation:\n\\[ w^* = b + \\beta\\lambda\\int_{w^*}\\frac{1-F_{W}(w)}{1 - \\beta(1-\\delta)}dw \\]\nand we can characterize the steady state rate of unemployment as:\n\\[ P[E = 0] = \\frac{h}{h+\\delta} \\]\nwhere \\(h = \\lambda(1-F_{W}(w^*))\\) is the rate at which workers exit unemployment.\nSimilarly, we can show that the steady state fraction of unemployment durations \\(t_{U}\\) is\n\\[ P[t_{U}=t] = h(1-h)^{t} \\]",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Job Search Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/search.html#numerical-model-solution",
+    "href": "models/search.html#numerical-model-solution",
+    "title": "2  Job Search Model",
+    "section": "2.5 Numerical Model Solution",
+    "text": "2.5 Numerical Model Solution\nTo solve the reservation wage equation numerically, we need to evaluate the integral on the right-hand side and find the value of \\(w^*\\) that satisfies the equation. This requires two key numerical methods: quadrature (for integration) and root-finding.\n\n2.5.1 Gauss-Legendre Quadrature\nWhen integrating numerically, we approximate the integral using a weighted sum at specific evaluation points (nodes):\n\\[ \\int_a^b f(x)dx \\approx \\frac{b-a}{2}\\sum_{k=1}^n w_k f\\left(\\frac{a+b}{2} + \\frac{b-a}{2}x_k\\right) \\]\nwhere \\(x_k\\) are the nodes and \\(w_k\\) are the weights from Gauss-Legendre quadrature. This method is particularly accurate for smooth functions and uses a fixed number of nodes, which is important for automatic differentiation (unlike adaptive methods like in the package QuadGK that adjust the number of nodes based on the integrand).\nLet’s implement a simple Gauss-Legendre integration routine:\n\nusing FastGaussQuadrature, Distributions, Roots\n\n# Fixed-node quadrature for integration (compatible with automatic differentiation)\nfunction integrateGL(f, a, b; num_nodes = 10)\n    nodes, weights = gausslegendre(num_nodes)\n    ∫f = 0.\n    for k in eachindex(nodes)\n        x = (a + b)/2 + (b - a)/2 * nodes[k]\n        ∫f += weights[k] * f(x)\n    end\n    return (b - a)/2 * ∫f\nend\n\n# Evaluate the derivative of the surplus function\ndS(x; F, β, δ) = (1 - cdf(F, x)) / (1 - β*(1 - δ))\n\n# Reservation wage equation (should equal zero at the solution)\nfunction res_wage(wres, b, λ, δ, β, F::Distribution)\n    ub = quantile(F, 0.9999)  # Upper bound of integration\n    integral = integrateGL(x -&gt; dS(x; F, β, δ), wres, ub)\n    return wres - b - β * λ * integral\nend\n\npars = (;b = -5., λ = 0.45, δ = 0.03, β = 0.99, F = LogNormal(1, 1))\nres_wage(1., pars.b, pars.λ, pars.δ, pars.β, pars.F)\n\n-33.6935906934783\n\n\n\n\n2.5.2 Root Finding\nThe reservation wage \\(w^*\\) is the value that makes the reservation wage equation equal to zero. We use the Roots.jl package, which implements efficient root-finding algorithms based on combinations of bisection, secant, and inverse quadratic interpolation methods.\nThe find_zero function takes:\n\nA function to find the root of\nAn initial guess\nThe type of the initial guess (to ensure type stability)\n\n\nfunction solve_res_wage(b, λ, δ, β, F)\n    return find_zero(\n        x -&gt; res_wage(x, b, λ, δ, β, F),\n        eltype(b)(4.)  # Initial guess of $4/hour\n    )\nend\n\nrwage = solve_res_wage(pars.b, pars.λ, pars.δ, pars.β, pars.F)\nprintln(\"Reservation wage: \", round(rwage, digits=2))\n\nReservation wage: 7.23\n\n\nThis approach has the advantage of being compatible with automatic differentiation tools like ForwardDiff, which is a very useful tool in numerical methods.\n\n\n2.5.3 Steady-State Statistics\nUsing the computed reservation wage, we can calculate the steady-state unemployment rate and average duration:\n\n# Compute steady-state statistics\nh = pars.λ * (1 - cdf(pars.F, rwage))  # Exit rate from unemployment\nu_rate = pars.δ / (pars.δ + h)          # Unemployment rate\navg_duration = 1 / h                     # Average duration\n\nprintln(\"Exit rate (h): \", round(h, digits=3))\nprintln(\"Unemployment rate: \", round(u_rate * 100, digits=1), \"%\")\nprintln(\"Average duration: \", round(avg_duration, digits=1), \" periods\")\n\nExit rate (h): 0.074\nUnemployment rate: 28.9%\nAverage duration: 13.6 periods",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Job Search Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/search.html#further-reading",
+    "href": "models/search.html#further-reading",
+    "title": "2  Job Search Model",
+    "section": "2.6 Further Reading",
+    "text": "2.6 Further Reading\n\nMcCall (1970): “Economics of Information and Job Search” - Original search model\nWolpin (1987): “Estimating a Structural Search Model” - Early structural estimation\nEckstein and van den Berg (2007): “Empirical Labor Search” - Survey of search models\nFlinn and Heckman (1982): “New Methods for Analyzing Structural Models of Labor Force Dynamics” - Duration data analysis",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Job Search Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/savings.html",
+    "href": "models/savings.html",
+    "title": "4  A Life-Cycle Savings Model",
+    "section": "",
+    "text": "4.1 Overview\nThis section presents a stylized life-cycle model of consumption and savings. Households make dynamic decisions about consumption and asset accumulation over their lifetime, facing income uncertainty and borrowing constraints.",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>A Life-Cycle Savings Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/savings.html#economic-environment",
+    "href": "models/savings.html#economic-environment",
+    "title": "4  A Life-Cycle Savings Model",
+    "section": "4.2 Economic Environment",
+    "text": "4.2 Economic Environment\nTime is discrete and indexed by \\(t\\). Individuals live for a finite number of periods, \\(T\\). They derive utility from consumption according to a CRRA utility function:\n\\[ u(c) = \\frac{c^{1-\\sigma}}{1-\\sigma} \\]\nand from “bequests”, which are modeled here as cash on hand net of consumption in the final period:\n\\[ \\nu(a) = \\psi \\frac{a^{1-\\sigma}}{1-\\sigma} \\].\nConsumption can be transferred between periods via a portfolio of one-period bonds (“savings’, \\(a\\)) that can be purchased at the price \\(1 / (1+r)\\), with a prdetermined limit, \\(\\underline{a}\\), on borrowing.\nInviduals receive income \\(y\\) every period that is governed by a deterministic (\\(\\mu_{t}\\)) and stochastic component:\n\\[ \\log(y_{t}) = \\mu_{t} + \\varepsilon_{it} \\]\nwhere \\(\\varepsilon_{it}\\) is a first-order Markov process. A particular case of interest is the case where \\(\\varepsilon\\) is a stationary AR 1 process:\n\\[ \\varepsilon_{it} = \\rho \\varepsilon_{it-1} + \\eta_{it} \\]\nwhere \\(\\eta_{it} \\sim \\mathcal{N}(0,\\sigma^2_{\\eta})\\). The unconditional variance of \\(\\varepsilon_{it}\\) is therefore \\(\\sigma^2_{\\eta} / (1-\\rho^2)\\).",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>A Life-Cycle Savings Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/savings.html#model-solution",
+    "href": "models/savings.html#model-solution",
+    "title": "4  A Life-Cycle Savings Model",
+    "section": "4.3 Model Solution",
+    "text": "4.3 Model Solution\nDefine\n\\[ V_{T}(a,\\varepsilon) = \\max_{c}\\left\\{u(c) + \\nu(y + a - c)\\right\\} \\]\nAnd now define the remaining value functions recursively:\n\\[ V_{t}(a,\\varepsilon) = \\max_{c,a'}\\left\\{u(c) + \\beta\\mathbb{E}_{\\varepsilon'|\\varepsilon}V(a',\\varepsilon')\\right\\} \\]\nsubject to:\n\\[ c + \\frac{1}{1+r}a' \\leq y + a \\]\nand\n\\[ a' \\geq \\underline{a}\\]\nwhere \\(\\underline{a}\\) is the borrowing constraint.\nWe’re going to write code to solve the model naively using this recursive formulation. You may already be aware that there are more efficient solution methods that exploit the first order conditions of the problem. Not the focus of our class! Please don’t use the example below as a demonstration of best practice when it comes to solving savings models.\nWe’ll start picking some default parameters.\n\npars = (;\n    T = 45, β = 0.95, σ = 2,ρ = 0.9,ση = 0.1, μ = fill(2.,45), ψ = 5., r = 0.05\n)\n\n(T = 45, β = 0.95, σ = 2, ρ = 0.9, ση = 0.1, μ = [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0  …  2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0], ψ = 5.0, r = 0.05)\n\n\nNext we’ll write a function that uses Tauchen’s method to approximate the income process as a discrete markov process.\n\nusing Distributions,Random\nusing LinearAlgebra\nΦ(x) = cdf(Normal(),x)\n\nfunction tauchen(ρ,ση,Kϵ)\n    sd = ση/sqrt(1-ρ^2)\n    grid = range(-3sd,stop=3sd,length=Kϵ)\n    Π = zeros(Kϵ,Kϵ)\n    Δ = grid[2]-grid[1]\n    for j=1:Kϵ\n        Π[1,j] = Φ((grid[1] + Δ/2 - ρ*grid[j])/ση)\n        Π[end,j] = 1 - Φ((grid[end] - Δ/2 - ρ*grid[j])/ση)\n        for k=2:(Kϵ-1)\n            Π[k,j] = Φ((grid[k] + Δ/2 - ρ*grid[j])/ση) - Φ((grid[k] - Δ/2 - ρ*grid[j])/ση)\n        end\n    end\n    return Π,grid\nend\n\ntauchen (generic function with 1 method)\n\n\nNow, let’s think about how to solve this model. We have two state variables to track. We have discretized \\(\\varepsilon\\), now let’s discretize assets and define a max operator.\n\nKa = 100\nKϵ = 5\nagrid = LinRange(0,pars.μ[1] * pars.T,Ka) #&lt;- is this a reasonable upper bound? We'll find out!\nΠ,ϵgrid = tauchen(pars.ρ,pars.ση,Kϵ)\npars = (;pars...,Ka,agrid,Π,ϵgrid,Kϵ)\n\nu(c,σ) = c^(1-σ) / (1-σ)\n\nfunction solve_max(V,t,iϵ,ia,pars)\n    (;agrid,ϵgrid,Π,σ,Ka,r,β) = pars\n    cash = exp(pars.μ[t] + ϵgrid[iϵ]) + agrid[ia]\n    amax = 0\n    vmax = -Inf\n    loop = true\n    a = 1\n    while loop && a&lt;Ka\n        c = cash - agrid[a] / (1+r)\n        if c&gt;0\n            #@views v = u(c,σ) + β * dot(Π[:,iϵ],V[:,a,t+1])\n            v = u(c,σ)\n            for iϵ′ in axes(V,1)\n                v += β * Π[iϵ′,iϵ] * V[iϵ′,a,t+1]\n            end\n            if v&gt;vmax\n                vmax = v\n                amax = a\n            end\n        else\n            loop = false\n        end\n        a += 1 #&lt;- move one up the grid space\n    end\n    return amax,vmax\nend\n\nsolve_max (generic function with 1 method)\n\n\nNext, a function that uses this max operator to get the value function for all states in a period, \\(t\\), and records the optimal savings policy.\n\nfunction iterate!(V,A,t,pars)\n    for ia in axes(V,2), iϵ in axes(V,1)\n        A[iϵ,ia,t],V[iϵ,ia,t] = solve_max(V,t,iϵ,ia,pars)\n    end\nend\nfunction terminal_values!(V,pars)\n    (;σ,ψ,agrid) = pars\n    for ia in axes(V,2), iϵ in axes(V,1)\n        V[iϵ,ia] = ψ * u(agrid[ia],σ)\n    end\nend\n\nterminal_values! (generic function with 1 method)\n\n\n\nfunction backward_induction!(V,A,pars)\n    (;ψ,σ,T,agrid) = pars\n    # set the values at T+1 (bequest motives)\n    @views terminal_values!(V[:,:,T+1],pars)\n    for t in reverse(1:T)\n        iterate!(V,A,t,pars)\n    end\nend\n\nbackward_induction! (generic function with 1 method)\n\n\nLet’s check the model solution and time it also.\n\nV = zeros(pars.Kϵ,pars.Ka,pars.T+1)\nA = zeros(Int64,pars.Kϵ,pars.Ka,pars.T)\nbackward_induction!(V,A,pars)\n@time backward_induction!(V,A,pars)\n\n  0.008767 seconds\n\n\nSeems ok. We can plot the policy functions as a sanity check. The plot below shows savings policy at the median wage shock over time at different levels of assets.\n\nusing Plots\n\nplot(1:pars.T,agrid[A[3,1:10:Ka,:]'],legend=false)\n\n\n\n\nYou can see that the discreteness creates some jumpiness in the policy functions. As I said, other solution methods that use interpolation can be more efficient and will create smoother pictures, but since that is not the focus of this class we will use this simple solution method.",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>A Life-Cycle Savings Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/entry-exit.html",
+    "href": "models/entry-exit.html",
+    "title": "4  Firm Entry-Exit Model",
+    "section": "",
+    "text": "4.1 Overview\nThis section presents a symmetric duopoly model of firm entry and exit decisions. Firms make discrete choices about market participation based on profitability and fixed costs. This model illustrates static discrete choice with strategic interactions and is used in Chapter 5 to demonstrate discrete choice estimation methods.",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Firm Entry-Exit Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/entry-exit.html#model-ingredients",
+    "href": "models/entry-exit.html#model-ingredients",
+    "title": "4  Firm Entry-Exit Model",
+    "section": "4.2 Model Ingredients",
+    "text": "4.2 Model Ingredients\nHere are the basic ingredients of the model:\n\nThere are two firms indexed by \\(f\\in\\{0,1\\}\\)\nThere are \\(M\\) markets indexed by \\(m\\)\nTime is discrete and indexed by \\(t\\)\nEach firm makes an entry decision every period. We let \\(j\\in\\{0,1\\}\\) index this decision to enter or not. Let \\(j(f,m,t)\\) indicate the choice of firm \\(f\\) in market \\(m\\) in period \\(t\\).\nWe let \\(a_{f,m,t}=j(f,m,t-1)\\) indicate whether firm \\(f\\) is active in market \\(m\\) in period \\(t\\), which means they entered in the previous period.\nLet \\(x_{m}\\) be a market-level observable that shifts the profitability of operations in market \\(m\\).\nIn addition to the observed states, each firm draws a pair of idiosyncatic shocks to payoffs in each period, \\(\\epsilon_{f}=[\\epsilon_{f0},\\epsilon_{f1}]\\) that is private information to the firm and is iid over markets, firms, and time periods.\nFirms make their decisions in each period simultaneously\n\nTo simplify notation, suppress dependance of outcomes on the market \\(m\\) and time period \\(t\\). Because we are writing a symmetric model, we will also suppress dependence on \\(f\\). The deterministic component of the payoff to entering is a function of the market primitives (\\(x\\)), the firm’s activity status (\\(a\\)), and the other firm’s entry decision \\(j^\\prime\\):\n\\[ u_{1}(x,a,j^{\\prime}) = \\phi_{0} + \\phi_{1}x - \\phi_{2}j^\\prime - \\phi_{3}(1-a) \\]\nThe payoff to not entering is simply:\n\\[{u}_{0}(x,a) = \\phi_{4}a \\]\nBefore characterizing the solution to the firm’s problem, let’s code up these payoff functions:\n\nu1(x,a,j′,ϕ) = ϕ[1] + ϕ[2]*x - ϕ[3]j′ + ϕ[4]*(1-a)\nu0(a,ϕ) = a * ϕ[5]\n\nu0 (generic function with 1 method)",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Firm Entry-Exit Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/entry-exit.html#solving-the-firms-problem",
+    "href": "models/entry-exit.html#solving-the-firms-problem",
+    "title": "4  Firm Entry-Exit Model",
+    "section": "4.3 Solving the firm’s problem",
+    "text": "4.3 Solving the firm’s problem\nLet \\(j^*(x,a,a',\\epsilon)\\) be the firm’s optimal decision given the state and the idiosyncratic shock. We will focus on symmetric equilibria so this policy function is sufficient to describe the behavior of both firms.\nThe value to either firm of arriving in a period with state \\((x,a,a')\\) can be written recursively as:\n\\[\n\\begin{split}\nV(x,a,a') = \\mathbb{E}_{\\epsilon,\\epsilon'}\\max\\{u_{1}(x,a,j^*(x,a,a',\\epsilon'))+\\epsilon_{1} + \\beta V(x,1,j^*(x,a,a',\\epsilon')), \\\\ u_{0}(x,a) + \\epsilon_{0} + \\beta V(x,0,j^*(x,a,a',\\epsilon'))\\}\n\\end{split}\n\\]\nDefine the optimal choice probability in equilibrium as:\n\\[ p(x,a,a') = \\int_{\\epsilon}j^*(x,a,a',\\epsilon)dF(\\epsilon) \\]\nWith this in hand we can integrate out the other firm’s shocks \\(\\epsilon\\)’ to get:\n\\[\n\\begin{split}\nV(x,a,a') = \\mathbb{E}_{\\epsilon}\\max\\{\\phi_{0}+\\phi_{1}x - \\phi_{2}p(x,a',a) +\\epsilon_{1} + \\beta [p(x,a',a)V(x,1,1) + (1-p(x,a',a))V(x,1,0)], \\\\\na \\phi_{4} + \\epsilon_{0} + \\beta [p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0)]\\}\n\\end{split}\n\\]\nDefine the choice-specific values as:\n\\[ v_{1}(x,a,a') = \\phi_{0}+\\phi_{1}x - \\phi_{2}p(x,a',a) + \\beta [p(x,a',a)V(x,1,1) + (1-p(x,a',a))V(x,1,0)] \\]\nand\n\\[ v_{0}(x,a,a') = a \\phi_{4} + \\beta [p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0)] \\]\nSo assuming that \\(\\epsilon\\) is distributed as type I extreme value random variable with location parameter 0 and scale parameter 1 we get analytical expressions for the choice probabilities and the expected value of the maximum:\n\\[ V(x) = \\gamma + \\log\\left(\\exp(v_{0}(x,a,a'))+\\exp(v_{1}(x,a,a'))\\right)\\]\nwhere \\(\\gamma\\) is the Euler-Mascheroni constant and\n\\[ p(x,a,a') = \\frac{\\exp(v_{1}(x,a,a'))}{\\exp(v_{0}(x,a,a'))+\\exp(v_{1}(x,a,a'))} \\]\nBefore we define equilibrium and think about solving the model, let’s quickly write up the mapping between the other firm’s choice probabilities and the choice values:\n\n# Fixing x, assume that V is stored as a 2 x 2 array\n# The argument p is the current guess of p(x,a',a)\nfunction choice_values(x,a,p,V,ϕ,β)\n    v0 = u0(a,ϕ) + β * p * V[1,2] + β * (1-p) * V[1,1]\n    v1 = u1(x,a,p,ϕ) + β * p * V[2,2] + β * (1-p) * V[2,1]\n    return v0,v1\nend\n\nchoice_values (generic function with 1 method)\n\n\nIn principle we could iterate on this mapping to find (for a fixed \\(p\\)), the firm’s optimal solution. But that won’t be an efficient way to try and solve for the equilibrium.",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Firm Entry-Exit Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/entry-exit.html#equilibrium",
+    "href": "models/entry-exit.html#equilibrium",
+    "title": "4  Firm Entry-Exit Model",
+    "section": "4.4 Equilibrium",
+    "text": "4.4 Equilibrium\nThe solution concept for this model is Markov Perfect Equilibrium. Fixing the market \\(x\\), here the equilibrium be characterized as a fixed point in the value function \\(V\\) and choice probabilities, \\(p\\). In words, equilibrium is summarized by a \\(V\\) and a \\(p\\) such that:\n\nGiven \\(p\\), \\(V\\) is a fixed point in the recursive formulation of values; and\n\\(p\\) are the optimal choice probabilities of each firm given \\(V\\) and given the other firm’s choice probabilities are \\(p\\).\n\nHow should we solve for this symmetric equilibrium? We could try iterating on \\(V\\) and \\(p\\) as follows:\n\n# V is a 2x2 array with values\n# p is a 2x2 array with choice probabilities\nfunction iterate_model(V,p,x,ϕ,β)\n    Vnew = copy(V)\n    pnew = copy(p)\n    for a′ in axes(V,2)\n        for a in axes(V,1)\n            p′ = p[a′,a]\n            v0,v1 = choice_values(x,a-1,p′,V,ϕ,β)\n            pnew[a,a′] = exp(v1) / (exp(v0)+exp(v1))\n            Vnew[a,a′] = log(exp(v0)+exp(v1))\n        end\n    end\n    return Vnew,pnew\nend\n\nfunction solve_by_iteration(x,ϕ,β; max_iter = 1000, verbose = false)\n    V0 = zeros(2,2)\n    p0 = fill(0.1,2,2)\n    err = Inf\n    iter = 1\n    while err&gt;1e-10 && iter&lt;max_iter\n        V1,p1 = iterate_model(V0,p0,x,ϕ,β)\n        err = maximum(abs.(V1 .- V0))\n        if mod(iter,100)==0 && verbose\n            println(\"Iteration $iter, error is $err\")\n        end\n        V0 = V1\n        p0 = p1\n        iter += 1\n    end\n    return V0,p0\nend\n\nβ = 0.95\nϕ = 2 * [1.,0.1,0.5,2.,0.5]\nsolve_by_iteration(0.,ϕ,β; verbose = true)\n\nIteration 100, error is 0.04823924738592211\nIteration 200, error is 0.001242310554474102\nIteration 300, error is 5.032709619001707e-5\nIteration 400, error is 2.123540213005981e-6\nIteration 500, error is 8.863101186307176e-8\nIteration 600, error is 3.693557459882868e-9\nIteration 700, error is 1.538467131467769e-10\n\n\n([69.73147518902888 70.96824731388737; 68.46263413289174 67.89546273371974], [0.9107652821657111 0.990549524651413; 0.052475860075290155 0.27729654446688445])\n\n\nThis seems to work! But notice that it takes a while for the iteration to converge. Also, unlike the single agent case, there is no guarantee that this iteration is always a contraction.\nWe can also solve this model relatively easily using Newton’s Method and the magic of Automatic Differentiation. To do this, we’ll solve over the pair of choice-specific values \\(v_{0}\\) and \\(v_{1}\\) (these encode both values and choice probabilities) and store these values as a vector instead of an array:\n\nusing ForwardDiff, LinearAlgebra\n\n# this function returns V as a 2 x 2 array given the vector of choice specific values in V\nfunction calc_V(v)\n    idx = LinearIndices((2,2,2))\n    [log(exp(v[idx[1,1+a,1+a′]]) + exp(v[idx[2,1+a,1+a′]])) for a in 0:1, a′ in 0:1]\nend\n\n# this function returns choice probabilities as a 2x2 array given the vector v\nfunction calc_p(v)\n    idx = LinearIndices((2,2,2))\n    [1 / (1+exp(v[idx[1,1+a,1+a′]] - v[idx[2,1+a,1+a′]])) for a in 0:1, a′ in 0:1]\nend\n\n\nfunction iterate_model_v(v,x,ϕ,β)\n    idx = LinearIndices((2,2,2)) #&lt;- this is for convenient indexing over v\n    vnew = copy(v)\n    V = calc_V(v)\n    for a′ in axes(idx,3)\n        for a in axes(idx,2)\n            i0′ = idx[1,a′,a] #&lt;- this locates the position in v for v_{0}(x,a',a)\n            i1′ = idx[2,a′,a] #&lt;- this locates the position in v for v_{1}(x,a',a)\n            p = 1 / (1 + exp(v[i0′] - v[i1′]))\n            v0,v1 = choice_values(x,a-1,p,V,ϕ,β)\n            vnew[idx[1,a,a′]] = v0\n            vnew[idx[2,a,a′]] = v1\n        end\n    end\n    return vnew\nend\n\nF(v,x,ϕ,β) = v .- iterate_model_v(v,x,ϕ,β)\nfunction solve_model_newton(x,ϕ,β;max_iter = 10, verbose = false)\n    v = zeros(8)\n    dF(v) = ForwardDiff.jacobian(y-&gt;F(y,x,ϕ,β),v)\n    err = Inf\n    iter = 1\n    while (err&gt;1e-10) && (iter&lt;max_iter)\n        Fv = F(v,x,ϕ,β)\n        dFv = dF(v)\n        vnew = v - inv(dFv) * Fv\n        err = maximum(abs.(Fv))\n        if verbose\n            println(\"Iteration $iter, error is $err\")\n        end\n        iter += 1\n        v = vnew\n    end\n    return v\nend\n\nsolve_model_newton(0.,ϕ,β;verbose = true);\n\nIteration 1, error is 6.158489821531948\nIteration 2, error is 1.776646323755557\nIteration 3, error is 0.056247498263360285\nIteration 4, error is 0.0002843462895327775\nIteration 5, error is 3.447298979608604e-8\nIteration 6, error is 2.842170943040401e-14\n\n\nLet’s try timing each solution method to quickly compare:\n\nsolve_model_newton(0.,ϕ,β)\nsolve_by_iteration(0.,ϕ,β)\n\n@time solve_model_newton(0.,ϕ,β)\n@time solve_by_iteration(0.,ϕ,β)\n\n  0.000037 seconds (230 allocations: 54.688 KiB)\n  0.000104 seconds (4.29 k allocations: 234.531 KiB)\n\n\n([69.73147518902888 70.96824731388737; 68.46263413289174 67.89546273371974], [0.9107652821657111 0.990549524651413; 0.052475860075290155 0.27729654446688445])\n\n\nIn this case Newton’s method is faster. Let’s double check that both methods return the same answer:\n\nv0 = solve_model_newton(0.,ϕ,β)\nV0,p = solve_by_iteration(0.,ϕ,β)\np1 = calc_p(v0)\n[p p1]\n\n2×4 Matrix{Float64}:\n 0.910765   0.99055   0.910765   0.99055\n 0.0524759  0.277297  0.0524759  0.277297\n\n\nLooks good! We can re-use this code when we get to thinking about estimation later on. To do this we will have to solve the model for different values of \\(x_{m}\\), but that can be done by using this code and iterating (potentially in parallel) over different values of \\(x\\).\nIf you play around with parameters, you will see how convergence times may change and that solution methods are not always stable, especially when choice probabilities in equilibrium are very close to one or zero.",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Firm Entry-Exit Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/dynamic-labor-supply.html",
+    "href": "models/dynamic-labor-supply.html",
+    "title": "5  A Simple Labor Supply Model",
+    "section": "",
+    "text": "5.1 Model Setup and Solution\nConsider a dynamic labor supply model (with no uncertainty) where each agent \\(n\\) chooses a sequence of consumption and hours, \\(\\{c_{t},h_{t}\\}_{t=1}^{\\infty}\\), to solve: \\[ \\max \\sum_{t=0}^\\infty \\beta^{t} \\left(\\frac{c_{t}^{1-\\sigma}}{1-\\sigma} - \\frac{\\alpha_{n}^{-1}}{1 + 1/\\psi}h_{t}^{1+1/\\psi}\\right)\\] subject to the intertemporal budget constraint: \\[ \\sum_{t}q_{t}c_{t} \\leq A_{n,0} + \\sum_{t}q_{t}W_{n,t}h_{t},\\qquad q_{t} = (1+r)^{-t}.\\] Let \\(H_{n,t}\\) and \\(C_{n,t}\\) be the realizations of labor supply for agent \\(n\\) at time \\(t\\). Labor supply in this model obeys: \\[H_{n,t}^{1/\\psi} = (\\alpha_{n}W_{n,t})C^{-\\sigma}_{n,t}.\\] To simplify below, assume that \\(\\beta=(1+r)^{-1}\\), so that the optimal solution features perfectly smoothed consumption, \\(C^*_{n}\\). Making appropriate substitutions gives \\(C^*_{n}\\) as the solution to: \\[ \\left(\\sum_{t}q_{t}\\right)C^*_{n} = \\sum_{t}\\left(q_{t}W_{n,t}^{1+\\psi}\\right)\\alpha_{n}^{\\psi}(C_{n}^*)^{-\\psi\\sigma} + A_{n,0}.\\]",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>A Simple Labor Supply Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/dynamic-labor-supply.html#code-to-solve-the-model",
+    "href": "models/dynamic-labor-supply.html#code-to-solve-the-model",
+    "title": "5  A Simple Labor Supply Model",
+    "section": "5.2 Code to solve the model",
+    "text": "5.2 Code to solve the model\nThere is only one object to solve here which is consumption given a sequence of net wages. If one were to assume also constant wages the function below solves optimal consumption.\n\nusing Optim\nfunction solve_consumption(r,α,W,A,σ,ψ)\n    Q = 1/ (1 - 1/(1+r))\n    f(c) = (Q * c - Q * W^(1 + ψ) * α^ψ * c^(-σ*ψ) - A)^2\n    r = Optim.optimize(f,0.,A+W)\n    return r.minimizer\nend\n\nsolve_consumption (generic function with 1 method)",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>A Simple Labor Supply Model</span>"
+    ]
+  },
+  {
+    "objectID": "models/dynamic-labor-supply.html#code-to-simulate-a-cross-section",
+    "href": "models/dynamic-labor-supply.html#code-to-simulate-a-cross-section",
+    "title": "5  A Simple Labor Supply Model",
+    "section": "5.3 Code to simulate a cross-section",
+    "text": "5.3 Code to simulate a cross-section\nHere we’ll assume that wages, tastes for work, and assets co-vary systematically. For simplicity we’ll use a multivariate log-normal distribution.\nBelow is code to simulate a cross-section of 1,000 observations.\n\nusing Distributions\nfunction simulate_data(σ,ψ,r,N)\n    ch = [0.3 0. 0.; 0.5 0.5 0.; 0.4 0.8 1.8]\n    Σ = ch * ch'\n    X = rand(MvNormal(Σ),N)\n    α = exp.(X[1,:])\n    W = exp.(X[2,:])\n    A = exp.(X[3,:])\n    C = [solve_consumption(r,α[i],W[i],A[i],σ,ψ) for i in eachindex(A)]\n    @views H = exp.( X[1,:] .+ ψ .* X[2,:] .- ψ * σ .* log.(C) )\n    return (;α,W,A,C,H)\nend\n\n# assume risk-aversion of 2 and frisch of 0.5\nσ = 2.\nψ = 0.5\nr = 0.05\n\ndat = simulate_data(σ,ψ,r,1_000)\n\n(α = [0.769370088431213, 0.7499777818161549, 0.811386004305868, 1.1622431833990308, 1.0012071260616142, 1.1409164018667208, 1.3769511941867982, 0.717602772423061, 1.3732877362878777, 0.7803572285609538  …  0.7030708399923061, 1.2937034687527997, 0.5195949782411872, 1.2742745896340497, 0.5825420892867847, 0.9570299294535854, 0.6844193656466966, 2.7114819665691656, 0.8688857051183492, 0.9112801446965436], W = [0.9863889958240541, 0.9508340602249311, 0.8220377378612731, 0.5766876981938149, 0.39493181183618103, 0.8404802163831009, 1.483506668505422, 0.6681192896000416, 1.4991137791120714, 0.9494222761994702  …  0.4807499974212963, 1.8750322893808449, 0.3856380920013705, 1.7638170400058442, 0.62840231931759, 0.8954940450593154, 0.35262852843483616, 10.081821156591293, 0.8101311731009287, 0.5518890940796154], A = [1.3586927998642822, 3.002361692708459, 0.1384327608604815, 2.6863642912565426, 0.007269074166886639, 0.23304005488651464, 1.933244505603474, 1.9250017182489847, 0.22892058637895366, 3.5032547230760516  …  2.142610565438305, 0.13993025205282728, 2.6912547234330657, 0.818253844433415, 2.947450193111652, 0.4027269310651917, 0.017427539664430326, 1.8906867232817686, 1.403282301217454, 0.08255970301694122], C = [0.9598933288278524, 0.9703990124126052, 0.8226644101541711, 0.7540471176076254, 0.40220087482940764, 0.9127781490261204, 1.5028756250590818, 0.72753659210226, 1.4720763283266152, 0.9912497319273893  …  0.5821457260447573, 1.712229408452387, 0.4844706394574557, 1.6457313421852249, 0.6907674701155745, 0.920135987448973, 0.37005605758789817, 7.305478582582987, 0.8585246550436398, 0.6275761359739139], H = [0.7960428276911367, 0.7536165318523924, 0.8942329750989965, 1.1704931249312667, 1.5643790091532688, 1.1459148203417668, 1.1159384914384078, 0.8062250201824133, 1.1422167133729932, 0.767078982389741  …  0.8373885490816979, 1.0346111776181635, 0.6660202675555028, 1.0283260785306179, 0.6685198719032288, 0.9842487097742938, 1.098281059643355, 1.1784944540277213, 0.9109353430653804, 1.0787266122824544])",
+    "crumbs": [
+      "Five Prototype Models",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>A Simple Labor Supply Model</span>"
+    ]
+  },
+  {
+    "objectID": "summary.html",
+    "href": "summary.html",
+    "title": "7  Summary",
+    "section": "",
+    "text": "In summary, this book has no content whatsoever.",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Summary</span>"
+    ]
+  },
+  {
+    "objectID": "references.html",
+    "href": "references.html",
+    "title": "References",
+    "section": "",
+    "text": "Heckman, James J, and Bo E Honore. 1990. “The Empirical Content of\nthe Roy Model.” Econometrica: Journal of the Econometric\nSociety, 1121–49.\n\n\nHeckman, James, and Edward Vytlacil. 2005. “Structural equations, treatment effects, and econometric\npolicy evaluation.” Econometrica 73 (3): 669–738.\n\n\nRoy, A. D. 1951. “Some Thoughts on the Distribution of\nEarnings.” Oxford Economic Papers 3 (2): 135–46. http://www.jstor.org/stable/2662082.",
+    "crumbs": [
+      "References"
+    ]
+  },
+  {
+    "objectID": "data.html",
+    "href": "data.html",
+    "title": "Appendix A — Data",
+    "section": "",
+    "text": "A.1 A Disclaimer for IPUMS CPS data\nFor the practical applications in this course we will use three datasets:\nThese data are included in the course git repo, and you should be able to run all of the example code in this class using the relative file paths in the git repo if you clone it. Alternatively you can download these datasets and save them wherever you wish, but you will need to edit file paths accordingly.\nThese data are a subsample of the IPUMS CPS data available from cps.ipums.org. Any use of these data should be cited as follows:\nSarah Flood, Miriam King, Renae Rodgers, Steven Ruggles, J. Robert Warren, Daniel Backman, Annie Chen, Grace Cooper, Stephanie Richards, Megan Schouweiler, and Michael Westberry. IPUMS CPS: Version 11.0 [dataset]. Minneapolis, MN: IPUMS, 2023. https://doi.org/10.18128/D030.V11.0\nThe CPS data file is intended only for exercises as part of ECON8208. Individuals are not to redistribute the data without permission. Contact ipums@umn.edu for redistribution requests. For all other uses of these data, please access data directly via cps.ipums.org.",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Data</span>"
+    ]
+  },
+  {
+    "objectID": "data.html#a-disclaimer-for-ipums-cps-data",
+    "href": "data.html#a-disclaimer-for-ipums-cps-data",
+    "title": "Appendix A — Data",
+    "section": "",
+    "text": "Arellano, Manuel, Richard Blundell, and Stephane Bonhomme. 2018. “Nonlinear Persistence and Partial Insurance: Income and Consumption Dynamics in the PSID.” AEA Papers and Proceedings 108 (May): 281–86. https://doi.org/10.1257/pandp.20181049.\n\n\nDearing, Adam, and Jason R. Blevins. 2024. “Efficient and Convergent Sequential Pseudo-Likelihood Estimation of Dynamic Discrete Games.” Review of Economic Studies.",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Data</span>"
+    ]
+  },
+  {
+    "objectID": "autodiff.html",
+    "href": "autodiff.html",
+    "title": "Appendix B — Automatic Differentiation",
+    "section": "",
+    "text": "B.1 Why AD Matters for Structural Estimation\nAutomatic differentiation (AD) is a technique for computing exact derivatives of functions specified by computer programs. Unlike symbolic differentiation (which manipulates mathematical expressions) or numerical differentiation (which uses finite differences), AD exploits the fact that every program, no matter how complex, executes a sequence of elementary operations. By applying the chain rule systematically to these operations, AD computes derivatives to machine precision.\nIn structural econometrics, we frequently need gradients for:\nHand-coding derivatives is tedious and error-prone. Finite differences are slow (requiring \\(O(n)\\) function evaluations for an \\(n\\)-dimensional gradient) and can be numerically unstable. AD provides exact gradients efficiently.",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Automatic Differentiation</span>"
+    ]
+  },
+  {
+    "objectID": "autodiff.html#why-ad-matters-for-structural-estimation",
+    "href": "autodiff.html#why-ad-matters-for-structural-estimation",
+    "title": "Appendix B — Automatic Differentiation",
+    "section": "",
+    "text": "Optimization (MLE, GMM, minimum distance)\n\nGradient-free methods such as Nelder-Mead are popular, of course, but are less efficient\n\nComputing standard errors\nSolving models with equilibrium conditions (using Newton’s method, for example)",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Automatic Differentiation</span>"
+    ]
+  },
+  {
+    "objectID": "autodiff.html#forward-mode-vs-reverse-mode",
+    "href": "autodiff.html#forward-mode-vs-reverse-mode",
+    "title": "Appendix B — Automatic Differentiation",
+    "section": "B.2 Forward Mode vs Reverse Mode",
+    "text": "B.2 Forward Mode vs Reverse Mode\nAD comes in two flavors:\nForward mode propagates derivatives forward through the computation. For a function \\(f: \\mathbb{R}^n \\to \\mathbb{R}^m\\), computing the full Jacobian requires \\(n\\) forward passes. This is efficient when \\(n \\ll m\\).\nReverse mode propagates derivatives backward (like backpropagation in neural networks). Computing the full Jacobian requires \\(m\\) reverse passes. This is efficient when \\(m \\ll n\\).\nFor most estimation problems, we have a scalar objective (\\(m = 1\\)) and many parameters (\\(n\\) large), so reverse mode is typically preferred. In my experience however, I have had more success writing code to",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Automatic Differentiation</span>"
+    ]
+  },
+  {
+    "objectID": "autodiff.html#ad-in-julia",
+    "href": "autodiff.html#ad-in-julia",
+    "title": "Appendix B — Automatic Differentiation",
+    "section": "B.3 AD in Julia",
+    "text": "B.3 AD in Julia\nJulia’s AD ecosystem is excellent. The main packages are:\n\nB.3.1 ForwardDiff.jl\nForward-mode AD. Simple and robust, works out-of-the-box for most pure Julia code.\n\nusing ForwardDiff\n\nf(x) = sum(x.^2)\nx = [1.0, 2.0, 3.0]\n\n# Gradient\nForwardDiff.gradient(f, x)\n\n3-element Vector{Float64}:\n 2.0\n 4.0\n 6.0\n\n\n\n# Hessian\nForwardDiff.hessian(f, x)\n\n3×3 Matrix{Float64}:\n 2.0  0.0  0.0\n 0.0  2.0  0.0\n 0.0  0.0  2.0\n\n\n\n\nB.3.2 Enzyme.jl\nA high-performance AD engine that works at the LLVM level. Supports both forward and reverse mode. Often the fastest option, especially for code with loops and mutations.\n\nusing Enzyme\n\nf(x) = x[1]^2 + sin(x[2])\n\nx = [1.0, 2.0]\ndx = zeros(2)\n\n# Reverse mode gradient\nEnzyme.autodiff(Reverse, f, Active, Duplicated(x, dx))\ndx\n\n2-element Vector{Float64}:\n  2.0\n -0.4161468365471424\n\n\n\n\nB.3.3 Zygote.jl\nA source-to-source reverse-mode AD system. Popular in machine learning (used by Flux.jl). Works well for array-heavy code but may struggle with control flow.\n\nusing Zygote\n\nf(x) = sum(x.^2)\nx = [1.0, 2.0, 3.0]\n\nZygote.gradient(f, x)\n\n([2.0, 4.0, 6.0],)",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Automatic Differentiation</span>"
+    ]
+  },
+  {
+    "objectID": "autodiff.html#practical-recommendations",
+    "href": "autodiff.html#practical-recommendations",
+    "title": "Appendix B — Automatic Differentiation",
+    "section": "B.4 Practical Recommendations",
+    "text": "B.4 Practical Recommendations\n\nStart with ForwardDiff for problems with few parameters (&lt; 100). It’s the most reliable.\nUse Enzyme for performance-critical code, especially if you have loops or in-place mutations.\nBe aware of limitations: AD systems can fail on code that uses certain constructs (try-catch, foreign function calls, some global variables). When in doubt, test that your gradients match finite differences:\n\n\nusing ForwardDiff, FiniteDiff\n\nf(x) = log(1 + exp(x[1] * x[2])) + x[3]^2\nx = [1.0, 2.0, 3.0]\n\nad_grad = ForwardDiff.gradient(f, x)\nfd_grad = FiniteDiff.finite_difference_gradient(f, x)\n\nmaximum(abs.(ad_grad .- fd_grad))\n\n5.3512749786932545e-12",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Automatic Differentiation</span>"
+    ]
+  },
+  {
+    "objectID": "autodiff.html#integration-with-optimization",
+    "href": "autodiff.html#integration-with-optimization",
+    "title": "Appendix B — Automatic Differentiation",
+    "section": "B.5 Integration with Optimization",
+    "text": "B.5 Integration with Optimization\nMost Julia optimization packages accept AD gradients. Here’s an example with Optim.jl:\n\nusing Optim, ForwardDiff\n\nrosenbrock(x) = (1 - x[1])^2 + 100*(x[2] - x[1]^2)^2\nx0 = [0.0, 0.0]\n\n# With automatic gradients via ForwardDiff\nresult = optimize(rosenbrock, x0, LBFGS(); autodiff = :forward)\nresult.minimizer\n\n2-element Vector{Float64}:\n 0.999999999999928\n 0.9999999999998559",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Automatic Differentiation</span>"
+    ]
+  },
+  {
+    "objectID": "autodiff.html#further-reading",
+    "href": "autodiff.html#further-reading",
+    "title": "Appendix B — Automatic Differentiation",
+    "section": "B.7 Further Reading",
+    "text": "B.7 Further Reading\n\nJuliaDiff documentation\nForwardDiff.jl docs\nEnzyme.jl docs",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Automatic Differentiation</span>"
+    ]
+  },
+  {
+    "objectID": "autodiff.html#example-maximum-likelihood-with-optim.jl",
+    "href": "autodiff.html#example-maximum-likelihood-with-optim.jl",
+    "title": "Appendix B — Automatic Differentiation",
+    "section": "B.6 Example: Maximum Likelihood with Optim.jl",
+    "text": "B.6 Example: Maximum Likelihood with Optim.jl\nConsider a simple probit model:\n\\[ D = \\mathbf{1}\\{X\\beta - \\nu \\geq 0\\},\\qquad \\nu \\sim \\mathcal{N}(0,\\sigma^2) \\]\nHere is code to simulate data for this model:\n\nusing Random, Distributions\n\nfunction sim_data(X ; γ)\n    N = size(X,1)\n    ν = rand(Normal(),N)\n    D = (X * γ .- ν) .&gt; 0\n    return D\nend\n\n# a quick test of the function:\nN = 1000\nX = [ones(N) 2*rand(Normal(),N)]\nγ = [0.1, 0.5]\nφ = 1.\nα = 0.6\nσ_ϵ = 0.5\n\nD = sim_data(X ; γ)\n\n1000-element BitVector:\n 0\n 1\n 0\n 1\n 0\n 1\n 1\n 1\n 0\n 1\n 0\n 1\n 1\n ⋮\n 1\n 1\n 1\n 1\n 0\n 0\n 0\n 1\n 1\n 0\n 0\n 0\n\n\nConsider the problem of estimating \\(\\gamma\\) using maximum likelihood. We will establish the properties of this estimator in class. Here let’s just focus on numerically how to attack the minimization problem. The log-likelihood of the data D given X is:\n\\[ \\mathcal{L}(\\gamma) = \\sum_{n}l(D_{n}; X_{n},\\gamma) = \\sum_{n=1}^{N}D_{n}\\log(\\Phi(X\\gamma)) + (1-D_{n})\\log(1-\\Phi(X\\gamma)) \\]\nLet’s write up this likelihood function.\n\nfunction log_likelihood(D,X,γ)\n    ll = 0.\n    for n in eachindex(D)\n        xg = X[n,1] * γ[1] + X[n,2] * γ[2] \n        if D[n]\n            ll += log(cdf(Normal(),xg))\n        else\n            ll += log(1-cdf(Normal(),xg))\n        end\n    end\n    return ll\nend\nlog_likelihood(D,X,[0.,0.])\n\n-693.1471805599322\n\n\n\nB.6.1 Numerical Optimization\nOptimization is most efficient when we have access to the first and second order derivatives of the function. There is a general class of hill-climbing (or descent in the case of minimization) algorithms that find new guesses \\(\\gamma_{k+1}\\) given \\(\\gamma_{k}\\) as:\n\\[ \\gamma_{k+1} = \\gamma_{k} + \\lambda_{k}A_{k}\\frac{\\partial Q}{\\partial \\gamma} \\]\nwhere \\(Q\\) is the function being maximized (or minimized). \\(A_{k}\\) defines a direction in which to search (providing weights on the derivatives) and \\(\\lambda_{k}\\) is a scalar variable known as a step-size which is often calculated optimally in each iteration \\(k\\). For Newton’s method, the matrix \\(A_{k}\\) is the inverse of the Hessian of the objective function \\(Q\\). Since the hessian can sometimes be expensive to calculate, other methods use approximations to the Hessian that are cheaper to compute.\nSince we have a simple model, we can calculate derivatives relatively easily. Below we’ll compare a hard-coded derivative to this automatic differentiation.\n\nusing ForwardDiff\n\nfunction deriv_ll(D,X,γ)\n    dll = zeros(2)\n    for n in eachindex(D)\n        xg = X[n,1] * γ[1] + X[n,2] * γ[2] \n        if D[n]\n            dl = pdf(Normal(),xg) / cdf(Normal(),xg)\n        else\n            dl = - pdf(Normal(),xg) / (1 - cdf(Normal(),xg))\n        end\n        dll[1] += X[n,1] * dl\n        dll[2] += X[n,2] * dl            \n    end\n    return dll\nend\ndx = zeros(2)\nauto_deriv_ll(D,X,γ) = ForwardDiff.gradient(x-&gt;log_likelihood(D,X,x),γ)\nauto_deriv2_ll(D,X,γ,dx) = Enzyme.autodiff(Reverse, x-&gt;log_likelihood(D,X,x), Active, Duplicated(γ, dx))\n\nd1 = deriv_ll(D,X,γ)\nd2 = auto_deriv_ll(D,X,γ)\nauto_deriv2_ll(D,X,γ,dx)\n[d1 d2 dx]\n\n2×3 Matrix{Float64}:\n  15.8028   15.8028   15.8028\n -52.027   -52.027   -52.027\n\n\nOk so we’re confident that these functions work as intended, but how do they compare in performance?\n\n@time deriv_ll(D,X,γ);\n@time auto_deriv_ll(D,X,γ);\n@time auto_deriv2_ll(D,X,γ,dx);\n\n  0.000020 seconds (2 allocations: 80 bytes)\n  0.000041 seconds (7 allocations: 304 bytes)\n  0.000038 seconds\n\n\nBoth are quite quick but you can see that we’re not losing much with automatic differentiation. In my experience, the gap between the two methods can narrow for more complicated functions.\nSo now let’s try implementing the maximum likelihood estimator using two different gradient-based algorithms: Newton’s Method (which uses the Hessian), and the Broyden–Fletcher–Goldfarb–Shannon (BFGS) algorithm (which updates search direction using changes in the first derivative).\nWhile Newton’s method requires calculation of the Hessian (second derivatives), BFGS and related methods only require first derivatives. Typically, this makes each iteration quicker but will take more time to converge. Let’s test them.\n\nusing Optim\nmin_objective(x) = -log_likelihood(D,X,x) #&lt;- Optim assumes that we will minimize a function, hence the negative\nγ_guess = zeros(2)\nprintln(\" ---- Using Newton's Method ------ \")\nres1 = optimize(min_objective,γ_guess,Newton(),autodiff=:forward,Optim.Options(show_trace=true))\nprintln(\" ---- Using BFGS ------ \")\nres2 = optimize(min_objective,γ_guess,BFGS(),autodiff=:forward,Optim.Options(show_trace=true))\n[res1.minimizer res2.minimizer γ]\n\n ---- Using Newton's Method ------ \nIter     Function value   Gradient norm \n     0     6.931472e+02     8.342612e+02\n * time: 0.027292966842651367\n     1     5.324086e+02     1.268371e+02\n * time: 0.40681004524230957\n     2     5.241423e+02     2.326245e+00\n * time: 0.4070549011230469\n     3     5.241399e+02     1.266718e-04\n * time: 0.4072380065917969\n     4     5.241399e+02     9.329537e-12\n * time: 0.4074268341064453\n ---- Using BFGS ------ \nIter     Function value   Gradient norm \n     0     6.931472e+02     8.342612e+02\n * time: 5.91278076171875e-5\n     1     5.381739e+02     1.540781e+02\n * time: 0.007317066192626953\n     2     5.353726e+02     1.476490e+02\n * time: 0.0075151920318603516\n     3     5.242726e+02     1.745354e+01\n * time: 0.00769805908203125\n     4     5.241399e+02     4.754447e-02\n * time: 0.007882118225097656\n     5     5.241399e+02     1.661182e-03\n * time: 0.008045196533203125\n     6     5.241399e+02     2.028995e-08\n * time: 0.008236169815063477\n     7     5.241399e+02     2.853273e-14\n * time: 0.00841212272644043\n\n\n2×3 Matrix{Float64}:\n 0.126477  0.126477  0.1\n 0.455491  0.455491  0.5",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Automatic Differentiation</span>"
+    ]
+  },
+  {
+    "objectID": "performance.html",
+    "href": "performance.html",
+    "title": "Appendix C — Performance Tips",
+    "section": "",
+    "text": "C.1 The Golden Rules\nJulia can be extremely fast, but achieving good performance requires understanding a few key principles. This appendix provides a brief summary; see the official Performance Tips for comprehensive guidance.",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>C</span>  <span class='chapter-title'>Performance Tips</span>"
+    ]
+  },
+  {
+    "objectID": "performance.html#the-golden-rules",
+    "href": "performance.html#the-golden-rules",
+    "title": "Appendix C — Performance Tips",
+    "section": "",
+    "text": "C.1.1 1. Avoid Global Variables\nGlobal variables with non-constant types force the compiler to generate slow, generic code.\n# Bad\ndata = [1.0, 2.0, 3.0]\nf() = sum(data)  # `data` could change type\n\n# Good: use const\nconst DATA = [1.0, 2.0, 3.0]\nf() = sum(DATA)\n\n# Good: pass as argument\nf(data) = sum(data)\n\n\nC.1.2 2. Write Type-Stable Functions\nA function is type-stable if the output type can be inferred from the input types. Type instability forces runtime dispatch.\n# Bad: returns Int or Float64 depending on value\nfunction unstable(x)\n    if x &gt; 0\n        return 1\n    else\n        return 0.0\n    end\nend\n\n# Good: consistent return type\nfunction stable(x)\n    if x &gt; 0\n        return 1.0\n    else\n        return 0.0\n    end\nend\nUse @code_warntype to check for type instabilities (look for red Any or Union types).\n\n\nC.1.3 3. Pre-allocate Arrays\nAvoid creating arrays inside loops. Pre-allocate and use in-place operations.\n# Bad: allocates on every iteration\nfunction bad_example(n)\n    result = 0.0\n    for i in 1:n\n        v = zeros(100)  # allocation!\n        v .= rand(100)\n        result += sum(v)\n    end\n    result\nend\n\n# Good: pre-allocate\nfunction good_example(n)\n    result = 0.0\n    v = zeros(100)\n    for i in 1:n\n        rand!(v)  # in-place\n        result += sum(v)\n    end\n    result\nend\n\n\nC.1.4 4. Use @views for Array Slices\nArray slices create copies by default. Use @views or view() to avoid allocation.\nA = rand(1000, 1000)\n\n# Bad: creates a copy\nf(A[1:100, :])\n\n# Good: creates a view\nf(@views A[1:100, :])",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>C</span>  <span class='chapter-title'>Performance Tips</span>"
+    ]
+  },
+  {
+    "objectID": "performance.html#quick-profiling",
+    "href": "performance.html#quick-profiling",
+    "title": "Appendix C — Performance Tips",
+    "section": "C.2 Quick Profiling",
+    "text": "C.2 Quick Profiling\nUse @time for basic timing (run twice—first call includes compilation):\n@time my_function(args)  # compile\n@time my_function(args)  # actual timing\nFor more detailed analysis: - BenchmarkTools.jl: Accurate microbenchmarks with @btime - Profile (stdlib): Sampling profiler - ProfileView.jl: Flame graph visualization",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>C</span>  <span class='chapter-title'>Performance Tips</span>"
+    ]
+  },
+  {
+    "objectID": "performance.html#further-resources",
+    "href": "performance.html#further-resources",
+    "title": "Appendix C — Performance Tips",
+    "section": "C.3 Further Resources",
+    "text": "C.3 Further Resources\n\nJulia Performance Tips — the official guide, essential reading\nJulia Academy performance course — free video tutorials\nBenchmarkTools.jl documentation",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>C</span>  <span class='chapter-title'>Performance Tips</span>"
+    ]
+  }
+]

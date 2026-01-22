@@ -1,0 +1,142 @@
+# Job Search Model
+
+## Overview
+
+This section presents a simple model of undirected job search. The model demonstrates how workers optimally choose which job offers to accept based on a reservation wage strategy. 
+
+
+## Economic Environment
+
+Time is discrete and indexed by $t$ over an infinite horizon. Workers move between employment and unemployment, have linear utility, and cannot save.
+
+### Parameters
+
+| Parameter | Description | 
+| --------- | ------------|
+| $\lambda$ | The probability an unemployed worker receives a job offer | 
+| $\delta$  | The probability an employed worker loses their job | 
+| $F_{W}$   | The distribution of wage offers | 
+| $1-\beta$   | The exponential rate of discounting | 
+| $b$       | Per-period utility when unemployed | 
+
+## Recursive Formulation
+
+The classic approach to solve this model is to write the values of unemployment and employment recursively. For example:
+
+$$ U = b + \beta[(1-\lambda)U + \lambda\int\max\{V(w),U\}dF_{W}(w)] $$
+$$ V(w) = w + \beta[(1-\delta)V(w) + \delta U] $$
+
+## Model solution
+
+One can show that the optimal decision rule of the worker is characterized by a reservation wage $w^*$, defined as $V(w^*)=U$. We can also differentiate the expression for $V(w)$ to get:
+
+$$ V'(w) = \frac{1}{1 - \beta(1-\delta)} $$
+
+and applying integration by parts gives:
+
+$$ U = b + \beta[U + \lambda\int_{w^*}\frac{1-F_{W}(w)}{1-\beta(1-\delta)}dw] $$
+
+Now applying the definition of the reservation wage gives the reservation wage equation:
+
+$$ w^* = b + \beta\lambda\int_{w^*}\frac{1-F_{W}(w)}{1 - \beta(1-\delta)}dw $$
+
+and we can characterize the steady state rate of unemployment as:
+
+$$ P[E = 0] = \frac{h}{h+\delta} $$
+
+where $h = \lambda(1-F_{W}(w^*))$ is the rate at which workers exit unemployment. 
+
+Similarly, we can show that the steady state fraction of unemployment durations $t_{U}$ is
+
+$$ P[t_{U}=t] = h(1-h)^{t} $$
+
+## Numerical Model Solution
+
+To solve the reservation wage equation numerically, we need to evaluate the integral on the right-hand side and find the value of $w^*$ that satisfies the equation. This requires two key numerical methods: quadrature (for integration) and root-finding.
+
+### Gauss-Legendre Quadrature
+
+When integrating numerically, we approximate the integral using a weighted sum at specific evaluation points (nodes):
+
+$$ \int_a^b f(x)dx \approx \frac{b-a}{2}\sum_{k=1}^n w_k f\left(\frac{a+b}{2} + \frac{b-a}{2}x_k\right) $$
+
+where $x_k$ are the nodes and $w_k$ are the weights from Gauss-Legendre quadrature. This method is particularly accurate for smooth functions and uses a fixed number of nodes, which is important for [automatic differentiation](/autodiff.qmd) (unlike adaptive methods like in the package `QuadGK` that adjust the number of nodes based on the integrand).
+
+Let's implement a simple Gauss-Legendre integration routine:
+
+```{julia}
+using FastGaussQuadrature, Distributions, Roots
+
+# Fixed-node quadrature for integration (compatible with automatic differentiation)
+function integrateGL(f, a, b; num_nodes = 10)
+    nodes, weights = gausslegendre(num_nodes)
+    ∫f = 0.
+    for k in eachindex(nodes)
+        x = (a + b)/2 + (b - a)/2 * nodes[k]
+        ∫f += weights[k] * f(x)
+    end
+    return (b - a)/2 * ∫f
+end
+
+# Evaluate the derivative of the surplus function
+dS(x; F, β, δ) = (1 - cdf(F, x)) / (1 - β*(1 - δ))
+
+# Reservation wage equation (should equal zero at the solution)
+function res_wage(wres, b, λ, δ, β, F::Distribution)
+    ub = quantile(F, 0.9999)  # Upper bound of integration
+    integral = integrateGL(x -> dS(x; F, β, δ), wres, ub)
+    return wres - b - β * λ * integral
+end
+
+pars = (;b = -5., λ = 0.45, δ = 0.03, β = 0.99, F = LogNormal(1, 1))
+res_wage(1., pars.b, pars.λ, pars.δ, pars.β, pars.F)
+```
+
+### Root Finding
+
+The reservation wage $w^*$ is the value that makes the reservation wage equation equal to zero. We use the `Roots.jl` package, which implements efficient root-finding algorithms based on combinations of bisection, secant, and inverse quadratic interpolation methods.
+
+The `find_zero` function takes:
+
+- A function to find the root of
+- An initial guess
+- The type of the initial guess (to ensure type stability)
+
+```{julia}
+function solve_res_wage(b, λ, δ, β, F)
+    return find_zero(
+        x -> res_wage(x, b, λ, δ, β, F),
+        eltype(b)(4.)  # Initial guess of $4/hour
+    )
+end
+
+rwage = solve_res_wage(pars.b, pars.λ, pars.δ, pars.β, pars.F)
+println("Reservation wage: ", round(rwage, digits=2))
+```
+
+This approach has the advantage of being compatible with [automatic differentiation](/autodiff.qmd) tools like `ForwardDiff`, which is a very useful tool in numerical methods.
+
+### Steady-State Statistics
+
+Using the computed reservation wage, we can calculate the steady-state unemployment rate and average duration:
+
+```{julia}
+# Compute steady-state statistics
+h = pars.λ * (1 - cdf(pars.F, rwage))  # Exit rate from unemployment
+u_rate = pars.δ / (pars.δ + h)          # Unemployment rate
+avg_duration = 1 / h                     # Average duration
+
+println("Exit rate (h): ", round(h, digits=3))
+println("Unemployment rate: ", round(u_rate * 100, digits=1), "%")
+println("Average duration: ", round(avg_duration, digits=1), " periods")
+```
+
+---
+
+## Further Reading
+
+- **McCall (1970)**: "Economics of Information and Job Search" - Original search model
+- **Wolpin (1987)**: "Estimating a Structural Search Model" - Early structural estimation
+- **Eckstein and van den Berg (2007)**: "Empirical Labor Search" - Survey of search models
+- **Flinn and Heckman (1982)**: "New Methods for Analyzing Structural Models of Labor Force Dynamics" - Duration data analysis
+

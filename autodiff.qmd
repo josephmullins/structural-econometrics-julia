@@ -1,0 +1,235 @@
+# Automatic Differentiation
+
+Automatic differentiation (AD) is a technique for computing exact derivatives of functions specified by computer programs. Unlike symbolic differentiation (which manipulates mathematical expressions) or numerical differentiation (which uses finite differences), AD exploits the fact that every program, no matter how complex, executes a sequence of elementary operations. By applying the chain rule systematically to these operations, AD computes derivatives to machine precision.
+
+## Why AD Matters for Structural Estimation
+
+In structural econometrics, we frequently need gradients for:
+
+- Optimization (MLE, GMM, minimum distance)
+    - Gradient-free methods such as Nelder-Mead are popular, of course, but are less efficient
+- Computing standard errors
+- Solving models with equilibrium conditions (using Newton's method, for example)
+
+Hand-coding derivatives is tedious and error-prone. Finite differences are slow (requiring $O(n)$ function evaluations for an $n$-dimensional gradient) and can be numerically unstable. AD provides exact gradients efficiently.
+
+## Forward Mode vs Reverse Mode
+
+AD comes in two flavors:
+
+**Forward mode** propagates derivatives forward through the computation. For a function $f: \mathbb{R}^n \to \mathbb{R}^m$, computing the full Jacobian requires $n$ forward passes. This is efficient when $n \ll m$.
+
+**Reverse mode** propagates derivatives backward (like backpropagation in neural networks). Computing the full Jacobian requires $m$ reverse passes. This is efficient when $m \ll n$.
+
+For most estimation problems, we have a scalar objective ($m = 1$) and many parameters ($n$ large), so reverse mode is typically preferred. *In my experience however*, I have had more success writing code to 
+
+## AD in Julia
+
+Julia's AD ecosystem is excellent. The main packages are:
+
+### ForwardDiff.jl
+
+Forward-mode AD. Simple and robust, works out-of-the-box for most pure Julia code.
+
+```{julia}
+using ForwardDiff
+
+f(x) = sum(x.^2)
+x = [1.0, 2.0, 3.0]
+
+# Gradient
+ForwardDiff.gradient(f, x)
+```
+
+```{julia}
+# Hessian
+ForwardDiff.hessian(f, x)
+```
+
+### Enzyme.jl
+
+A high-performance AD engine that works at the LLVM level. Supports both forward and reverse mode. Often the fastest option, especially for code with loops and mutations.
+
+```{julia}
+using Enzyme
+
+f(x) = x[1]^2 + sin(x[2])
+
+x = [1.0, 2.0]
+dx = zeros(2)
+
+# Reverse mode gradient
+Enzyme.autodiff(Reverse, f, Active, Duplicated(x, dx))
+dx
+```
+
+### Zygote.jl
+
+A source-to-source reverse-mode AD system. Popular in machine learning (used by Flux.jl). Works well for array-heavy code but may struggle with control flow.
+
+```{julia}
+using Zygote
+
+f(x) = sum(x.^2)
+x = [1.0, 2.0, 3.0]
+
+Zygote.gradient(f, x)
+```
+
+## Practical Recommendations
+
+1. **Start with ForwardDiff** for problems with few parameters (< 100). It's the most reliable.
+
+2. **Use Enzyme for performance-critical code**, especially if you have loops or in-place mutations.
+
+3. **Be aware of limitations**: AD systems can fail on code that uses certain constructs (try-catch, foreign function calls, some global variables). When in doubt, test that your gradients match finite differences:
+
+```{julia}
+using ForwardDiff, FiniteDiff
+
+f(x) = log(1 + exp(x[1] * x[2])) + x[3]^2
+x = [1.0, 2.0, 3.0]
+
+ad_grad = ForwardDiff.gradient(f, x)
+fd_grad = FiniteDiff.finite_difference_gradient(f, x)
+
+maximum(abs.(ad_grad .- fd_grad))
+```
+
+## Integration with Optimization
+
+Most Julia optimization packages accept AD gradients. Here's an example with `Optim.jl`:
+
+```{julia}
+using Optim, ForwardDiff
+
+rosenbrock(x) = (1 - x[1])^2 + 100*(x[2] - x[1]^2)^2
+x0 = [0.0, 0.0]
+
+# With automatic gradients via ForwardDiff
+result = optimize(rosenbrock, x0, LBFGS(); autodiff = :forward)
+result.minimizer
+```
+
+## Example: Maximum Likelihood with `Optim.jl`
+
+Consider a simple probit model:
+
+$$ D = \mathbf{1}\{X\beta - \nu \geq 0\},\qquad \nu \sim \mathcal{N}(0,\sigma^2) $$
+
+Here is code to simulate data for this model:
+
+```{julia}
+using Random, Distributions
+
+function sim_data(X ; γ)
+    N = size(X,1)
+    ν = rand(Normal(),N)
+    D = (X * γ .- ν) .> 0
+    return D
+end
+
+# a quick test of the function:
+N = 1000
+X = [ones(N) 2*rand(Normal(),N)]
+γ = [0.1, 0.5]
+φ = 1.
+α = 0.6
+σ_ϵ = 0.5
+
+D = sim_data(X ; γ)
+
+```
+
+Consider the problem of estimating $\gamma$ using maximum likelihood. We will establish the properties of this estimator in class. Here let's just focus on numerically how to attack the minimization problem. The log-likelihood of the data `D` given `X` is:
+
+$$ \mathcal{L}(\gamma) = \sum_{n}l(D_{n}; X_{n},\gamma) = \sum_{n=1}^{N}D_{n}\log(\Phi(X\gamma)) + (1-D_{n})\log(1-\Phi(X\gamma)) $$
+
+Let's write up this likelihood function.
+
+```{julia}
+
+function log_likelihood(D,X,γ)
+    ll = 0.
+    for n in eachindex(D)
+        xg = X[n,1] * γ[1] + X[n,2] * γ[2] 
+        if D[n]
+            ll += log(cdf(Normal(),xg))
+        else
+            ll += log(1-cdf(Normal(),xg))
+        end
+    end
+    return ll
+end
+log_likelihood(D,X,[0.,0.])
+
+```
+
+### Numerical Optimization
+
+Optimization is most efficient when we have access to the first and second order derivatives of the function. There is a general class of hill-climbing (or descent in the case of minimization) algorithms that find new guesses $\gamma_{k+1}$ given $\gamma_{k}$ as:
+
+$$ \gamma_{k+1} = \gamma_{k} + \lambda_{k}A_{k}\frac{\partial Q}{\partial \gamma} $$
+
+where $Q$ is the function being maximized (or minimized). $A_{k}$ defines a direction in which to search (providing weights on the derivatives) and $\lambda_{k}$ is a scalar variable known as a step-size which is often calculated optimally in each iteration $k$. For Newton's method, the matrix $A_{k}$ is the inverse of the Hessian of the objective function $Q$. Since the hessian can sometimes be expensive to calculate, other methods use approximations to the Hessian that are cheaper to compute.
+
+Since we have a simple model, we can calculate derivatives relatively easily. Below we'll compare a hard-coded derivative to this automatic differentiation.
+
+```{julia}
+using ForwardDiff
+
+function deriv_ll(D,X,γ)
+    dll = zeros(2)
+    for n in eachindex(D)
+        xg = X[n,1] * γ[1] + X[n,2] * γ[2] 
+        if D[n]
+            dl = pdf(Normal(),xg) / cdf(Normal(),xg)
+        else
+            dl = - pdf(Normal(),xg) / (1 - cdf(Normal(),xg))
+        end
+        dll[1] += X[n,1] * dl
+        dll[2] += X[n,2] * dl            
+    end
+    return dll
+end
+dx = zeros(2)
+auto_deriv_ll(D,X,γ) = ForwardDiff.gradient(x->log_likelihood(D,X,x),γ)
+auto_deriv2_ll(D,X,γ,dx) = Enzyme.autodiff(Reverse, x->log_likelihood(D,X,x), Active, Duplicated(γ, dx))
+
+d1 = deriv_ll(D,X,γ)
+d2 = auto_deriv_ll(D,X,γ)
+auto_deriv2_ll(D,X,γ,dx)
+[d1 d2 dx]
+
+```
+
+Ok so we're confident that these functions work as intended, but how do they compare in performance?
+
+```{julia}
+@time deriv_ll(D,X,γ);
+@time auto_deriv_ll(D,X,γ);
+@time auto_deriv2_ll(D,X,γ,dx);
+```
+
+Both are quite quick but you can see that we're not losing much with automatic differentiation. In my experience, the gap between the two methods can narrow for more complicated functions.
+
+So now let's try implementing the maximum likelihood estimator using two different gradient-based algorithms: Newton's Method (which uses the Hessian), and the Broyden–Fletcher–Goldfarb–Shannon (BFGS) algorithm (which updates search direction using changes in the first derivative). 
+
+While Newton's method requires calculation of the Hessian (second derivatives), BFGS and related methods only require first derivatives. Typically, this makes each iteration quicker but will take more time to converge. Let's test them.
+
+```{julia}
+using Optim
+min_objective(x) = -log_likelihood(D,X,x) #<- Optim assumes that we will minimize a function, hence the negative
+γ_guess = zeros(2)
+println(" ---- Using Newton's Method ------ ")
+res1 = optimize(min_objective,γ_guess,Newton(),autodiff=:forward,Optim.Options(show_trace=true))
+println(" ---- Using BFGS ------ ")
+res2 = optimize(min_objective,γ_guess,BFGS(),autodiff=:forward,Optim.Options(show_trace=true))
+[res1.minimizer res2.minimizer γ]
+```
+
+## Further Reading
+
+- [JuliaDiff documentation](https://juliadiff.org/)
+- [ForwardDiff.jl docs](https://juliadiff.org/ForwardDiff.jl/stable/)
+- [Enzyme.jl docs](https://enzyme.mit.edu/julia/)
