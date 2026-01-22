@@ -132,7 +132,7 @@ end
 # a quick test of the function:
 N = 1000
 X = [ones(N) 2*rand(Normal(),N)]
-
+γ = [0.1, 0.5]
 D = sim_data(X ; γ);
 
 ```

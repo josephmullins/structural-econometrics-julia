@@ -14,15 +14,15 @@ Here are the basic ingredients of the model:
 - There are two firms indexed by $f\in\{0,1\}$
 - There are $M$ markets indexed by $m$
 - Time is discrete and indexed by $t$
-- Each firm makes an *entry decision* every period. We let $j\in\{0,1\}$ index this decision to enter or not. Let $j(f,m,t)$ indicate the choice of firm $f$ in market $m$ in period $t$.
-- We let $a_{f,m,t}=j(f,m,t-1)$ indicate whether firm $f$ is active in market $m$ in period $t$, which means they entered in the previous period.
+- Each firm makes an *entry decision* every period. We let $d\in\{0,1\}$ index this decision to enter or not. Let $d(f,m,t)$ indicate the choice of firm $f$ in market $m$ in period $t$.
+- We let $a_{f,m,t}=d(f,m,t-1)$ indicate whether firm $f$ is active in market $m$ in period $t$, which means they entered in the previous period.
 - Let $x_{m}$ be a market-level observable that shifts the profitability of operations in market $m$.
 - In addition to the observed states, each firm draws a pair of idiosyncatic shocks to payoffs in each period, $\epsilon_{f}=[\epsilon_{f0},\epsilon_{f1}]$ that is *private information* to the firm and is iid over markets, firms, and time periods.
 - Firms make their decisions in each period *simultaneously*
 
-To simplify notation, suppress dependance of outcomes on the market $m$ and time period $t$. Because we are writing a symmetric model, we will also suppress dependence on $f$. The *deterministic* component of the payoff to entering is a function of the market primitives ($x$), the firm's activity status ($a$), and the other firm's entry decision $j^\prime$:
+To simplify notation, suppress dependance of outcomes on the market $m$ and time period $t$. Because we are writing a symmetric model, we will also suppress dependence on $f$. The *deterministic* component of the payoff to entering is a function of the market primitives ($x$), the firm's activity status ($a$), and the other firm's entry decision $d^\prime$:
 
-$$ u_{1}(x,a,j^{\prime}) = \phi_{0} + \phi_{1}x - \phi_{2}j^\prime - \phi_{3}(1-a) $$
+$$ u_{1}(x,a,d^{\prime}) = \phi_{0} + \phi_{1}x - \phi_{2}d^\prime - \phi_{3}(1-a) $$
 
 The payoff to not entering is simply:
 
@@ -33,42 +33,58 @@ Before characterizing the solution to the firm's problem, let's code up these pa
 
 ```{julia}
 
-u1(x,a,j′,ϕ) = ϕ[1] + ϕ[2]*x - ϕ[3]j′ + ϕ[4]*(1-a)
+u1(x,a,d′,ϕ) = ϕ[1] + ϕ[2]*x - ϕ[3]d′ + ϕ[4]*(1-a)
 u0(a,ϕ) = a * ϕ[5]
 ```
 
 ## Solving the firm's problem
 
-Let $j^*(x,a,a',\epsilon)$ be the firm's optimal decision given the state and the idiosyncratic shock. We will focus on *symmetric equilibria* so this policy function is sufficient to describe the behavior of both firms. 
+Let $d^*(x,a,a',\epsilon)$ be the firm's optimal decision given the state and the idiosyncratic shock. We will focus on *symmetric equilibria* so this policy function is sufficient to describe the behavior of both firms. 
 
 The value to either firm of arriving in a period with state $(x,a,a')$ can be written recursively as:
 
-$$ 
-\begin{split} 
-V(x,a,a') = \mathbb{E}_{\epsilon,\epsilon'}\max\{u_{1}(x,a,j^*(x,a,a',\epsilon'))+\epsilon_{1} + \beta V(x,1,j^*(x,a,a',\epsilon')), \\ u_{0}(x,a) + \epsilon_{0} + \beta V(x,0,j^*(x,a,a',\epsilon'))\} 
-\end{split}
+$$
+\begin{aligned}
+V(x,a,a') = \mathbb{E}_{\epsilon,\epsilon'}\max\big\{
+    &u_{1}(x,a,d^*(x,a,a',\epsilon'))+\epsilon_{1} \\
+    &\quad + \beta V(x,1,d^*(x,a,a',\epsilon')), \\
+    &u_{0}(x,a) + \epsilon_{0} \\
+    &\quad + \beta V(x,0,d^*(x,a,a',\epsilon'))\big\}
+\end{aligned}
 $$
 
 Define the optimal choice probability in equilibrium as:
 
-$$ p(x,a,a') = \int_{\epsilon}j^*(x,a,a',\epsilon)dF(\epsilon) $$
+$$ p(x,a,a') = \int_{\epsilon}d^*(x,a,a',\epsilon)dF(\epsilon) $$
 
-With this in hand we can integrate out the other firm's shocks $\epsilon$' to get:
+With this in hand we can integrate out the other firm's shocks $\epsilon'$ to get:
 
-$$ 
-\begin{split} 
-V(x,a,a') = \mathbb{E}_{\epsilon}\max\{\phi_{0}+\phi_{1}x - \phi_{2}p(x,a',a) +\epsilon_{1} + \beta [p(x,a',a)V(x,1,1) + (1-p(x,a',a))V(x,1,0)], \\ 
-a \phi_{4} + \epsilon_{0} + \beta [p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0)]\}
-\end{split}
+$$
+\begin{aligned}
+V(x,a,a') = \mathbb{E}_{\epsilon}\max\big\{
+    &\phi_{0}+\phi_{1}x - \phi_{2}p(x,a',a) +\epsilon_{1} \\
+    &\quad + \beta \big[p(x,a',a)V(x,1,1) + (1-p(x,a',a))V(x,1,0)\big], \\
+    &a \phi_{4} + \epsilon_{0} \\
+    &\quad + \beta \big[p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0)\big]\big\}
+\end{aligned}
 $$
 
 Define the choice-specific values as:
 
-$$ v_{1}(x,a,a') = \phi_{0}+\phi_{1}x - \phi_{2}p(x,a',a) + \beta [p(x,a',a)V(x,1,1) + (1-p(x,a',a))V(x,1,0)] $$
+$$
+\begin{aligned}
+v_{1}(x,a,a') = \phi_{0}+\phi_{1}x &- \phi_{2}p(x,a',a) \\
+    &+ \beta \big[p(x,a',a)V(x,1,1) + (1-p(x,a',a))V(x,1,0)\big]
+\end{aligned}
+$$
 
-and 
+and
 
-$$ v_{0}(x,a,a') = a \phi_{4} + \beta [p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0)] $$
+$$
+\begin{aligned}
+v_{0}(x,a,a') = a \phi_{4} + \beta \big[p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0)\big]
+\end{aligned}
+$$
 
 So assuming that $\epsilon$ is distributed as type I extreme value random variable with location parameter 0 and scale parameter 1 we get analytical expressions for the choice probabilities and the expected value of the maximum:
 

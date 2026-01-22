@@ -344,7 +344,7 @@ window.Quarto = {
 <section id="forwarddiff.jl" class="level3" data-number="B.3.1">
 <h3 data-number="B.3.1" class="anchored" data-anchor-id="forwarddiff.jl"><span class="header-section-number">B.3.1</span> ForwardDiff.jl</h3>
 <p>Forward-mode AD. Simple and robust, works out-of-the-box for most pure Julia code.</p>
-<div id="fc897338" class="cell" data-execution_count="1">
+<div id="e68a87a5" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">sum</span>(x<span class="op">.^</span><span class="fl">2</span>)</span>
@@ -359,7 +359,7 @@ window.Quarto = {
  6.0</code></pre>
 </div>
 </div>
-<div id="855a5ee4" class="cell" data-execution_count="2">
+<div id="185c81bc" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hessian</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ForwardDiff.<span class="fu">hessian</span>(f, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
@@ -373,7 +373,7 @@ window.Quarto = {
 <section id="enzyme.jl" class="level3" data-number="B.3.2">
 <h3 data-number="B.3.2" class="anchored" data-anchor-id="enzyme.jl"><span class="header-section-number">B.3.2</span> Enzyme.jl</h3>
 <p>A high-performance AD engine that works at the LLVM level. Supports both forward and reverse mode. Often the fastest option, especially for code with loops and mutations.</p>
-<div id="a9d9421b" class="cell" data-execution_count="3">
+<div id="7fa47b52" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Enzyme</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x[<span class="fl">1</span>]<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fu">sin</span>(x[<span class="fl">2</span>])</span>
@@ -394,7 +394,7 @@ window.Quarto = {
 <section id="zygote.jl" class="level3" data-number="B.3.3">
 <h3 data-number="B.3.3" class="anchored" data-anchor-id="zygote.jl"><span class="header-section-number">B.3.3</span> Zygote.jl</h3>
 <p>A source-to-source reverse-mode AD system. Popular in machine learning (used by Flux.jl). Works well for array-heavy code but may struggle with control flow.</p>
-<div id="f3dc816a" class="cell" data-execution_count="4">
+<div id="5d184400" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Zygote</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">sum</span>(x<span class="op">.^</span><span class="fl">2</span>)</span>
@@ -414,7 +414,7 @@ window.Quarto = {
 <li><p><strong>Use Enzyme for performance-critical code</strong>, especially if you have loops or in-place mutations.</p></li>
 <li><p><strong>Be aware of limitations</strong>: AD systems can fail on code that uses certain constructs (try-catch, foreign function calls, some global variables). When in doubt, test that your gradients match finite differences:</p></li>
 </ol>
-<div id="35fc4200" class="cell" data-execution_count="5">
+<div id="5386431f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span>, <span class="bu">FiniteDiff</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">log</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu">exp</span>(x[<span class="fl">1</span>] <span class="op">*</span> x[<span class="fl">2</span>])) <span class="op">+</span> x[<span class="fl">3</span>]<span class="op">^</span><span class="fl">2</span></span>
@@ -432,7 +432,7 @@ window.Quarto = {
 <section id="integration-with-optimization" class="level2" data-number="B.5">
 <h2 data-number="B.5" class="anchored" data-anchor-id="integration-with-optimization"><span class="header-section-number">B.5</span> Integration with Optimization</h2>
 <p>Most Julia optimization packages accept AD gradients. Here’s an example with <code>Optim.jl</code>:</p>
-<div id="47139832" class="cell" data-execution_count="6">
+<div id="c3cdc329" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Optim</span>, <span class="bu">ForwardDiff</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rosenbrock</span>(x) <span class="op">=</span> (<span class="fl">1</span> <span class="op">-</span> x[<span class="fl">1</span>])<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">100</span><span class="fu">*</span>(x[<span class="fl">2</span>] <span class="op">-</span> x[<span class="fl">1</span>]<span class="op">^</span><span class="fl">2</span>)<span class="op">^</span><span class="fl">2</span></span>
@@ -451,9 +451,9 @@ window.Quarto = {
 <section id="example-maximum-likelihood-with-optim.jl" class="level2" data-number="B.6">
 <h2 data-number="B.6" class="anchored" data-anchor-id="example-maximum-likelihood-with-optim.jl"><span class="header-section-number">B.6</span> Example: Maximum Likelihood with <code>Optim.jl</code></h2>
 <p>Consider a simple probit model:</p>
-<p><span class="math display">\[ D = \mathbf{1}\{X\beta - \nu \geq 0\},\qquad \nu \sim \mathcal{N}(0,\sigma^2) \]</span></p>
+<p><span class="math display">\[ D = \mathbf{1}\{X\beta - \nu \geq 0\},\qquad \nu \sim \mathcal{N}(0,1) \]</span></p>
 <p>Here is code to simulate data for this model:</p>
-<div id="0e2eb74d" class="cell" data-execution_count="7">
+<div id="2e66eae4" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span>, <span class="bu">Distributions</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">sim_data</span>(X ; γ)</span>
@@ -467,58 +467,25 @@ window.Quarto = {
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="fl">1000</span></span>
 <span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> [<span class="fu">ones</span>(N) <span class="fl">2</span><span class="fu">*rand</span>(<span class="fu">Normal</span>(),N)]</span>
 <span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>γ <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.5</span>]</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="cn">φ</span> <span class="op">=</span> <span class="fl">1</span>.</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>α <span class="op">=</span> <span class="fl">0.6</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>σ_ϵ <span class="op">=</span> <span class="fl">0.5</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> <span class="fu">sim_data</span>(X ; γ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
-<pre><code>1000-element BitVector:
- 0
- 1
- 0
- 1
- 0
- 1
- 1
- 1
- 0
- 1
- 0
- 1
- 1
- ⋮
- 1
- 1
- 1
- 1
- 0
- 0
- 0
- 1
- 1
- 0
- 0
- 0</code></pre>
-</div>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> <span class="fu">sim_data</span>(X ; γ);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Consider the problem of estimating <span class="math inline">\(\gamma\)</span> using maximum likelihood. We will establish the properties of this estimator in class. Here let’s just focus on numerically how to attack the minimization problem. The log-likelihood of the data <code>D</code> given <code>X</code> is:</p>
 <p><span class="math display">\[ \mathcal{L}(\gamma) = \sum_{n}l(D_{n}; X_{n},\gamma) = \sum_{n=1}^{N}D_{n}\log(\Phi(X\gamma)) + (1-D_{n})\log(1-\Phi(X\gamma)) \]</span></p>
 <p>Let’s write up this likelihood function.</p>
-<div id="94119879" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">log_likelihood</span>(D,X,γ)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> <span class="fl">0</span>.</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="fu">eachindex</span>(D)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        xg <span class="op">=</span> X[n,<span class="fl">1</span>] <span class="op">*</span> γ[<span class="fl">1</span>] <span class="op">+</span> X[n,<span class="fl">2</span>] <span class="op">*</span> γ[<span class="fl">2</span>] </span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> D[n]</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>            ll <span class="op">+=</span> <span class="fu">log</span>(<span class="fu">cdf</span>(<span class="fu">Normal</span>(),xg))</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>            ll <span class="op">+=</span> <span class="fu">log</span>(<span class="fl">1</span><span class="fu">-cdf</span>(<span class="fu">Normal</span>(),xg))</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ll</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">log_likelihood</span>(D,X,[<span class="fl">0</span>.,<span class="fl">0</span>.])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="fed99112" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">log_likelihood</span>(D,X,γ)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> <span class="fl">0</span>.</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="fu">eachindex</span>(D)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>        xg <span class="op">=</span> X[n,<span class="fl">1</span>] <span class="op">*</span> γ[<span class="fl">1</span>] <span class="op">+</span> X[n,<span class="fl">2</span>] <span class="op">*</span> γ[<span class="fl">2</span>] </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> D[n]</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>            ll <span class="op">+=</span> <span class="fu">log</span>(<span class="fu">cdf</span>(<span class="fu">Normal</span>(),xg))</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>            ll <span class="op">+=</span> <span class="fu">log</span>(<span class="fl">1</span><span class="fu">-cdf</span>(<span class="fu">Normal</span>(),xg))</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ll</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="fu">log_likelihood</span>(D,X,[<span class="fl">0</span>.,<span class="fl">0</span>.])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>-693.1471805599322</code></pre>
 </div>
@@ -529,96 +496,98 @@ window.Quarto = {
 <p><span class="math display">\[ \gamma_{k+1} = \gamma_{k} + \lambda_{k}A_{k}\frac{\partial Q}{\partial \gamma} \]</span></p>
 <p>where <span class="math inline">\(Q\)</span> is the function being maximized (or minimized). <span class="math inline">\(A_{k}\)</span> defines a direction in which to search (providing weights on the derivatives) and <span class="math inline">\(\lambda_{k}\)</span> is a scalar variable known as a step-size which is often calculated optimally in each iteration <span class="math inline">\(k\)</span>. For Newton’s method, the matrix <span class="math inline">\(A_{k}\)</span> is the inverse of the Hessian of the objective function <span class="math inline">\(Q\)</span>. Since the hessian can sometimes be expensive to calculate, other methods use approximations to the Hessian that are cheaper to compute.</p>
 <p>Since we have a simple model, we can calculate derivatives relatively easily. Below we’ll compare a hard-coded derivative to this automatic differentiation.</p>
-<div id="133299c5" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">deriv_ll</span>(D,X,γ)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    dll <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="fu">eachindex</span>(D)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        xg <span class="op">=</span> X[n,<span class="fl">1</span>] <span class="op">*</span> γ[<span class="fl">1</span>] <span class="op">+</span> X[n,<span class="fl">2</span>] <span class="op">*</span> γ[<span class="fl">2</span>] </span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> D[n]</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>            dl <span class="op">=</span> <span class="fu">pdf</span>(<span class="fu">Normal</span>(),xg) <span class="op">/</span> <span class="fu">cdf</span>(<span class="fu">Normal</span>(),xg)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>            dl <span class="op">=</span> <span class="op">-</span> <span class="fu">pdf</span>(<span class="fu">Normal</span>(),xg) <span class="op">/</span> (<span class="fl">1</span> <span class="op">-</span> <span class="fu">cdf</span>(<span class="fu">Normal</span>(),xg))</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        dll[<span class="fl">1</span>] <span class="op">+=</span> X[n,<span class="fl">1</span>] <span class="op">*</span> dl</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>        dll[<span class="fl">2</span>] <span class="op">+=</span> X[n,<span class="fl">2</span>] <span class="op">*</span> dl            </span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dll</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>dx <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>)</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="fu">auto_deriv_ll</span>(D,X,γ) <span class="op">=</span> ForwardDiff.<span class="fu">gradient</span>(<span class="fu">x-&gt;log_likelihood</span>(D,X,x),γ)</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="fu">auto_deriv2_ll</span>(D,X,γ,dx) <span class="op">=</span> Enzyme.<span class="fu">autodiff</span>(Reverse, <span class="fu">x-&gt;log_likelihood</span>(D,X,x), Active, <span class="fu">Duplicated</span>(γ, dx))</span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> <span class="fu">deriv_ll</span>(D,X,γ)</span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>d2 <span class="op">=</span> <span class="fu">auto_deriv_ll</span>(D,X,γ)</span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="fu">auto_deriv2_ll</span>(D,X,γ,dx)</span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>[d1 d2 dx]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="15dd7ee1" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">deriv_ll</span>(D,X,γ)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    dll <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="fu">eachindex</span>(D)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        xg <span class="op">=</span> X[n,<span class="fl">1</span>] <span class="op">*</span> γ[<span class="fl">1</span>] <span class="op">+</span> X[n,<span class="fl">2</span>] <span class="op">*</span> γ[<span class="fl">2</span>] </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> D[n]</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>            dl <span class="op">=</span> <span class="fu">pdf</span>(<span class="fu">Normal</span>(),xg) <span class="op">/</span> <span class="fu">cdf</span>(<span class="fu">Normal</span>(),xg)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>            dl <span class="op">=</span> <span class="op">-</span> <span class="fu">pdf</span>(<span class="fu">Normal</span>(),xg) <span class="op">/</span> (<span class="fl">1</span> <span class="op">-</span> <span class="fu">cdf</span>(<span class="fu">Normal</span>(),xg))</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>        dll[<span class="fl">1</span>] <span class="op">+=</span> X[n,<span class="fl">1</span>] <span class="op">*</span> dl</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>        dll[<span class="fl">2</span>] <span class="op">+=</span> X[n,<span class="fl">2</span>] <span class="op">*</span> dl            </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dll</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>dx <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co"># forward mode</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="fu">auto_deriv_ll</span>(D,X,γ) <span class="op">=</span> ForwardDiff.<span class="fu">gradient</span>(<span class="fu">x-&gt;log_likelihood</span>(D,X,x),γ)</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="co"># reverse mode</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="fu">auto_deriv2_ll</span>(D,X,γ,dx) <span class="op">=</span> Enzyme.<span class="fu">autodiff</span>(Reverse, <span class="fu">x-&gt;log_likelihood</span>(D,X,x), Active, <span class="fu">Duplicated</span>(γ, dx))</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> <span class="fu">deriv_ll</span>(D,X,γ)</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>d2 <span class="op">=</span> <span class="fu">auto_deriv_ll</span>(D,X,γ)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a><span class="fu">auto_deriv2_ll</span>(D,X,γ,dx)</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>[d1 d2 dx]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>2×3 Matrix{Float64}:
-  15.8028   15.8028   15.8028
- -52.027   -52.027   -52.027</code></pre>
+  -2.19915   -2.19915   -2.19915
+ -21.6904   -21.6904   -21.6904</code></pre>
 </div>
 </div>
 <p>Ok so we’re confident that these functions work as intended, but how do they compare in performance?</p>
-<div id="04612b7f" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">deriv_ll</span>(D,X,γ);</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">auto_deriv_ll</span>(D,X,γ);</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">auto_deriv2_ll</span>(D,X,γ,dx);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="2a71934b" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">deriv_ll</span>(D,X,γ);</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">auto_deriv_ll</span>(D,X,γ);</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">auto_deriv2_ll</span>(D,X,γ,dx);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  0.000020 seconds (2 allocations: 80 bytes)
+<pre><code>  0.000022 seconds (2 allocations: 80 bytes)
   0.000041 seconds (7 allocations: 304 bytes)
-  0.000038 seconds</code></pre>
+  0.000041 seconds</code></pre>
 </div>
 </div>
-<p>Both are quite quick but you can see that we’re not losing much with automatic differentiation. In my experience, the gap between the two methods can narrow for more complicated functions.</p>
+<p>All are quite quick and you can see that we’re not losing much with automatic differentiation. In my experience, the gap between the two methods can narrow for more complicated functions.</p>
 <p>So now let’s try implementing the maximum likelihood estimator using two different gradient-based algorithms: Newton’s Method (which uses the Hessian), and the Broyden–Fletcher–Goldfarb–Shannon (BFGS) algorithm (which updates search direction using changes in the first derivative).</p>
 <p>While Newton’s method requires calculation of the Hessian (second derivatives), BFGS and related methods only require first derivatives. Typically, this makes each iteration quicker but will take more time to converge. Let’s test them.</p>
-<div id="66feaa8f" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Optim</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">min_objective</span>(x) <span class="op">=</span> <span class="fu">-log_likelihood</span>(D,X,x) <span class="co">#&lt;- Optim assumes that we will minimize a function, hence the negative</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>γ_guess <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">" ---- Using Newton's Method ------ "</span>)</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>res1 <span class="op">=</span> <span class="fu">optimize</span>(min_objective,γ_guess,<span class="fu">Newton</span>(),autodiff<span class="op">=:</span>forward,Optim.<span class="fu">Options</span>(show_trace<span class="op">=</span><span class="cn">true</span>))</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">" ---- Using BFGS ------ "</span>)</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>res2 <span class="op">=</span> <span class="fu">optimize</span>(min_objective,γ_guess,<span class="fu">BFGS</span>(),autodiff<span class="op">=:</span>forward,Optim.<span class="fu">Options</span>(show_trace<span class="op">=</span><span class="cn">true</span>))</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>[res1.minimizer res2.minimizer γ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cf690e72" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Optim</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">min_objective</span>(x) <span class="op">=</span> <span class="fu">-log_likelihood</span>(D,X,x) <span class="co">#&lt;- Optim assumes that we will minimize a function, hence the negative</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>γ_guess <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">" ---- Using Newton's Method ------ "</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>res1 <span class="op">=</span> <span class="fu">optimize</span>(min_objective,γ_guess,<span class="fu">Newton</span>(),autodiff<span class="op">=:</span>forward,Optim.<span class="fu">Options</span>(show_trace<span class="op">=</span><span class="cn">true</span>))</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">" ---- Using BFGS ------ "</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>res2 <span class="op">=</span> <span class="fu">optimize</span>(min_objective,γ_guess,<span class="fu">BFGS</span>(),autodiff<span class="op">=:</span>forward,Optim.<span class="fu">Options</span>(show_trace<span class="op">=</span><span class="cn">true</span>))</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>[res1.minimizer res2.minimizer γ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> ---- Using Newton's Method ------ 
 Iter     Function value   Gradient norm 
-     0     6.931472e+02     8.342612e+02
- * time: 0.027292966842651367
-     1     5.324086e+02     1.268371e+02
- * time: 0.40681004524230957
-     2     5.241423e+02     2.326245e+00
- * time: 0.4070549011230469
-     3     5.241399e+02     1.266718e-04
- * time: 0.4072380065917969
-     4     5.241399e+02     9.329537e-12
- * time: 0.4074268341064453
+     0     6.931472e+02     8.890824e+02
+ * time: 0.010066986083984375
+     1     5.137529e+02     1.386429e+02
+ * time: 0.3530700206756592
+     2     5.042171e+02     2.743665e+00
+ * time: 0.35329699516296387
+     3     5.042137e+02     5.768310e-04
+ * time: 0.35349202156066895
+     4     5.042137e+02     2.440216e-10
+ * time: 0.3536698818206787
  ---- Using BFGS ------ 
 Iter     Function value   Gradient norm 
-     0     6.931472e+02     8.342612e+02
- * time: 5.91278076171875e-5
-     1     5.381739e+02     1.540781e+02
- * time: 0.007317066192626953
-     2     5.353726e+02     1.476490e+02
- * time: 0.0075151920318603516
-     3     5.242726e+02     1.745354e+01
- * time: 0.00769805908203125
-     4     5.241399e+02     4.754447e-02
- * time: 0.007882118225097656
-     5     5.241399e+02     1.661182e-03
- * time: 0.008045196533203125
-     6     5.241399e+02     2.028995e-08
- * time: 0.008236169815063477
-     7     5.241399e+02     2.853273e-14
- * time: 0.00841212272644043</code></pre>
+     0     6.931472e+02     8.890824e+02
+ * time: 5.1021575927734375e-5
+     1     5.189495e+02     1.649408e+02
+ * time: 0.006424903869628906
+     2     5.173559e+02     1.605226e+02
+ * time: 0.006636857986450195
+     3     5.043715e+02     1.901468e+01
+ * time: 0.006825923919677734
+     4     5.042137e+02     6.198033e-02
+ * time: 0.006981849670410156
+     5     5.042137e+02     2.925208e-03
+ * time: 0.007169008255004883
+     6     5.042137e+02     4.162222e-08
+ * time: 0.007340908050537109
+     7     5.042137e+02     3.619327e-14
+ * time: 0.007525920867919922</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>2×3 Matrix{Float64}:
- 0.126477  0.126477  0.1
- 0.455491  0.455491  0.5</code></pre>
+ 0.0934469  0.0934469  0.1
+ 0.481195   0.481195   0.5</code></pre>
 </div>
 </div>
 </section>
