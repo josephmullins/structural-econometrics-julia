@@ -21,7 +21,7 @@ AD comes in two flavors:
 
 **Reverse mode** propagates derivatives backward (like backpropagation in neural networks). Computing the full Jacobian requires $m$ reverse passes. This is efficient when $m \ll n$.
 
-For most estimation problems, we have a scalar objective ($m = 1$) and many parameters ($n$ large), so reverse mode is typically preferred. *In my experience however*, I have had more success writing code to 
+For most estimation problems, we have a scalar objective ($m = 1$) and many parameters ($n$ large), so reverse mode is typically preferred. *In my experience however*, I have had more success writing code that is compatible with forward differencing. You will learn from experience that these tools can be fussy.
 
 ## AD in Julia
 

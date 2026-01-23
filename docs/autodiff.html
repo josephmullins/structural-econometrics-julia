@@ -336,7 +336,7 @@ window.Quarto = {
 <p>AD comes in two flavors:</p>
 <p><strong>Forward mode</strong> propagates derivatives forward through the computation. For a function <span class="math inline">\(f: \mathbb{R}^n \to \mathbb{R}^m\)</span>, computing the full Jacobian requires <span class="math inline">\(n\)</span> forward passes. This is efficient when <span class="math inline">\(n \ll m\)</span>.</p>
 <p><strong>Reverse mode</strong> propagates derivatives backward (like backpropagation in neural networks). Computing the full Jacobian requires <span class="math inline">\(m\)</span> reverse passes. This is efficient when <span class="math inline">\(m \ll n\)</span>.</p>
-<p>For most estimation problems, we have a scalar objective (<span class="math inline">\(m = 1\)</span>) and many parameters (<span class="math inline">\(n\)</span> large), so reverse mode is typically preferred. <em>In my experience however</em>, I have had more success writing code to</p>
+<p>For most estimation problems, we have a scalar objective (<span class="math inline">\(m = 1\)</span>) and many parameters (<span class="math inline">\(n\)</span> large), so reverse mode is typically preferred. <em>In my experience however</em>, I have had more success writing code that is compatible with forward differencing. You will learn from experience that these tools can be fussy.</p>
 </section>
 <section id="ad-in-julia" class="level2" data-number="B.3">
 <h2 data-number="B.3" class="anchored" data-anchor-id="ad-in-julia"><span class="header-section-number">B.3</span> AD in Julia</h2>
@@ -344,7 +344,7 @@ window.Quarto = {
 <section id="forwarddiff.jl" class="level3" data-number="B.3.1">
 <h3 data-number="B.3.1" class="anchored" data-anchor-id="forwarddiff.jl"><span class="header-section-number">B.3.1</span> ForwardDiff.jl</h3>
 <p>Forward-mode AD. Simple and robust, works out-of-the-box for most pure Julia code.</p>
-<div id="e68a87a5" class="cell" data-execution_count="1">
+<div id="2b30953d" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">sum</span>(x<span class="op">.^</span><span class="fl">2</span>)</span>
@@ -359,7 +359,7 @@ window.Quarto = {
  6.0</code></pre>
 </div>
 </div>
-<div id="185c81bc" class="cell" data-execution_count="2">
+<div id="84fd4d08" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hessian</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ForwardDiff.<span class="fu">hessian</span>(f, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
@@ -373,7 +373,7 @@ window.Quarto = {
 <section id="enzyme.jl" class="level3" data-number="B.3.2">
 <h3 data-number="B.3.2" class="anchored" data-anchor-id="enzyme.jl"><span class="header-section-number">B.3.2</span> Enzyme.jl</h3>
 <p>A high-performance AD engine that works at the LLVM level. Supports both forward and reverse mode. Often the fastest option, especially for code with loops and mutations.</p>
-<div id="7fa47b52" class="cell" data-execution_count="3">
+<div id="eabae94f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Enzyme</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x[<span class="fl">1</span>]<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fu">sin</span>(x[<span class="fl">2</span>])</span>
@@ -394,7 +394,7 @@ window.Quarto = {
 <section id="zygote.jl" class="level3" data-number="B.3.3">
 <h3 data-number="B.3.3" class="anchored" data-anchor-id="zygote.jl"><span class="header-section-number">B.3.3</span> Zygote.jl</h3>
 <p>A source-to-source reverse-mode AD system. Popular in machine learning (used by Flux.jl). Works well for array-heavy code but may struggle with control flow.</p>
-<div id="5d184400" class="cell" data-execution_count="4">
+<div id="038b81f9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Zygote</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">sum</span>(x<span class="op">.^</span><span class="fl">2</span>)</span>
@@ -414,7 +414,7 @@ window.Quarto = {
 <li><p><strong>Use Enzyme for performance-critical code</strong>, especially if you have loops or in-place mutations.</p></li>
 <li><p><strong>Be aware of limitations</strong>: AD systems can fail on code that uses certain constructs (try-catch, foreign function calls, some global variables). When in doubt, test that your gradients match finite differences:</p></li>
 </ol>
-<div id="5386431f" class="cell" data-execution_count="5">
+<div id="d04fa9f0" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span>, <span class="bu">FiniteDiff</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">log</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu">exp</span>(x[<span class="fl">1</span>] <span class="op">*</span> x[<span class="fl">2</span>])) <span class="op">+</span> x[<span class="fl">3</span>]<span class="op">^</span><span class="fl">2</span></span>
@@ -432,7 +432,7 @@ window.Quarto = {
 <section id="integration-with-optimization" class="level2" data-number="B.5">
 <h2 data-number="B.5" class="anchored" data-anchor-id="integration-with-optimization"><span class="header-section-number">B.5</span> Integration with Optimization</h2>
 <p>Most Julia optimization packages accept AD gradients. Here’s an example with <code>Optim.jl</code>:</p>
-<div id="c3cdc329" class="cell" data-execution_count="6">
+<div id="9ed46756" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Optim</span>, <span class="bu">ForwardDiff</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rosenbrock</span>(x) <span class="op">=</span> (<span class="fl">1</span> <span class="op">-</span> x[<span class="fl">1</span>])<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">100</span><span class="fu">*</span>(x[<span class="fl">2</span>] <span class="op">-</span> x[<span class="fl">1</span>]<span class="op">^</span><span class="fl">2</span>)<span class="op">^</span><span class="fl">2</span></span>
@@ -453,7 +453,7 @@ window.Quarto = {
 <p>Consider a simple probit model:</p>
 <p><span class="math display">\[ D = \mathbf{1}\{X\beta - \nu \geq 0\},\qquad \nu \sim \mathcal{N}(0,1) \]</span></p>
 <p>Here is code to simulate data for this model:</p>
-<div id="2e66eae4" class="cell" data-execution_count="7">
+<div id="c4db7335" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span>, <span class="bu">Distributions</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">sim_data</span>(X ; γ)</span>
@@ -472,7 +472,7 @@ window.Quarto = {
 <p>Consider the problem of estimating <span class="math inline">\(\gamma\)</span> using maximum likelihood. We will establish the properties of this estimator in class. Here let’s just focus on numerically how to attack the minimization problem. The log-likelihood of the data <code>D</code> given <code>X</code> is:</p>
 <p><span class="math display">\[ \mathcal{L}(\gamma) = \sum_{n}l(D_{n}; X_{n},\gamma) = \sum_{n=1}^{N}D_{n}\log(\Phi(X\gamma)) + (1-D_{n})\log(1-\Phi(X\gamma)) \]</span></p>
 <p>Let’s write up this likelihood function.</p>
-<div id="fed99112" class="cell" data-execution_count="8">
+<div id="ed6d9e25" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">log_likelihood</span>(D,X,γ)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> <span class="fl">0</span>.</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="fu">eachindex</span>(D)</span>
@@ -496,7 +496,7 @@ window.Quarto = {
 <p><span class="math display">\[ \gamma_{k+1} = \gamma_{k} + \lambda_{k}A_{k}\frac{\partial Q}{\partial \gamma} \]</span></p>
 <p>where <span class="math inline">\(Q\)</span> is the function being maximized (or minimized). <span class="math inline">\(A_{k}\)</span> defines a direction in which to search (providing weights on the derivatives) and <span class="math inline">\(\lambda_{k}\)</span> is a scalar variable known as a step-size which is often calculated optimally in each iteration <span class="math inline">\(k\)</span>. For Newton’s method, the matrix <span class="math inline">\(A_{k}\)</span> is the inverse of the Hessian of the objective function <span class="math inline">\(Q\)</span>. Since the hessian can sometimes be expensive to calculate, other methods use approximations to the Hessian that are cheaper to compute.</p>
 <p>Since we have a simple model, we can calculate derivatives relatively easily. Below we’ll compare a hard-coded derivative to this automatic differentiation.</p>
-<div id="15dd7ee1" class="cell" data-execution_count="9">
+<div id="488238a6" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">deriv_ll</span>(D,X,γ)</span>
@@ -525,25 +525,25 @@ window.Quarto = {
 <span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>[d1 d2 dx]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>2×3 Matrix{Float64}:
-  -2.19915   -2.19915   -2.19915
- -21.6904   -21.6904   -21.6904</code></pre>
+ 11.1675  11.1675  11.1675
+ 59.9985  59.9985  59.9985</code></pre>
 </div>
 </div>
 <p>Ok so we’re confident that these functions work as intended, but how do they compare in performance?</p>
-<div id="2a71934b" class="cell" data-execution_count="10">
+<div id="0fd17ef3" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">deriv_ll</span>(D,X,γ);</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">auto_deriv_ll</span>(D,X,γ);</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">auto_deriv2_ll</span>(D,X,γ,dx);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  0.000022 seconds (2 allocations: 80 bytes)
-  0.000041 seconds (7 allocations: 304 bytes)
-  0.000041 seconds</code></pre>
+<pre><code>  0.000028 seconds (2 allocations: 80 bytes)
+  0.000044 seconds (7 allocations: 304 bytes)
+  0.000038 seconds</code></pre>
 </div>
 </div>
 <p>All are quite quick and you can see that we’re not losing much with automatic differentiation. In my experience, the gap between the two methods can narrow for more complicated functions.</p>
 <p>So now let’s try implementing the maximum likelihood estimator using two different gradient-based algorithms: Newton’s Method (which uses the Hessian), and the Broyden–Fletcher–Goldfarb–Shannon (BFGS) algorithm (which updates search direction using changes in the first derivative).</p>
 <p>While Newton’s method requires calculation of the Hessian (second derivatives), BFGS and related methods only require first derivatives. Typically, this makes each iteration quicker but will take more time to converge. Let’s test them.</p>
-<div id="cf690e72" class="cell" data-execution_count="11">
+<div id="0ccaf061" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Optim</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">min_objective</span>(x) <span class="op">=</span> <span class="fu">-log_likelihood</span>(D,X,x) <span class="co">#&lt;- Optim assumes that we will minimize a function, hence the negative</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>γ_guess <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>)</span>
@@ -555,39 +555,39 @@ window.Quarto = {
 <div class="cell-output cell-output-stdout">
 <pre><code> ---- Using Newton's Method ------ 
 Iter     Function value   Gradient norm 
-     0     6.931472e+02     8.890824e+02
- * time: 0.010066986083984375
-     1     5.137529e+02     1.386429e+02
- * time: 0.3530700206756592
-     2     5.042171e+02     2.743665e+00
- * time: 0.35329699516296387
-     3     5.042137e+02     5.768310e-04
- * time: 0.35349202156066895
-     4     5.042137e+02     2.440216e-10
- * time: 0.3536698818206787
+     0     6.931472e+02     9.429516e+02
+ * time: 0.012720108032226562
+     1     4.873710e+02     1.564794e+02
+ * time: 0.43104004859924316
+     2     4.693793e+02     9.133735e+00
+ * time: 0.4315500259399414
+     3     4.693308e+02     2.431698e-03
+ * time: 0.4318211078643799
+     4     4.693308e+02     4.359872e-09
+ * time: 0.43204617500305176
  ---- Using BFGS ------ 
 Iter     Function value   Gradient norm 
-     0     6.931472e+02     8.890824e+02
- * time: 5.1021575927734375e-5
-     1     5.189495e+02     1.649408e+02
- * time: 0.006424903869628906
-     2     5.173559e+02     1.605226e+02
- * time: 0.006636857986450195
-     3     5.043715e+02     1.901468e+01
- * time: 0.006825923919677734
-     4     5.042137e+02     6.198033e-02
- * time: 0.006981849670410156
-     5     5.042137e+02     2.925208e-03
- * time: 0.007169008255004883
-     6     5.042137e+02     4.162222e-08
- * time: 0.007340908050537109
-     7     5.042137e+02     3.619327e-14
- * time: 0.007525920867919922</code></pre>
+     0     6.931472e+02     9.429516e+02
+ * time: 7.987022399902344e-5
+     1     4.849950e+02     1.434033e+02
+ * time: 0.00822591781616211
+     2     4.825821e+02     1.387009e+02
+ * time: 0.00848388671875
+     3     4.696142e+02     2.158030e+01
+ * time: 0.008702993392944336
+     4     4.693308e+02     1.473504e-01
+ * time: 0.008884906768798828
+     5     4.693308e+02     7.674024e-03
+ * time: 0.0090789794921875
+     6     4.693308e+02     3.727930e-07
+ * time: 0.009229898452758789
+     7     4.693308e+02     8.768958e-13
+ * time: 0.009376049041748047</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>2×3 Matrix{Float64}:
- 0.0934469  0.0934469  0.1
- 0.481195   0.481195   0.5</code></pre>
+ 0.129586  0.129586  0.1
+ 0.56237   0.56237   0.5</code></pre>
 </div>
 </div>
 </section>
