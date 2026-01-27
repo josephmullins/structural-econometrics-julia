@@ -166,3 +166,6 @@ plot(1:pars.T,agrid[A[3,1:10:Ka,:]'],legend=false)
 
 You can see that the discreteness creates some jumpiness in the policy functions. As I said, other solution methods that use interpolation can be more efficient and will create smoother pictures, but since that is not the focus of this class we will use this simple solution method.
 
+## Further Reading
+
+@GourinchasParker2002 and @DeNardi2004 are two classic examples of quantitative applications of the life-cycle savings model.

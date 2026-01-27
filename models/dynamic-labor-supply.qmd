@@ -53,3 +53,7 @@ dat = simulate_data(σ,ψ,r,1_000)
 
 
 ```
+
+## Further Reading
+
+@macurdy1981 and @blundell1986 both consider estimation of closely related models of life-cycle labor supply.

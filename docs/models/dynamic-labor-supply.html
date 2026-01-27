@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.40">
+<meta name="generator" content="quarto-1.4.539">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>5&nbsp; A Simple Labor Supply Model – Structural Econometrics with Julia</title>
+<title>Structural Econometrics with Julia - 5&nbsp; A Simple Labor Supply Model</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -33,7 +33,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -54,7 +54,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -71,10 +91,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-626149efe8f5d16e1d391ba177679bf0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -103,7 +123,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -141,13 +161,13 @@ window.Quarto = {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../models.html">Five Prototype Models</a></li><li class="breadcrumb-item"><a href="../models/dynamic-labor-supply.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A Simple Labor Supply Model</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -179,7 +199,7 @@ window.Quarto = {
       <div class="sidebar-item-container"> 
             <a href="../models.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Five Prototype Models</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -242,9 +262,9 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
  <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -282,6 +302,7 @@ window.Quarto = {
   <li><a href="#model-setup-and-solution" id="toc-model-setup-and-solution" class="nav-link active" data-scroll-target="#model-setup-and-solution"><span class="header-section-number">5.1</span> Model Setup and Solution</a></li>
   <li><a href="#code-to-solve-the-model" id="toc-code-to-solve-the-model" class="nav-link" data-scroll-target="#code-to-solve-the-model"><span class="header-section-number">5.2</span> Code to solve the model</a></li>
   <li><a href="#code-to-simulate-a-cross-section" id="toc-code-to-simulate-a-cross-section" class="nav-link" data-scroll-target="#code-to-simulate-a-cross-section"><span class="header-section-number">5.3</span> Code to simulate a cross-section</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">5.4</span> Further Reading</a></li>
   </ul>
 </nav>
     </div>
@@ -314,7 +335,7 @@ window.Quarto = {
 <section id="code-to-solve-the-model" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="code-to-solve-the-model"><span class="header-section-number">5.2</span> Code to solve the model</h2>
 <p>There is only one object to solve here which is consumption given a sequence of net wages. If one were to assume also constant wages the function below solves optimal consumption.</p>
-<div id="e89d5395" class="cell" data-execution_count="1">
+<div id="8edccd15" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Optim</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">solve_consumption</span>(r,α,W,A,σ,ψ)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> <span class="fl">1</span><span class="op">/</span> (<span class="fl">1</span> <span class="op">-</span> <span class="fl">1</span><span class="op">/</span>(<span class="fl">1</span><span class="op">+</span>r))</span>
@@ -331,7 +352,7 @@ window.Quarto = {
 <h2 data-number="5.3" class="anchored" data-anchor-id="code-to-simulate-a-cross-section"><span class="header-section-number">5.3</span> Code to simulate a cross-section</h2>
 <p>Here we’ll assume that wages, tastes for work, and assets co-vary systematically. For simplicity we’ll use a multivariate log-normal distribution.</p>
 <p>Below is code to simulate a cross-section of 1,000 observations.</p>
-<div id="d98994b7" class="cell" data-execution_count="2">
+<div id="e5479357" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">simulate_data</span>(σ,ψ,r,N)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    ch <span class="op">=</span> [<span class="fl">0.3</span> <span class="fl">0</span>. <span class="fl">0</span>.; <span class="fl">0.5</span> <span class="fl">0.5</span> <span class="fl">0</span>.; <span class="fl">0.4</span> <span class="fl">0.8</span> <span class="fl">1.8</span>]</span>
@@ -352,11 +373,23 @@ window.Quarto = {
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>dat <span class="op">=</span> <span class="fu">simulate_data</span>(σ,ψ,r,<span class="fl">1_000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>(α = [0.769370088431213, 0.7499777818161549, 0.811386004305868, 1.1622431833990308, 1.0012071260616142, 1.1409164018667208, 1.3769511941867982, 0.717602772423061, 1.3732877362878777, 0.7803572285609538  …  0.7030708399923061, 1.2937034687527997, 0.5195949782411872, 1.2742745896340497, 0.5825420892867847, 0.9570299294535854, 0.6844193656466966, 2.7114819665691656, 0.8688857051183492, 0.9112801446965436], W = [0.9863889958240541, 0.9508340602249311, 0.8220377378612731, 0.5766876981938149, 0.39493181183618103, 0.8404802163831009, 1.483506668505422, 0.6681192896000416, 1.4991137791120714, 0.9494222761994702  …  0.4807499974212963, 1.8750322893808449, 0.3856380920013705, 1.7638170400058442, 0.62840231931759, 0.8954940450593154, 0.35262852843483616, 10.081821156591293, 0.8101311731009287, 0.5518890940796154], A = [1.3586927998642822, 3.002361692708459, 0.1384327608604815, 2.6863642912565426, 0.007269074166886639, 0.23304005488651464, 1.933244505603474, 1.9250017182489847, 0.22892058637895366, 3.5032547230760516  …  2.142610565438305, 0.13993025205282728, 2.6912547234330657, 0.818253844433415, 2.947450193111652, 0.4027269310651917, 0.017427539664430326, 1.8906867232817686, 1.403282301217454, 0.08255970301694122], C = [0.9598933288278524, 0.9703990124126052, 0.8226644101541711, 0.7540471176076254, 0.40220087482940764, 0.9127781490261204, 1.5028756250590818, 0.72753659210226, 1.4720763283266152, 0.9912497319273893  …  0.5821457260447573, 1.712229408452387, 0.4844706394574557, 1.6457313421852249, 0.6907674701155745, 0.920135987448973, 0.37005605758789817, 7.305478582582987, 0.8585246550436398, 0.6275761359739139], H = [0.7960428276911367, 0.7536165318523924, 0.8942329750989965, 1.1704931249312667, 1.5643790091532688, 1.1459148203417668, 1.1159384914384078, 0.8062250201824133, 1.1422167133729932, 0.767078982389741  …  0.8373885490816979, 1.0346111776181635, 0.6660202675555028, 1.0283260785306179, 0.6685198719032288, 0.9842487097742938, 1.098281059643355, 1.1784944540277213, 0.9109353430653804, 1.0787266122824544])</code></pre>
+<pre><code>(α = [0.8325625872008392, 0.9962630352835987, 0.8885806746692435, 1.0925701005945476, 0.979694089236883, 1.0836163138967156, 1.0331845132092115, 1.1752042758339816, 0.8430023365714854, 1.4876767291144681  …  1.1206653578445815, 1.0154072855426861, 0.8549042815472401, 0.8969690930290717, 1.3941648777204114, 0.7912102235012285, 1.0938611999642693, 0.8021512521340305, 1.2176718460396716, 1.8163966968053349], W = [1.1480125466348308, 1.0591778087855994, 0.6141750014717905, 2.4062527204162683, 0.9515391648667579, 1.4694506696800311, 2.163269816911264, 1.1095567931628112, 0.4213294924515321, 1.0757518906453958  …  0.8040407651475204, 1.7064189700818648, 0.7416468930397977, 0.7406881303740364, 0.5986946904751422, 0.2508092368097511, 2.2250003526030175, 0.5224764274006107, 0.9799857092690983, 1.4170755574152123], A = [34.954371964718916, 69.04149024036246, 0.10642255562358229, 6.1457236413797425, 12.091008629864714, 2.7819511555653023, 2.9945446049005966, 0.11309172021659913, 1.478521981687108, 0.5549403123623208  …  6.643346027575894, 10.681885071519977, 0.0031490102527746084, 0.3948753487051468, 0.036458214755153685, 0.21163283761176657, 1.1894745715936748, 0.5266191646516406, 14.53176268100821, 1.4341312243613662], C = [2.1794608123486925, 3.59070273905277, 0.6761250459659739, 2.1269719912185607, 1.288680812562386, 1.4295585579837027, 1.871075038928553, 1.12831249003358, 0.5375369701111443, 1.1798588416729197  …  1.046008602780442, 1.7744901918035187, 0.7447958815305814, 0.7864584756212141, 0.6351528873514529, 0.3393339393423258, 1.8916444375712305, 0.5942598960199967, 1.4369718900802375, 1.5423453879369953], H = [0.40929943369630645, 0.2855479196058828, 1.0299494441046484, 0.7968162077387962, 0.7415807703196826, 0.9188636907426071, 0.8121608078155509, 1.0971316294222433, 1.0179615385119214, 1.3077796563189361  …  0.9606821578909431, 0.7474970915192722, 0.9885048773507075, 0.9815657004947512, 1.6983944589243865, 1.1677136441386682, 0.8625568972206313, 0.9756930100961451, 0.8388645920473728, 1.401927541932])</code></pre>
 </div>
 </div>
+</section>
+<section id="further-reading" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">5.4</span> Further Reading</h2>
+<p><span class="citation" data-cites="macurdy1981">MaCurdy (<a href="../references.html#ref-macurdy1981" role="doc-biblioref">1981</a>)</span> and <span class="citation" data-cites="blundell1986">Blundell and Walker (<a href="../references.html#ref-blundell1986" role="doc-biblioref">1986</a>)</span> both consider estimation of closely related models of life-cycle labor supply.</p>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-blundell1986" class="csl-entry" role="listitem">
+Blundell, Richard, and Ian Walker. 1986. <span>“A Life-Cycle Consistent Empirical Model of Family Labour Supply Using Cross-Section Data.”</span> <em>The Review of Economic Studies</em> 53 (4): 539–58.
+</div>
+<div id="ref-macurdy1981" class="csl-entry" role="listitem">
+MaCurdy, Thomas E. 1981. <span>“An Empirical Model of Labor Supply in a Life-Cycle Setting.”</span> <em>Journal of Political Economy</em> 89 (6): 1059–85.
+</div>
+</div>
 </section>
 
 </main> <!-- /main -->
@@ -395,7 +428,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const onCopySuccess = function(e) {
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -427,45 +471,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
   });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
-    });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -500,11 +506,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
+      return note.innerHTML;
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
@@ -552,11 +554,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
-      }
+      return note.innerHTML;
     }
   }
   for (var i=0; i<xrefs.length; i++) {
@@ -779,12 +777,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../models/entry-exit.html" class="pagination-link" aria-label="Firm Entry-Exit Model">
+      <a href="../models/entry-exit.html" class="pagination-link  aria-label=" &lt;span="" entry-exit="" model&lt;="" span&gt;"="">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../why_models.html" class="pagination-link" aria-label="How and Why to Use Models">
+      <a href="../why_models.html" class="pagination-link" aria-label="<span class='chapter-number'>6</span>&nbsp; <span class='chapter-title'>How and Why to Use Models</span>">
         <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">How and Why to Use Models</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>

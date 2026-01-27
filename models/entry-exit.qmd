@@ -45,11 +45,11 @@ The value to either firm of arriving in a period with state $(x,a,a')$ can be wr
 
 $$
 \begin{aligned}
-V(x,a,a') = \mathbb{E}_{\epsilon,\epsilon'}\max\big\{
-    &u_{1}(x,a,d^*(x,a,a',\epsilon'))+\epsilon_{1} \\
+V(x,a,a') = \mathbb{E}_{\epsilon}\max\mathbb{E}_{\epsilon'}\big\{
+    &u_{1}(x,a,d^*(x,a',a,\epsilon'))+\epsilon_{1} \\
     &\quad + \beta V(x,1,d^*(x,a,a',\epsilon')), \\
     &u_{0}(x,a) + \epsilon_{0} \\
-    &\quad + \beta V(x,0,d^*(x,a,a',\epsilon'))\big\}
+    &\quad + \beta V(x,0,d^*(x,a',a,\epsilon'))\big\}
 \end{aligned}
 $$
 
@@ -240,3 +240,6 @@ Looks good! We can re-use this code when we get to thinking about estimation lat
 
 If you play around with parameters, you will see how convergence times may change and that solution methods are not always stable, especially when choice probabilities in equilibrium are very close to one or zero.
 
+## Further Redaing
+
+@EricsonPakes1995 and @Aguirregabiria2007 are both classic entries in this literature.
