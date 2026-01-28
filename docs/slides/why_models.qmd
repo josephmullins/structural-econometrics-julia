@@ -1,0 +1,400 @@
+---
+title: "How and Why to Use Models"
+author: "Joseph Mullins"
+format:
+  revealjs:
+    theme: solarized
+    slide-number: true
+    fig-format: png
+    chalkboard: true
+    incremental: true
+bibliography: ../references.bib
+execute:
+  freeze: auto
+---
+
+# When You Don't Need a Model
+
+## Causal Inference Without Deep Structure {.smaller}
+
+- Many questions take the form: "What is the effect of $X$ on $Y$?"
+- Often answerable with simple statistical models of causality (Potential Outcomes, Generalized Roy)
+- No need to specify preferences, technology, or equilibrium
+- But the [target parameter]{style="color: #2563eb"} must be precisely defined
+
+- **Key requirement:** observed variation directly identifies the [counterfactual]{style="color: #2563eb"} of interest
+- Three examples from our prototype models below
+
+## Example: Social Security {.smaller}
+
+- Consider the life-cycle savings model with a social security system
+- The budget constraint:
+$$ c_{t} + a_{t+1}/(1 + r) \leq (1-\tau)y_{t} + \mathbf{1}\{t\geq 65\}b $$
+- Individuals receive benefit $b$ after age 65 and pay proportional taxes $\tau$
+
+- Suppose eligibility is unexpectedly lowered from 65 to 60
+- Repeated cross-sections of consumption by age and cohort are available
+
+## Social Security: Target Parameter {.smaller}
+
+- Let $t^*$ index cohorts by age at the time of the policy announcement
+- $t^*$ indexes both a cohort *and* a treatment
+
+- **Question:** *"What was the effect of this eligibility expansion on consumption at age $t$ for cohort $t^*$?"*
+- $C_{t^*,t}(1)$: consumption under the announcement; $C_{t^*,t}(0)$: consumption absent the announcement
+- Target parameter:
+$$ \alpha_{t^*,t} = \mathbb{E}[C_{t^*,t}(1) - C_{t^*,t}(0)] $$
+- Can we identify this without specifying the full model?
+
+## Social Security: Difference-in-Differences {.smaller}
+
+- Use the cohort aged 65 (unaffected) as a control group
+- [**Parallel trends:**]{style="color: #2563eb"} for $t^*<65$, ages $t\geq t^*$ and $s < t^*$:
+$$ \mathbb{E}[C_{t^*,t}(0)] - \mathbb{E}[C_{65,t}(0)] = \mathbb{E}[C_{t^*,s}(0)] - \mathbb{E}[C_{65,s}] $$
+- The DD estimator constructs the counterfactual from observables:
+$$ \alpha_{t^*,t} = \mathbb{E}[C_{t^*,t}(1)] - \mathbb{E}[C_{65,t}(0)] - \left(\mathbb{E}[C_{t^*,s}(0)] - \mathbb{E}[C_{65,s}(0)]\right) $$
+
+## Social Security: Regression Specification {.smaller}
+
+- The above was for a specific $(t^*, \text{control cohort}, s)$ triple
+- With many cohorts and ages, the common regression:
+$$ \mathbb{E}[C_{t^*,t}] = \gamma_{t^*} + \mu_{t} + \alpha_{t^*,t}\mathbf{1}\{t\geq t^*\} $$
+- This layers in a stricter set of parallel trends assumptions
+
+- No need to specify utility, discount factors, or savings technology
+- Only need to defend parallel trends
+- Farther-apart cohorts make this assumption stronger
+- The regression cannot select "more ideal" controls for each treated cohort [@GOODMANBACON2021]
+
+## Example: Firm Entry and Minimum Wage {.smaller}
+
+- Panel data $(A_{m,t,1}, A_{m,t,2}, Z_{m,t})$ on firm activity across markets
+- $A_{m,t,j}$: whether firm $j$ is active in market $m$ at $t$; entry when $A_{m,t+1,j} - A_{m,t,j} = 1$
+- $X_m$: unobservable market-level profitability shifter
+- $Z \in \{0,1\}$: local minimum wage policy indicator
+
+- Payoff to entering under the policy:
+$$ u_{1}(x,a,d') = \phi_{0} + \phi_{1}x - \phi_{2}d' - \phi_{3}(1-a) + \phi_{4}z $$
+- $\phi_4$ captures the minimum wage effect on firm payoffs
+
+## Firm Entry: Target and Identification {.smaller}
+
+- $Z_{m,1} = 0$ initially; a subset adopt permanently at $t^*$, unanticipated
+- **Question:** *"What is the effect of the minimum wage on firm entry?"*
+- $N_{m,t} = D_{m,t,1} + D_{m,t,2}$: number of active firms
+- $N_{\tau,m}(z)$: potential outcome of $N$ in market $m$, $\tau$ periods after adoption
+- Dynamic treatment effect on the treated:
+$$ \alpha_{\tau} = \mathbb{E}[N_{\tau}(1) - N_{\tau}(0) \mid Z = 1] $$
+- Effects differ across markets --- [heterogeneity]{style="color: #2563eb"} matters
+- Selection into adoption: $\mathbb{E}[\Delta_{\tau}|Z=1] \neq \mathbb{E}[\Delta_{\tau}]$
+
+## Firm Entry: Parallel Trends {.smaller}
+
+- [Parallel trends]{style="color: #2563eb"} justifying the event study:
+$$ \mathbb{E}[N_{t}(0)|Z=1] - \mathbb{E}[N_{t}(0)|Z=0] = \text{constant} $$
+- If markets are in the ergodic distribution of the MPE, $N$ is stationary absent intervention and parallel trends holds
+
+- Event-study regression:
+$$ D_{m,t} = \gamma_{m} + \mu_{t} + \mathbf{1}\{t\geq t^*\}\alpha_{t-t^*} + \epsilon_{m,t} $$
+- Robustly identifies the average effect among adopters (uniform timing)
+- With staggered adoption and heterogeneous effects, regression delivers a hard-to-interpret weighted average [@GOODMANBACON2021]
+
+## Example: Tax Reform Experiments {.smaller}
+
+- Three states run different experiments with taxes and transfers
+- Let $\mathcal{Y}_j$ be the net income function in state $j$:
+\begin{align}
+\mathcal{Y}_{A}(W,H) &= b_{A} + (1-\tau_{A})WH \\
+\mathcal{Y}_{B}(W,H) &= WH + \sum_{k=0}^{5}\tau_{k}(WH-\overline{E}_{k})\mathbf{1}\{WH>\overline{E}_{k}\} \\
+\mathcal{Y}_{C}(W,H) &= WH(1-\tau_{C}) + \mathbf{1}\{H>20\}b_{C}
+\end{align}
+- Participants don't anticipate assignment; the experiment is temporary (3 periods)
+- $Z_j \in \{0,1\}$: assignment to treatment or control in state $j$
+
+## Tax Reform: Identification {.smaller}
+
+- **Question:** *"What is the effect of each unannounced, temporary reform on labor supply?"*
+- Compare treatment and control means in each state:
+$$\mathbb{E}[H \mid Z_j = 1, j] - \mathbb{E}[H \mid Z_j = 0, j]$$
+- [Random assignment]{style="color: #2563eb"} identifies the ATE --- no further assumptions needed
+
+# Reasons to Use a Model
+
+## When the Question Requires One {.smaller}
+
+- The most obvious reason: the research question cannot be articulated without a model
+- The most useful modeling insights concern efficiency, market failures, and policy design
+
+- What does the [optimal]{style="color: #2563eb"} tax and transfer system look like?
+- What is the cheapest way to incentivize competition between firms?
+- What are the welfare costs of incomplete insurance markets?
+
+- These involve [counterfactual]{style="color: #2563eb"} policy environments never observed
+- They require specifying objectives, constraints, and behavioral responses
+
+## Welfare Calculations {.smaller}
+
+- [**Revealed preference:**]{style="color: #2563eb"} treating individuals as knowing what they like lets us infer preferences and evaluate policy
+
+- How do individuals value the social security program? How would they value a different $(\tau, b)$?
+- What is the willingness to pay for a lump-sum transfer $b$ financed by taxes $\tau$? (We return to this below)
+
+## Making Sense of Puzzling Data {.smaller}
+
+- The most fundamental causal question: what is the effect of price on quantities?
+- A silly question --- but only because supply and demand theory is so fundamental
+- Without theory, all you see is a cloud of points:
+
+```{julia}
+#| echo: false
+#| label: fig-identification
+#| fig-cap: "Shifting supply and demand curves trace out equilibrium points"
+
+using Plots, Random, Logging
+Random.seed!(123)
+
+eq_prices = Float64[]
+eq_quantities = Float64[]
+
+anim = @animate for i in 1:60
+    a_d = 10 + 2*randn()
+    b_d = -1.0
+    a_s = 2 + 2*randn()
+    b_s = 1.0
+
+    Q_eq = (a_d - a_s) / (b_s - b_d)
+    P_eq = a_d + b_d * Q_eq
+
+    push!(eq_quantities, Q_eq)
+    push!(eq_prices, P_eq)
+
+    Q_range = range(0, 8, length=100)
+    p = plot(Q_range, a_d .+ b_d .* Q_range,
+             color=:blue, lw=2,
+             xlim=(0, 8), ylim=(0, 12),
+             xlabel="Quantity", ylabel="Price",
+             legend=false)
+    plot!(Q_range, a_s .+ b_s .* Q_range,
+          color=:red, lw=2)
+    scatter!(eq_quantities, eq_prices,
+             color=:black, ms=4, alpha=0.6)
+    scatter!([Q_eq], [P_eq],
+             color=:green, ms=8, marker=:star)
+end
+
+with_logger(NullLogger()) do
+    gif(anim, fps=1)
+end
+```
+
+## Making Sense of Puzzling Data {.smaller}
+
+- **With** supply and demand, each point is the equilibrium outcome of two structural relationships
+- Wright proposed [instrumental variables]{style="color: #2563eb"} to disentangle supply from demand
+- Perhaps the earliest estimated structural model
+
+## When Variation Doesn't Identify the Counterfactual {.smaller}
+
+- In the examples above, we defined the "treatment" very specifically
+- Models help articulate what can and cannot be identified by observed variation
+- They outline assumptions under which related counterfactuals can be forecast, even without exact replication
+- Often framed as [*internal vs external validity*]{style="color: #2563eb"} --- but the "external validity" column is too rich to leave undiscussed
+
+:::{.callout-note}
+## @HeckmanVytlacil2005
+Estimands from simple statistical models designed to infer causal effects (IV, DD, RD) are rarely parameters of exact policy interest
+:::
+
+## Social Security: A Concrete Case {.smaller}
+
+To see what DD misses, simplify the savings model:
+
+- Each individual faces a *known* income sequence $\{y_{n,t}\}_{t=1}^{T}$
+- Agents face a *natural borrowing constraint*:
+$$ \sum_{s=t}^{T}q_{s-t}c_{s} \leq a_{t} + \sum_{s=t}^{T}q_{s-t}(1-\tau)y_{n,s} + \sum_{s\geq 65}^{T}q_{s-t}b $$
+where $q_{\tau} = 1/(1+r)^{\tau}$ is the price of consumption $\tau$ periods ahead
+- $\beta(1+r)=1$, $\psi = 0$: agents perfectly smooth consumption to NPV of net income
+
+## Social Security: Consumption Effect {.smaller}
+
+- Mean consumption effect for cohort $t^*$ at any $t \geq t^*$ equals the NPV effect of the announcement:
+$$ \Delta C_{t^*,t} = \sum_{s=60}^{64}q_{s-t^*}b + \sum_{s=t^*}^{T}(\tau - \tau')\overline{y}_{t^*,t} $$
+where $\overline{y}_{t^*,t}$ is average income for cohort $t^*$ at age $t$
+- Parallel trends holds: cross-cohort differences are constant with age ($\mu_t$ normalizable to zero)
+- DD robustly identifies $\alpha_{t^*,t}$
+- The model implies $\alpha_{t^*,t}$ is constant in $t$
+- Each effect depends on [**how cohort $t^*$ expects the expansion to be financed**]{style="color: #2563eb"} ($\tau' - \tau$), which we haven't specified
+
+## Social Security: What DD Doesn't Tell Us {.smaller}
+
+- The $\alpha_{t^*,t}$ are informative but don't tell us about *future* policy changes
+- They don't even tell us what would happen if the expansion were repealed
+- Extrapolation requires more theory
+
+DD does **not** identify:
+
+- The total effect of social security (not just the expansion)
+- Effects of additional changes in the eligibility age
+- Effects of changes in $b$ and $\tau$ at different ages and anticipation horizons
+- Effects on cohort $t^*$ if they learned at any age other than $t^*$ (one-to-one mapping between cohort and treatment)
+- Effects for cohorts who anticipated the policy their whole life
+- Effects under alternative financing arrangements
+
+## Tax Reform: What the Model Reveals {.smaller}
+
+- Effect of reform $A$ when $\beta(1+r) = 1$ (stationary consumption):
+$$\Delta H_{n,t} = \psi\log(1-\tau) - \psi\sigma\Delta \log\left(C^*_{n}\right) $$
+- $\Delta C^*_n$ embodies the income effect; solved by plugging optimal labor supply into the intertemporal budget constraint
+
+- The ATE depends on income effects, which depend on the [*perceived persistence*]{style="color: #2563eb"} of the reform
+- Substantial heterogeneity in treatment effects
+- Different distributions of wages or work costs across populations imply different impacts
+
+## Tax Reform: What Experiments Don't Tell Us {.smaller}
+
+Each experiment robustly identifies the effect of reform $j$ on population $j$. It does **not** identify:
+
+- Effects of reforms with different persistence --- experimental findings must be interpreted carefully regarding perceived duration
+- The effect of reform $A$ on population $B$, or vice versa
+- The distribution of individual treatment effects
+- Effects of partly anticipated reforms
+- Effects at scale, where general equilibrium responses may appear
+- The model can invert out wage and work cost distributions from panel data, then return to the experimental data to estimate ATEs along latent dimensions
+
+## Entry-Exit: What the Event Study Doesn't Tell Us {.smaller}
+
+The model-free approach does not identify:
+
+- The effect when the minimum wage introduction is [anticipated]{style="color: #2563eb"}
+- The effect on markets that do *not* adopt
+- The effect of repealing the minimum wage
+- The effect of nominal changes to the minimum wage
+
+- Each of these is arguably a more useful or compelling policy calculation
+
+## Interpolating Variation {.smaller}
+
+- Each tax reform is related: each takes the form $\mathcal{Y}(W,H)$ over wages and hours
+- Estimating labor supply as a nonparametric function of $\mathcal{Y}$ would require implausible amounts of policy variation
+
+- Models [**interpolate**]{style="color: #2563eb"} related --- but not functionally identical --- variation
+- In the labor supply model, any $\mathcal{Y}$ enters through the budget constraint --- different reforms are comparable without new parameters
+- See @Mullins2026 for a similar exercise with welfare reform experiments
+
+## Articulated Variation {.smaller}
+
+- [**Articulated variation:**]{style="color: #2563eb"} when a policy's effect can be modeled without additional parameters
+- Typically involves *a priori* known changes to prices and endowments
+- With structural parameters in hand, any observed variation in $\mathcal{Y}$ can be interpreted through the model
+
+- **Counterexample:** the minimum wage in the entry-exit model
+- Embodied as a reduced-form parameter $\phi_4$ because within-period production is not modeled
+- The policy is *not* well-articulated: further nominal wage changes cannot be studied
+
+# Marschak's Maxim
+
+## The Principle {.smaller}
+
+- We've explored the boundaries of causal inference and where modeling adds value
+- Less instructive for *how* to do economic modeling
+- More art than science --- but [Marschak's Maxim]{style="color: #2563eb"} is a useful guiding principle
+
+:::{.callout-tip}
+## Marschak's Maxim [@Marschak1953; @HeckmanVytlacil2007]
+Researchers should specify the minimal set of model ingredients needed to answer their research question of interest
+:::
+
+## Marschak's Maxim: In Practice {.smaller}
+
+- This may seem obvious --- the hard part is figuring out what the [minimal set]{style="color: #2563eb"} is
+- Surprisingly easy to forget once deep inside your model
+- *"Is this ingredient essential to my question?"* --- ask repeatedly
+
+- Your research question is the mast you tie yourself to
+- Decide what it is as early as possible
+
+## Marschak's Original Example: Setup {.smaller}
+
+- A monopolist chooses quantities to maximize profit; the government taxes quantities
+- Demand: $p = \alpha_0 - \alpha_1 q$
+- Profits (constant marginal cost $c$):
+$$ \Pi(q) = (\alpha_0 - c - \tau)q - \alpha_1 q^2 $$
+- Optimal quantity and tax revenue:
+$$q^* = \frac{\alpha_0 - c - \tau}{2\alpha_1}, \qquad R = \frac{(\alpha_0 - c - \tau)\tau}{2\alpha_1}$$
+
+## Marschak's Original Example: Three Problems {.smaller}
+
+Suppose $q$ varies exogenously across markets. Three problems, three information requirements:
+
+1. **Firm maximizing profit:** observe $\Pi = aq - bq^2$, set $q^* = a/2b$
+2. **Government forecasting revenue:** only needs $\tau$ and observed quantities
+3. **Government optimizing taxes:** extract $a = \alpha_0 - c - \tau$ from the reduced form, set $\tau^* = (\alpha_0 - c)/2$
+
+- The setup is unconventional --- we typically assume agents already act optimally
+
+## Lessons from Marschak's Example {.smaller}
+
+Two insights:
+
+1. Each question requires only certain *combinations* of parameters, each observable in [reduced-form]{style="color: #2563eb"} relationships
+2. Once agents optimize, reduced-form relationships no longer suffice for forecasting policy effects
+
+- Point (2) is the @lucas1976 critique, articulated two decades earlier
+- Point (1): answers to some questions are invariant to particular model ingredients
+- In practice we can't always guarantee this, but the insight motivates seeking a minimal set of ingredients
+
+## Two-Stage Budgeting {.smaller}
+
+- Utility over $K$ commodities $x$ with price vector $p$:
+$$V_t(p,a,y) = \max_{x,a'} \left\{ v(x) + \beta\, \mathbb{E}\, V_{t+1}(p',a',y') \right\}$$
+subject to:
+$$ p \cdot x + \frac{1}{1+r}a' \leq y_t,\qquad a \geq \underline{a} $$
+- Suppose the question concerns savings accumulation and intertemporal policy counterfactuals
+
+## Two-Stage Budgeting: The Result {.smaller}
+
+- If $v$ is [homothetic]{style="color: #2563eb"}, there exists a price index $P(p)$ and indirect utility $u$ such that [@Gorman1959]:
+$$V(p,X) = u(X / P(p))$$
+- Consumers first allocate aggregate expenditure across periods, then allocate within periods separately
+
+- Classic application of Marschak's Maxim: if your question is about intertemporal allocation and counterfactuals don't affect intratemporal margins, no need to model intratemporal consumption under regularity conditions
+- All you need is a reasonable price index
+- @Gorman1959 and others sought assumptions permitting broader expenditure categories in demand systems
+
+## Sufficient Statistics: Setup {.smaller}
+
+- Static labor supply for $i \in [0,1]$: $H_i = \arg\max_h\; C - v(h)$, with $C = b + (1-\tau)hW_i$
+- Transfer financed through taxes: $b = \tau \int W_i H_i\, di$
+- Utilitarian welfare objective:
+$$ V(\tau) = \int (C_i - v(H_i))\, di $$
+- What is the welfare effect of a marginal expansion in $b$, financed through $\tau$?
+
+## Sufficient Statistics: Derivation {.smaller}
+
+- Applying the envelope theorem:
+$$ \frac{dV}{d\tau} = -\int W_iH_i\,di + \int W_iH_i\,di + \tau \int \frac{d(W_iH_i)}{d\tau}\, di $$
+- Assuming a constant elasticity of taxable income $Z_i = W_iH_i$ w.r.t. $\tau$:
+$$\frac{dV}{d\tau} = \bar{Z}\; \varepsilon_{Z,\tau}$$
+- The willingness to pay for the transfer **exactly cancels** the mechanical tax cost
+- Only the [**distortionary cost**]{style="color: #2563eb"} of behavioral adjustments remains [@Harberger1954]
+
+## Sufficient Statistics: Scope and Limits {.smaller}
+
+- A larger literature on [*sufficient statistics*]{style="color: #2563eb"} in public finance derives approximations to local policy effects
+- Welfare formulas depending on empirical quantities and elasticities
+- Less reliance on specific functional forms
+
+- As models grow more elaborate, required elasticities can become intractable [@kleven]
+- Sufficient statistics remain a useful guide to understanding policy fundamentals
+- A great example of Marschak's Maxim!
+
+# Summary
+
+## Takeaways {.smaller}
+
+- Quasi-experimental methods are powerful when observed variation directly identifies the [counterfactual]{style="color: #2563eb"}
+- Models become essential for [**welfare**]{style="color: #2563eb"}, [**optimal policy**]{style="color: #2563eb"}, or [**out-of-sample counterfactuals**]{style="color: #2563eb"}
+- Models [interpolate]{style="color: #2563eb"} related variation through [articulated]{style="color: #2563eb"} policy channels --- connecting different reforms through the same structural parameters
+- [**Marschak's Maxim:**]{style="color: #2563eb"} always aim for the minimal set of ingredients your question requires
+
+## References

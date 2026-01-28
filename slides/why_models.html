@@ -395,33 +395,23 @@ Joseph Mullins
 <li class="fragment"><p><span class="math inline">\(t^*\)</span> indexes both a cohort <em>and</em> a treatment</p></li>
 <li class="fragment"><p><strong>Question:</strong> <em>“What was the effect of this eligibility expansion on consumption at age <span class="math inline">\(t\)</span> for cohort <span class="math inline">\(t^*\)</span>?”</em></p></li>
 <li class="fragment"><p><span class="math inline">\(C_{t^*,t}(1)\)</span>: consumption under the announcement; <span class="math inline">\(C_{t^*,t}(0)\)</span>: consumption absent the announcement</p></li>
-<li class="fragment"><p>Target parameter:</p></li>
-</ul>
-<p><span class="math display">\[ \alpha_{t^*,t} = \mathbb{E}[C_{t^*,t}(1) - C_{t^*,t}(0)] \]</span></p>
-<ul>
-<li class="fragment">Can we identify this without specifying the full model?</li>
+<li class="fragment"><p>Target parameter: <span class="math display">\[ \alpha_{t^*,t} = \mathbb{E}[C_{t^*,t}(1) - C_{t^*,t}(0)] \]</span></p></li>
+<li class="fragment"><p>Can we identify this without specifying the full model?</p></li>
 </ul>
 </section>
 <section id="social-security-difference-in-differences" class="slide level2 smaller">
 <h2>Social Security: Difference-in-Differences</h2>
 <ul>
 <li class="fragment">Use the cohort aged 65 (unaffected) as a control group</li>
-<li class="fragment"><span style="color: #2563eb"><strong>Parallel trends:</strong></span> for <span class="math inline">\(t^*&lt;65\)</span>, ages <span class="math inline">\(t\geq t^*\)</span> and <span class="math inline">\(s &lt; t^*\)</span>:</li>
+<li class="fragment"><span style="color: #2563eb"><strong>Parallel trends:</strong></span> for <span class="math inline">\(t^*&lt;65\)</span>, ages <span class="math inline">\(t\geq t^*\)</span> and <span class="math inline">\(s &lt; t^*\)</span>: <span class="math display">\[ \mathbb{E}[C_{t^*,t}(0)] - \mathbb{E}[C_{65,t}(0)] = \mathbb{E}[C_{t^*,s}(0)] - \mathbb{E}[C_{65,s}] \]</span></li>
+<li class="fragment">The DD estimator constructs the counterfactual from observables: <span class="math display">\[ \alpha_{t^*,t} = \mathbb{E}[C_{t^*,t}(1)] - \mathbb{E}[C_{65,t}(0)] - \left(\mathbb{E}[C_{t^*,s}(0)] - \mathbb{E}[C_{65,s}(0)]\right) \]</span></li>
 </ul>
-<p><span class="math display">\[ \mathbb{E}[C_{t^*,t}(0)] - \mathbb{E}[C_{65,t}(0)] = \mathbb{E}[C_{t^*,s}(0)] - \mathbb{E}[C_{65,s}] \]</span></p>
-<ul>
-<li class="fragment">The DD estimator constructs the counterfactual from observables:</li>
-</ul>
-<p><span class="math display">\[ \alpha_{t^*,t} = \mathbb{E}[C_{t^*,t}(1)] - \mathbb{E}[C_{65,t}(0)] - \left(\mathbb{E}[C_{t^*,s}(0)] - \mathbb{E}[C_{65,s}(0)]\right) \]</span></p>
 </section>
 <section id="social-security-regression-specification" class="slide level2 smaller">
 <h2>Social Security: Regression Specification</h2>
 <ul>
-<li class="fragment">The above was for a specific <span class="math inline">\((t^*, \text{control cohort}, s)\)</span> triple</li>
-<li class="fragment">With many cohorts and ages, the common regression:</li>
-</ul>
-<p><span class="math display">\[ \mathbb{E}[C_{t^*,t}] = \gamma_{t^*} + \mu_{t} + \alpha_{t^*,t}\mathbf{1}\{t\geq t^*\} \]</span></p>
-<ul>
+<li class="fragment"><p>The above was for a specific <span class="math inline">\((t^*, \text{control cohort}, s)\)</span> triple</p></li>
+<li class="fragment"><p>With many cohorts and ages, the common regression: <span class="math display">\[ \mathbb{E}[C_{t^*,t}] = \gamma_{t^*} + \mu_{t} + \alpha_{t^*,t}\mathbf{1}\{t\geq t^*\} \]</span></p></li>
 <li class="fragment"><p>This layers in a stricter set of parallel trends assumptions</p></li>
 <li class="fragment"><p>No need to specify utility, discount factors, or savings technology</p></li>
 <li class="fragment"><p>Only need to defend parallel trends</p></li>
@@ -436,11 +426,8 @@ Joseph Mullins
 <li class="fragment"><p><span class="math inline">\(A_{m,t,j}\)</span>: whether firm <span class="math inline">\(j\)</span> is active in market <span class="math inline">\(m\)</span> at <span class="math inline">\(t\)</span>; entry when <span class="math inline">\(A_{m,t+1,j} - A_{m,t,j} = 1\)</span></p></li>
 <li class="fragment"><p><span class="math inline">\(X_m\)</span>: unobservable market-level profitability shifter</p></li>
 <li class="fragment"><p><span class="math inline">\(Z \in \{0,1\}\)</span>: local minimum wage policy indicator</p></li>
-<li class="fragment"><p>Payoff to entering under the policy:</p></li>
-</ul>
-<p><span class="math display">\[ u_{1}(x,a,d') = \phi_{0} + \phi_{1}x - \phi_{2}d' - \phi_{3}(1-a) + \phi_{4}z \]</span></p>
-<ul>
-<li class="fragment"><span class="math inline">\(\phi_4\)</span> captures the minimum wage effect on firm payoffs</li>
+<li class="fragment"><p>Payoff to entering under the policy: <span class="math display">\[ u_{1}(x,a,d') = \phi_{0} + \phi_{1}x - \phi_{2}d' - \phi_{3}(1-a) + \phi_{4}z \]</span></p></li>
+<li class="fragment"><p><span class="math inline">\(\phi_4\)</span> captures the minimum wage effect on firm payoffs</p></li>
 </ul>
 </section>
 <section id="firm-entry-target-and-identification" class="slide level2 smaller">
@@ -450,10 +437,7 @@ Joseph Mullins
 <li class="fragment"><strong>Question:</strong> <em>“What is the effect of the minimum wage on firm entry?”</em></li>
 <li class="fragment"><span class="math inline">\(N_{m,t} = D_{m,t,1} + D_{m,t,2}\)</span>: number of active firms</li>
 <li class="fragment"><span class="math inline">\(N_{\tau,m}(z)\)</span>: potential outcome of <span class="math inline">\(N\)</span> in market <span class="math inline">\(m\)</span>, <span class="math inline">\(\tau\)</span> periods after adoption</li>
-<li class="fragment">Dynamic treatment effect on the treated:</li>
-</ul>
-<p><span class="math display">\[ \alpha_{\tau} = \mathbb{E}[N_{\tau}(1) - N_{\tau}(0) \mid Z = 1] \]</span></p>
-<ul>
+<li class="fragment">Dynamic treatment effect on the treated: <span class="math display">\[ \alpha_{\tau} = \mathbb{E}[N_{\tau}(1) - N_{\tau}(0) \mid Z = 1] \]</span></li>
 <li class="fragment">Effects differ across markets — <span style="color: #2563eb">heterogeneity</span> matters</li>
 <li class="fragment">Selection into adoption: <span class="math inline">\(\mathbb{E}[\Delta_{\tau}|Z=1] \neq \mathbb{E}[\Delta_{\tau}]\)</span></li>
 </ul>
@@ -461,31 +445,22 @@ Joseph Mullins
 <section id="firm-entry-parallel-trends" class="slide level2 smaller">
 <h2>Firm Entry: Parallel Trends</h2>
 <ul>
-<li class="fragment"><span style="color: #2563eb">Parallel trends</span> justifying the event study:</li>
-</ul>
-<p><span class="math display">\[ \mathbb{E}[N_{t}(0)|Z=1] - \mathbb{E}[N_{t}(0)|Z=0] = \text{constant} \]</span></p>
-<ul>
+<li class="fragment"><p><span style="color: #2563eb">Parallel trends</span> justifying the event study: <span class="math display">\[ \mathbb{E}[N_{t}(0)|Z=1] - \mathbb{E}[N_{t}(0)|Z=0] = \text{constant} \]</span></p></li>
 <li class="fragment"><p>If markets are in the ergodic distribution of the MPE, <span class="math inline">\(N\)</span> is stationary absent intervention and parallel trends holds</p></li>
-<li class="fragment"><p>Event-study regression:</p></li>
-</ul>
-<p><span class="math display">\[ D_{m,t} = \gamma_{m} + \mu_{t} + \mathbf{1}\{t\geq t^*\}\alpha_{t-t^*} + \epsilon_{m,t} \]</span></p>
-<ul>
-<li class="fragment">Robustly identifies the average effect among adopters (uniform timing)</li>
-<li class="fragment">With staggered adoption and heterogeneous effects, regression delivers a hard-to-interpret weighted average <span class="citation" data-cites="GOODMANBACON2021">(<a href="#/references" role="doc-biblioref" onclick="">Goodman-Bacon 2021</a>)</span></li>
+<li class="fragment"><p>Event-study regression: <span class="math display">\[ D_{m,t} = \gamma_{m} + \mu_{t} + \mathbf{1}\{t\geq t^*\}\alpha_{t-t^*} + \epsilon_{m,t} \]</span></p></li>
+<li class="fragment"><p>Robustly identifies the average effect among adopters (uniform timing)</p></li>
+<li class="fragment"><p>With staggered adoption and heterogeneous effects, regression delivers a hard-to-interpret weighted average <span class="citation" data-cites="GOODMANBACON2021">(<a href="#/references" role="doc-biblioref" onclick="">Goodman-Bacon 2021</a>)</span></p></li>
 </ul>
 </section>
 <section id="example-tax-reform-experiments" class="slide level2 smaller">
 <h2>Example: Tax Reform Experiments</h2>
 <ul>
 <li class="fragment">Three states run different experiments with taxes and transfers</li>
-<li class="fragment">Let <span class="math inline">\(\mathcal{Y}_j\)</span> be the net income function in state <span class="math inline">\(j\)</span>:</li>
-</ul>
-<p><span class="math display">\[\begin{align}
+<li class="fragment">Let <span class="math inline">\(\mathcal{Y}_j\)</span> be the net income function in state <span class="math inline">\(j\)</span>: <span class="math display">\[\begin{align}
 \mathcal{Y}_{A}(W,H) &amp;= b_{A} + (1-\tau_{A})WH \\
 \mathcal{Y}_{B}(W,H) &amp;= WH + \sum_{k=0}^{5}\tau_{k}(WH-\overline{E}_{k})\mathbf{1}\{WH&gt;\overline{E}_{k}\} \\
 \mathcal{Y}_{C}(W,H) &amp;= WH(1-\tau_{C}) + \mathbf{1}\{H&gt;20\}b_{C}
-\end{align}\]</span></p>
-<ul>
+\end{align}\]</span></li>
 <li class="fragment">Participants don’t anticipate assignment; the experiment is temporary (3 periods)</li>
 <li class="fragment"><span class="math inline">\(Z_j \in \{0,1\}\)</span>: assignment to treatment or control in state <span class="math inline">\(j\)</span></li>
 </ul>
@@ -494,10 +469,7 @@ Joseph Mullins
 <h2>Tax Reform: Identification</h2>
 <ul>
 <li class="fragment"><strong>Question:</strong> <em>“What is the effect of each unannounced, temporary reform on labor supply?”</em></li>
-<li class="fragment">Compare treatment and control means in each state:</li>
-</ul>
-<p><span class="math display">\[\mathbb{E}[H \mid Z_j = 1, j] - \mathbb{E}[H \mid Z_j = 0, j]\]</span></p>
-<ul>
+<li class="fragment">Compare treatment and control means in each state: <span class="math display">\[\mathbb{E}[H \mid Z_j = 1, j] - \mathbb{E}[H \mid Z_j = 0, j]\]</span></li>
 <li class="fragment"><span style="color: #2563eb">Random assignment</span> identifies the ATE — no further assumptions needed</li>
 </ul>
 </section></section>
@@ -579,11 +551,7 @@ Figure&nbsp;1: Shifting supply and demand curves trace out equilibrium points
 <section id="social-security-consumption-effect" class="slide level2 smaller">
 <h2>Social Security: Consumption Effect</h2>
 <ul>
-<li class="fragment">Mean consumption effect for cohort <span class="math inline">\(t^*\)</span> at any <span class="math inline">\(t \geq t^*\)</span> equals the NPV effect of the announcement:</li>
-</ul>
-<p><span class="math display">\[ \Delta C_{t^*,t} = \sum_{s=60}^{64}q_{s-t^*}b + \sum_{s=t^*}^{T}(\tau - \tau')\overline{y}_{t^*,t} \]</span></p>
-<p>where <span class="math inline">\(\overline{y}_{t^*,t}\)</span> is average income for cohort <span class="math inline">\(t^*\)</span> at age <span class="math inline">\(t\)</span></p>
-<ul>
+<li class="fragment">Mean consumption effect for cohort <span class="math inline">\(t^*\)</span> at any <span class="math inline">\(t \geq t^*\)</span> equals the NPV effect of the announcement: <span class="math display">\[ \Delta C_{t^*,t} = \sum_{s=60}^{64}q_{s-t^*}b + \sum_{s=t^*}^{T}(\tau - \tau')\overline{y}_{t^*,t} \]</span> where <span class="math inline">\(\overline{y}_{t^*,t}\)</span> is average income for cohort <span class="math inline">\(t^*\)</span> at age <span class="math inline">\(t\)</span></li>
 <li class="fragment">Parallel trends holds: cross-cohort differences are constant with age (<span class="math inline">\(\mu_t\)</span> normalizable to zero)</li>
 <li class="fragment">DD robustly identifies <span class="math inline">\(\alpha_{t^*,t}\)</span></li>
 <li class="fragment">The model implies <span class="math inline">\(\alpha_{t^*,t}\)</span> is constant in <span class="math inline">\(t\)</span></li>
@@ -610,10 +578,7 @@ Figure&nbsp;1: Shifting supply and demand curves trace out equilibrium points
 <section id="tax-reform-what-the-model-reveals" class="slide level2 smaller">
 <h2>Tax Reform: What the Model Reveals</h2>
 <ul>
-<li class="fragment">Effect of reform <span class="math inline">\(A\)</span> when <span class="math inline">\(\beta(1+r) = 1\)</span> (stationary consumption):</li>
-</ul>
-<p><span class="math display">\[\Delta H_{n,t} = \psi\log(1-\tau) - \psi\sigma\Delta \log\left(C^*_{n}\right) \]</span></p>
-<ul>
+<li class="fragment"><p>Effect of reform <span class="math inline">\(A\)</span> when <span class="math inline">\(\beta(1+r) = 1\)</span> (stationary consumption): <span class="math display">\[\Delta H_{n,t} = \psi\log(1-\tau) - \psi\sigma\Delta \log\left(C^*_{n}\right) \]</span></p></li>
 <li class="fragment"><p><span class="math inline">\(\Delta C^*_n\)</span> embodies the income effect; solved by plugging optimal labor supply into the intertemporal budget constraint</p></li>
 <li class="fragment"><p>The ATE depends on income effects, which depend on the <span style="color: #2563eb"><em>perceived persistence</em></span> of the reform</p></li>
 <li class="fragment"><p>Substantial heterogeneity in treatment effects</p></li>
@@ -705,13 +670,9 @@ Figure&nbsp;1: Shifting supply and demand curves trace out equilibrium points
 <ul>
 <li class="fragment">A monopolist chooses quantities to maximize profit; the government taxes quantities</li>
 <li class="fragment">Demand: <span class="math inline">\(p = \alpha_0 - \alpha_1 q\)</span></li>
-<li class="fragment">Profits (constant marginal cost <span class="math inline">\(c\)</span>):</li>
+<li class="fragment">Profits (constant marginal cost <span class="math inline">\(c\)</span>): <span class="math display">\[ \Pi(q) = (\alpha_0 - c - \tau)q - \alpha_1 q^2 \]</span></li>
+<li class="fragment">Optimal quantity and tax revenue: <span class="math display">\[q^* = \frac{\alpha_0 - c - \tau}{2\alpha_1}, \qquad R = \frac{(\alpha_0 - c - \tau)\tau}{2\alpha_1}\]</span></li>
 </ul>
-<p><span class="math display">\[ \Pi(q) = (\alpha_0 - c - \tau)q - \alpha_1 q^2 \]</span></p>
-<ul>
-<li class="fragment">Optimal quantity and tax revenue:</li>
-</ul>
-<p><span class="math display">\[q^* = \frac{\alpha_0 - c - \tau}{2\alpha_1}, \qquad R = \frac{(\alpha_0 - c - \tau)\tau}{2\alpha_1}\]</span></p>
 </section>
 <section id="marschaks-original-example-three-problems" class="slide level2 smaller">
 <h2>Marschak’s Original Example: Three Problems</h2>
@@ -741,20 +702,14 @@ Figure&nbsp;1: Shifting supply and demand curves trace out equilibrium points
 <section id="two-stage-budgeting" class="slide level2 smaller">
 <h2>Two-Stage Budgeting</h2>
 <ul>
-<li class="fragment">Utility over <span class="math inline">\(K\)</span> commodities <span class="math inline">\(x\)</span> with price vector <span class="math inline">\(p\)</span>:</li>
-</ul>
-<p><span class="math display">\[V_t(p,a,y) = \max_{x,a'} \left\{ v(x) + \beta\, \mathbb{E}\, V_{t+1}(p',a',y') \right\}\]</span> subject to: <span class="math display">\[ p \cdot x + \frac{1}{1+r}a' \leq y_t,\qquad a \geq \underline{a} \]</span></p>
-<ul>
+<li class="fragment">Utility over <span class="math inline">\(K\)</span> commodities <span class="math inline">\(x\)</span> with price vector <span class="math inline">\(p\)</span>: <span class="math display">\[V_t(p,a,y) = \max_{x,a'} \left\{ v(x) + \beta\, \mathbb{E}\, V_{t+1}(p',a',y') \right\}\]</span> subject to: <span class="math display">\[ p \cdot x + \frac{1}{1+r}a' \leq y_t,\qquad a \geq \underline{a} \]</span></li>
 <li class="fragment">Suppose the question concerns savings accumulation and intertemporal policy counterfactuals</li>
 </ul>
 </section>
 <section id="two-stage-budgeting-the-result" class="slide level2 smaller">
 <h2>Two-Stage Budgeting: The Result</h2>
 <ul>
-<li class="fragment">If <span class="math inline">\(v\)</span> is <span style="color: #2563eb">homothetic</span>, there exists a price index <span class="math inline">\(P(p)\)</span> and indirect utility <span class="math inline">\(u\)</span> such that <span class="citation" data-cites="Gorman1959">(<a href="#/references" role="doc-biblioref" onclick="">Gorman 1959</a>)</span>:</li>
-</ul>
-<p><span class="math display">\[V(p,X) = u(X / P(p))\]</span></p>
-<ul>
+<li class="fragment"><p>If <span class="math inline">\(v\)</span> is <span style="color: #2563eb">homothetic</span>, there exists a price index <span class="math inline">\(P(p)\)</span> and indirect utility <span class="math inline">\(u\)</span> such that <span class="citation" data-cites="Gorman1959">(<a href="#/references" role="doc-biblioref" onclick="">Gorman 1959</a>)</span>: <span class="math display">\[V(p,X) = u(X / P(p))\]</span></p></li>
 <li class="fragment"><p>Consumers first allocate aggregate expenditure across periods, then allocate within periods separately</p></li>
 <li class="fragment"><p>Classic application of Marschak’s Maxim: if your question is about intertemporal allocation and counterfactuals don’t affect intratemporal margins, no need to model intratemporal consumption under regularity conditions</p></li>
 <li class="fragment"><p>All you need is a reasonable price index</p></li>
@@ -766,24 +721,15 @@ Figure&nbsp;1: Shifting supply and demand curves trace out equilibrium points
 <ul>
 <li class="fragment">Static labor supply for <span class="math inline">\(i \in [0,1]\)</span>: <span class="math inline">\(H_i = \arg\max_h\; C - v(h)\)</span>, with <span class="math inline">\(C = b + (1-\tau)hW_i\)</span></li>
 <li class="fragment">Transfer financed through taxes: <span class="math inline">\(b = \tau \int W_i H_i\, di\)</span></li>
-<li class="fragment">Utilitarian welfare objective:</li>
-</ul>
-<p><span class="math display">\[ V(\tau) = \int (C_i - v(H_i))\, di \]</span></p>
-<ul>
+<li class="fragment">Utilitarian welfare objective: <span class="math display">\[ V(\tau) = \int (C_i - v(H_i))\, di \]</span></li>
 <li class="fragment">What is the welfare effect of a marginal expansion in <span class="math inline">\(b\)</span>, financed through <span class="math inline">\(\tau\)</span>?</li>
 </ul>
 </section>
 <section id="sufficient-statistics-derivation" class="slide level2 smaller">
 <h2>Sufficient Statistics: Derivation</h2>
 <ul>
-<li class="fragment">Applying the envelope theorem:</li>
-</ul>
-<p><span class="math display">\[ \frac{dV}{d\tau} = -\int W_iH_i\,di + \int W_iH_i\,di + \tau \int \frac{d(W_iH_i)}{d\tau}\, di \]</span></p>
-<ul>
-<li class="fragment">Assuming a constant elasticity of taxable income <span class="math inline">\(Z_i = W_iH_i\)</span> w.r.t. <span class="math inline">\(\tau\)</span>:</li>
-</ul>
-<p><span class="math display">\[\frac{dV}{d\tau} = \bar{Z}\; \varepsilon_{Z,\tau}\]</span></p>
-<ul>
+<li class="fragment">Applying the envelope theorem: <span class="math display">\[ \frac{dV}{d\tau} = -\int W_iH_i\,di + \int W_iH_i\,di + \tau \int \frac{d(W_iH_i)}{d\tau}\, di \]</span></li>
+<li class="fragment">Assuming a constant elasticity of taxable income <span class="math inline">\(Z_i = W_iH_i\)</span> w.r.t. <span class="math inline">\(\tau\)</span>: <span class="math display">\[\frac{dV}{d\tau} = \bar{Z}\; \varepsilon_{Z,\tau}\]</span></li>
 <li class="fragment">The willingness to pay for the transfer <strong>exactly cancels</strong> the mechanical tax cost</li>
 <li class="fragment">Only the <span style="color: #2563eb"><strong>distortionary cost</strong></span> of behavioral adjustments remains <span class="citation" data-cites="Harberger1954">(<a href="#/references" role="doc-biblioref" onclick="">Harberger 1954</a>)</span></li>
 </ul>
