@@ -60,7 +60,7 @@ When integrating numerically, we approximate the integral using a weighted sum a
 
 $$ \int_a^b f(x)dx \approx \frac{b-a}{2}\sum_{k=1}^n w_k f\left(\frac{a+b}{2} + \frac{b-a}{2}x_k\right) $$
 
-where $x_k$ are the nodes and $w_k$ are the weights from Gauss-Legendre quadrature. This method is particularly accurate for smooth functions and uses a fixed number of nodes, which is important for [automatic differentiation](/autodiff.qmd) (unlike adaptive methods like in the package `QuadGK` that adjust the number of nodes based on the integrand).
+where $x_k$ are the nodes and $w_k$ are the weights from Gauss-Legendre quadrature. This method is particularly accurate for smooth functions and uses a fixed number of nodes, which is important for [automatic differentiation](/appendices/autodiff.qmd) (unlike adaptive methods like in the package `QuadGK` that adjust the number of nodes based on the integrand).
 
 Let's implement a simple Gauss-Legendre integration routine:
 
@@ -114,7 +114,7 @@ rwage = solve_res_wage(pars.b, pars.λ, pars.δ, pars.β, pars.F)
 println("Reservation wage: ", round(rwage, digits=2))
 ```
 
-This approach has the advantage of being compatible with [automatic differentiation](/autodiff.qmd) tools like `ForwardDiff`, which is a very useful tool in numerical methods.
+This approach has the advantage of being compatible with [automatic differentiation](/appendices/autodiff.qmd) tools like `ForwardDiff`, which is a very useful tool in numerical methods.
 
 ### Steady-State Statistics
 

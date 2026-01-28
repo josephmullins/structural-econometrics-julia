@@ -159,7 +159,7 @@ solve_by_iteration(0.,ϕ,β; verbose = true)
 
 This seems to work! But notice that it takes a while for the iteration to converge. Also, unlike the single agent case, there is no guarantee that this iteration is always a contraction. 
 
-We can also solve this model relatively easily using Newton's Method and the magic of [Automatic Differentiation](/autodiff.qmd). To do this, we'll solve over the pair of choice-specific values $v_{0}$ and $v_{1}$ (these encode both values and choice probabilities) and store these values as a vector instead of an array:
+We can also solve this model relatively easily using Newton's Method and the magic of [Automatic Differentiation](/appendices/autodiff.qmd). To do this, we'll solve over the pair of choice-specific values $v_{0}$ and $v_{1}$ (these encode both values and choice probabilities) and store these values as a vector instead of an array:
 
 ```{julia}
 using ForwardDiff, LinearAlgebra

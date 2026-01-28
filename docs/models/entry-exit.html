@@ -238,7 +238,7 @@ window.Quarto = {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../why_models.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/why_models.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">How and Why to Use Models</span></span></a>
   </div>
 </li>
@@ -271,19 +271,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../data.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Data</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../autodiff.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/autodiff.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Automatic Differentiation</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../performance.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/performance.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Performance Tips</span></span></a>
   </div>
 </li>
@@ -352,10 +352,10 @@ window.Quarto = {
 <p>The payoff to not entering is simply:</p>
 <p><span class="math display">\[{u}_{0}(x,a) = \phi_{4}a \]</span></p>
 <p>Before characterizing the solution to the firm’s problem, let’s code up these payoff functions:</p>
-<div id="4bfd8d62" class="cell" data-execution_count="1">
+<div id="7796ad34" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">u1</span>(x,a,d′,ϕ) <span class="op">=</span> ϕ[<span class="fl">1</span>] <span class="op">+</span> ϕ[<span class="fl">2</span>]<span class="op">*</span>x <span class="op">-</span> ϕ[<span class="fl">3</span>]d′ <span class="op">+</span> ϕ[<span class="fl">4</span>]<span class="fu">*</span>(<span class="fl">1</span><span class="op">-</span>a)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">u0</span>(a,ϕ) <span class="op">=</span> a <span class="op">*</span> ϕ[<span class="fl">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="10">
+<div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>u0 (generic function with 1 method)</code></pre>
 </div>
 </div>
@@ -403,7 +403,7 @@ v_{0}(x,a,a') = a \phi_{4} + \beta \big[p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0
 <p>where <span class="math inline">\(\gamma\)</span> is the <a href="https://en.wikipedia.org/wiki/Euler%27s_constant">Euler-Mascheroni constant</a> and</p>
 <p><span class="math display">\[ p(x,a,a') = \frac{\exp(v_{1}(x,a,a'))}{\exp(v_{0}(x,a,a'))+\exp(v_{1}(x,a,a'))} \]</span></p>
 <p>Before we define equilibrium and think about solving the model, let’s quickly write up the mapping between the other firm’s choice probabilities and the choice values:</p>
-<div id="346782a8" class="cell" data-execution_count="2">
+<div id="8d82d14d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixing x, assume that V is stored as a 2 x 2 array</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The argument p is the current guess of p(x,a',a)</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">choice_values</span>(x,a,p,V,ϕ,β)</span>
@@ -411,7 +411,7 @@ v_{0}(x,a,a') = a \phi_{4} + \beta \big[p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    v1 <span class="op">=</span> <span class="fu">u1</span>(x,a,p,ϕ) <span class="op">+</span> β <span class="op">*</span> p <span class="op">*</span> V[<span class="fl">2</span>,<span class="fl">2</span>] <span class="op">+</span> β <span class="op">*</span> (<span class="fl">1</span><span class="op">-</span>p) <span class="op">*</span> V[<span class="fl">2</span>,<span class="fl">1</span>]</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> v0,v1</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="11">
+<div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>choice_values (generic function with 1 method)</code></pre>
 </div>
 </div>
@@ -425,7 +425,7 @@ v_{0}(x,a,a') = a \phi_{4} + \beta \big[p(x,a',a)V(x,0,1) + (1-p(x,a',a))V(x,0,0
 <li><span class="math inline">\(p\)</span> are the optimal choice probabilities of each firm given <span class="math inline">\(V\)</span> and given the other firm’s choice probabilities are <span class="math inline">\(p\)</span>.</li>
 </ol>
 <p>How should we solve for this symmetric equilibrium? We could try iterating on <span class="math inline">\(V\)</span> and <span class="math inline">\(p\)</span> as follows:</p>
-<div id="f4298800" class="cell" data-execution_count="3">
+<div id="f99ff97b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># V is a 2x2 array with values</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># p is a 2x2 array with choice probabilities</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">iterate_model</span>(V,p,x,ϕ,β)</span>
@@ -472,13 +472,13 @@ Iteration 500, error is 8.863101186307176e-8
 Iteration 600, error is 3.693557459882868e-9
 Iteration 700, error is 1.538467131467769e-10</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>([69.73147518902888 70.96824731388737; 68.46263413289174 67.89546273371974], [0.9107652821657111 0.990549524651413; 0.052475860075290155 0.27729654446688445])</code></pre>
 </div>
 </div>
 <p>This seems to work! But notice that it takes a while for the iteration to converge. Also, unlike the single agent case, there is no guarantee that this iteration is always a contraction.</p>
-<p>We can also solve this model relatively easily using Newton’s Method and the magic of <a href="../autodiff.html">Automatic Differentiation</a>. To do this, we’ll solve over the pair of choice-specific values <span class="math inline">\(v_{0}\)</span> and <span class="math inline">\(v_{1}\)</span> (these encode both values and choice probabilities) and store these values as a vector instead of an array:</p>
-<div id="ffb61be8" class="cell" data-execution_count="4">
+<p>We can also solve this model relatively easily using Newton’s Method and the magic of <a href="../appendices/autodiff.html">Automatic Differentiation</a>. To do this, we’ll solve over the pair of choice-specific values <span class="math inline">\(v_{0}\)</span> and <span class="math inline">\(v_{1}\)</span> (these encode both values and choice probabilities) and store these values as a vector instead of an array:</p>
+<div id="73e46181" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span>, <span class="bu">LinearAlgebra</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># this function returns V as a 2 x 2 array given the vector of choice specific values in V</span></span>
@@ -542,27 +542,27 @@ Iteration 6, error is 1.4210854715202004e-14</code></pre>
 </div>
 </div>
 <p>Let’s try timing each solution method to quickly compare:</p>
-<div id="12ab6bd8" class="cell" data-execution_count="5">
+<div id="4f5d17fc" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_model_newton</span>(<span class="fl">0</span>.,ϕ,β)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_by_iteration</span>(<span class="fl">0</span>.,ϕ,β)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">solve_model_newton</span>(<span class="fl">0</span>.,ϕ,β)</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">solve_by_iteration</span>(<span class="fl">0</span>.,ϕ,β)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  0.000091 seconds (230 allocations: 54.688 KiB)
-  0.000204 seconds (4.29 k allocations: 234.531 KiB)</code></pre>
+<pre><code>  0.000092 seconds (230 allocations: 54.688 KiB)
+  0.000331 seconds (4.29 k allocations: 234.531 KiB)</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>([69.73147518902888 70.96824731388737; 68.46263413289174 67.89546273371974], [0.9107652821657111 0.990549524651413; 0.052475860075290155 0.27729654446688445])</code></pre>
 </div>
 </div>
 <p>In this case Newton’s method is faster. Let’s double check that both methods return the same answer:</p>
-<div id="3ad33b97" class="cell" data-execution_count="6">
+<div id="d5340936" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>v0 <span class="op">=</span> <span class="fu">solve_model_newton</span>(<span class="fl">0</span>.,ϕ,β)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>V0,p <span class="op">=</span> <span class="fu">solve_by_iteration</span>(<span class="fl">0</span>.,ϕ,β)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>p1 <span class="op">=</span> <span class="fu">calc_p</span>(v0)</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>[p p1]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="15">
+<div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>2×4 Matrix{Float64}:
  0.910765   0.99055   0.910765   0.99055
  0.0524759  0.277297  0.0524759  0.277297</code></pre>
@@ -573,10 +573,10 @@ Iteration 6, error is 1.4210854715202004e-14</code></pre>
 </section>
 <section id="further-redaing" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="further-redaing"><span class="header-section-number">4.5</span> Further Redaing</h2>
-<p><span class="citation" data-cites="EricsonPakes1995">Ericson and Pakes (<a href="../references.html#ref-EricsonPakes1995" role="doc-biblioref">1995</a>)</span> and <span class="citation" data-cites="Aguirregabiria2007">Aguirregabiria and Mira (<a href="../references.html#ref-Aguirregabiria2007" role="doc-biblioref">2007</a>)</span> are both classic entries in this literature.</p>
+<p><span class="citation" data-cites="EricsonPakes1995">Ericson and Pakes (<a href="#ref-EricsonPakes1995" role="doc-biblioref">1995</a>)</span> and <span class="citation" data-cites="Aguirregabiria2007">Aguirregabiria and Mira (<a href="#ref-Aguirregabiria2007" role="doc-biblioref">2007</a>)</span> are both classic entries in this literature.</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-Aguirregabiria2007" class="csl-entry" role="listitem">
 Aguirregabiria, Victor, and Pedro Mira. 2007. <span>“Sequential Estimation of Dynamic Discrete Games.”</span> <em>Econometrica</em> 75 (1): 1–53.
 </div>

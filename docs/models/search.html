@@ -218,7 +218,7 @@ window.Quarto = {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../why_models.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/why_models.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">How and Why to Use Models</span></span></a>
   </div>
 </li>
@@ -251,19 +251,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../data.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Data</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../autodiff.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/autodiff.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Automatic Differentiation</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../performance.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/performance.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Performance Tips</span></span></a>
   </div>
 </li>
@@ -389,9 +389,9 @@ window.Quarto = {
 <h3 data-number="2.5.1" class="anchored" data-anchor-id="gauss-legendre-quadrature"><span class="header-section-number">2.5.1</span> Gauss-Legendre Quadrature</h3>
 <p>When integrating numerically, we approximate the integral using a weighted sum at specific evaluation points (nodes):</p>
 <p><span class="math display">\[ \int_a^b f(x)dx \approx \frac{b-a}{2}\sum_{k=1}^n w_k f\left(\frac{a+b}{2} + \frac{b-a}{2}x_k\right) \]</span></p>
-<p>where <span class="math inline">\(x_k\)</span> are the nodes and <span class="math inline">\(w_k\)</span> are the weights from Gauss-Legendre quadrature. This method is particularly accurate for smooth functions and uses a fixed number of nodes, which is important for <a href="../autodiff.html">automatic differentiation</a> (unlike adaptive methods like in the package <code>QuadGK</code> that adjust the number of nodes based on the integrand).</p>
+<p>where <span class="math inline">\(x_k\)</span> are the nodes and <span class="math inline">\(w_k\)</span> are the weights from Gauss-Legendre quadrature. This method is particularly accurate for smooth functions and uses a fixed number of nodes, which is important for <a href="../appendices/autodiff.html">automatic differentiation</a> (unlike adaptive methods like in the package <code>QuadGK</code> that adjust the number of nodes based on the integrand).</p>
 <p>Let’s implement a simple Gauss-Legendre integration routine:</p>
-<div id="ccf5c549" class="cell" data-execution_count="1">
+<div id="cf434c45" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">FastGaussQuadrature</span>, <span class="bu">Distributions</span>, <span class="bu">Roots</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixed-node quadrature for integration (compatible with automatic differentiation)</span></span>
@@ -431,7 +431,7 @@ window.Quarto = {
 <li>An initial guess</li>
 <li>The type of the initial guess (to ensure type stability)</li>
 </ul>
-<div id="309e8cce" class="cell" data-execution_count="2">
+<div id="af518c5f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">solve_res_wage</span>(b, λ, δ, β, F)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">find_zero</span>(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        x <span class="op">-&gt;</span> <span class="fu">res_wage</span>(x, b, λ, δ, β, F),</span>
@@ -445,12 +445,12 @@ window.Quarto = {
 <pre><code>Reservation wage: 7.23</code></pre>
 </div>
 </div>
-<p>This approach has the advantage of being compatible with <a href="../autodiff.html">automatic differentiation</a> tools like <code>ForwardDiff</code>, which is a very useful tool in numerical methods.</p>
+<p>This approach has the advantage of being compatible with <a href="../appendices/autodiff.html">automatic differentiation</a> tools like <code>ForwardDiff</code>, which is a very useful tool in numerical methods.</p>
 </section>
 <section id="steady-state-statistics" class="level3" data-number="2.5.3">
 <h3 data-number="2.5.3" class="anchored" data-anchor-id="steady-state-statistics"><span class="header-section-number">2.5.3</span> Steady-State Statistics</h3>
 <p>Using the computed reservation wage, we can calculate the steady-state unemployment rate and average duration:</p>
-<div id="11765a53" class="cell" data-execution_count="3">
+<div id="3dd02c85" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute steady-state statistics</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> pars.λ <span class="op">*</span> (<span class="fl">1</span> <span class="op">-</span> <span class="fu">cdf</span>(pars.F, rwage))  <span class="co"># Exit rate from unemployment</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>u_rate <span class="op">=</span> pars.δ <span class="op">/</span> (pars.δ <span class="op">+</span> h)          <span class="co"># Unemployment rate</span></span>

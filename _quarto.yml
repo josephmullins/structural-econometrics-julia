@@ -17,16 +17,16 @@ book:
       - models/savings.qmd
       - models/entry-exit.qmd
       - models/dynamic-labor-supply.qmd
-    - why_models.qmd
-    - part: identification.qmd
-    - part: extremum-estimators.qmd
-    - part: discrete-choice.qmd
+    - lectures/why_models.qmd
+    - part: lectures/identification.qmd
+    - part: lectures/extremum-estimators.qmd
+    - part: lectures/discrete-choice.qmd
     #- summary.qmd
     - references.qmd
   appendices:
-    - data.qmd
-    - autodiff.qmd
-    - performance.qmd
+    - appendices/data.qmd
+    - appendices/autodiff.qmd
+    - appendices/performance.qmd
 
 bibliography: references.bib
 

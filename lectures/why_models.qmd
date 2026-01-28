@@ -1,5 +1,7 @@
 # How and Why to Use Models
 
+[Slides for this chapter](slides/why_models.qmd)
+
 Before we dive into methods, it will be helpful to review a number of important use cases for quantitative economic models. Why use a model? This might seem like a strange question to devote time to, given that there is no such thing as economics without them. Still, when you are out in the world presenting your research, you may sometimes encounter this question. Indeed, you will read many important and useful applied papers that have no need of an economic model, so it's not so surprising to think that there are research questions that do not demand a structural estimation exercise. What is my model for? How is it central to answering my research question?
 
 
@@ -141,7 +143,7 @@ with_logger(NullLogger()) do
 end
 ```
 
-**With** the theory of supply and demand, you and understand that each point is the simultaneous equilibrium outcome of two underlying structural relationships in equilibrium. [Phillip and / or Sewall Wright proposed the solution](https://mixtape.scunning.com/07-instrumental_variables): Instrumtal Variables, which is perhaps the earliest known example of an estimated structural model.
+**With** the theory of supply and demand, we understand that each point is the simultaneous equilibrium outcome of two underlying structural relationships in equilibrium. [Phillip and / or Sewall Wright proposed the solution](https://mixtape.scunning.com/07-instrumental_variables): Instrumtal Variables, which is perhaps the earliest known example of an estimated structural model.
 
 ### When variation does not identify the counterfactual of interest
 
@@ -216,11 +218,11 @@ Each of which might be considered much more useful or compelling policy calculat
 
 ### To interpolate existing variation in the data
 
-Sticking with the tax reform example, let's consider what it would take to jointly understand the effects. We know that each reform is related because each comes in the form of an infinite dimensional object: a function $\mathcal{T}(W,H)$ of wages and hours. A model-free theory that attempts to estimate labor supply as a non-parametric function of this function would not get very far due to the implausible quantities of policy variation that would be needed to estimate it.
+Sticking with the tax reform example, let's consider what it would take to jointly understand the effects. We know that each reform is related because each comes in the form of an infinite dimensional object: a function $\mathcal{Y}(W,H)$ of wages and hours. A model-free theory that attempts to estimate labor supply as a non-parametric function of this function would not get very far due to the implausible quantities of policy variation that would be needed to estimate it.
 
-Economic models often provide a useful way to interpolate related -- but not functionally identically related -- variation. Notice that in the labor supply model any function $\mathcal{T}$ is articulated through its effect on the budget constraint, and different policy reforms can be compared in the model without the addition of any new parameters. I refer to this property as *articulated variation*: when the effect of a variable can be modeled without the need for additional parameters. Typically, this involves *a priori* known changes to prices and endowments.
+Economic models often provide a useful way to interpolate related -- but not functionally identically related -- variation. Notice that in the labor supply model any function $\mathcal{Y}$ is articulated through its effect on the budget constraint, and different policy reforms can be compared in the model without the addition of any new parameters. I refer to this property as *articulated variation*: when the effect of a variable can be modeled without the need for additional parameters. Typically, this involves *a priori* known changes to prices and endowments.
 
-In this example, with structural parameters in hand, any function \mathcal{T}$ of wages and hours and can be modeled, and hence any observed variation in this function can be interpreted through the model without additional parameters. In @Mullins2026 I conduct a very similar example using data on welfare reform experiments in the United States.
+In this example, with structural parameters in hand, any function \mathcal{Y}$ of wages and hours and can be modeled, and hence any observed variation in this function can be interpreted through the model without additional parameters. In @Mullins2026 I conduct a very similar example using data on welfare reform experiments in the United States.
 
 Here is a useful *counterexample*: policy variation that is not well-articulated inside a model. Consider our choice of modeling the minimum wage in our entry and exit model: embodied as a parameter $\phi_{4}$. Our choice to not model within-period production decisions of the firm (and instead estimate a reduced form) means that this policy is *not* well-articulated. We need an additional parameter $\phi_{4}$ to model its effect, and further changes to the nominal wage cannot be studied.
 
@@ -261,6 +263,16 @@ Point (2) is essentially an early version of the @lucas1976 critique, while poin
 
 ### Two-Stage Budgeting
 
+Returning to the [life-cycle savings model](/models/savings.qmd), suppose we instead that utility depended on a vector of $K$ commodities $x$ in each period, such that the problem becomes:
+$$ V_{t}(p,a,y) = \max_{x,a'}\left\{v(x) + \beta \mathbb{E}_{p',y'|p,y}V_{t+1}(p',a',y')\right\}$$
+subject to:
+$$ p \cdot x + \frac{1}{1+r}a' \leq y_t,\qquad a\geq \underline{a} $$
+where $p$ is the vector of prices of each commodity. Imagine however that our research question is concerned only with studying the accumulation of savings over the life-cycle, and studying policy counterfactuals (such as the social security system above) that affect the intertemporal allocation of resources. A relatively weak assumption we could place on $v$ is that it is homothetic, in which case there exists a price index $P(p)$ and an indirect utility function $u$ such that [@Gorman1959]:
+$$ V(p,X) = \max_{x}v(x)\ s.t.\ p\cdot x \leq X = u(X/P(p)) $$
+This approach, known as *two-stage budgeting*, says that it is reasonable for consumers to first allocate an aggregate expenditure budget across periods and -- with access to a price index -- disregard the problem of allocating expenditures to more detailed categories. It is a classic and clean application of Marschak's maxim: if your research question concerns inter-temporal consumption allocation decisions, and your policy counterfactuals do not affect any intratemporal margins, then under regularity conditions on demand there is no need to consider intra-temporal consumption allocations. All you need is a reasonable price index with which to deflate nominal values.
+
+In the same spirit, a main goal of @Gorman1959 and others in the two-stage budgeting literature was to find assumptions that would permit broader categories of expenditure (food, utilities, clothing) when modeling and estimating systems of demand.
+
 ### Sufficient Statistics
 Consider a static labor supply model for individuals $i\in[0,1]$ in an economy
 $$ H_i = \arg\max_{h} C - v(h) $$
@@ -274,12 +286,14 @@ $$ V(\tau) = \int(C_i - v(H_i))di$$
 
 What is the welfare effect of a marginal expansion in $b$, financed through $\tau$? Taking $dV/d\tau$ we can apply the envelope theorem to get:
 
-$$ \frac{dV}{d\tau} = -\int WHdi + \int WHdi + \tau \int W_i dH_i/d\tau d_i $$
-which we can rearrange, noting that $dH/d\tau = \varepsilon_{H,W}H$
-$$ \frac{dV}{d\tau} = \tau \int H di \varepsilon_{H,W} $$
-assumign a constant wage elasticity of labor supply.
+$$ \frac{dV}{d\tau} = -\int W_iH_idi + \int W_iH_idi + \tau \int d(W_iH_i)/d\tau d_i $$
+which we can rearrange, assuming a constant elasticity of taxable income wrt to $\tau$
+$$ \frac{dV}{d\tau} = \int Z_i di \varepsilon_{Z,\tau} $$
+where $Z_i = W_iH_i$ is taxable income.
 
-In this setup, the willingess to pay for the marginal policy expansion exactly cancels out with the mechanical component of the cost, and we are left only with the distortionary cost of behavioral adjustments, similar to @Harberger1954.
+In this setup, the willingess to pay for the marginal policy expansion exactly cancels out with the mechanical component of the cost, and we are left only with the distortionary cost of behavioral adjustments, similar to @Harberger1954. [^longnote]
+
+[^longnote]: The assumption of quasi-linear utility simplifies things but is not required. In the general case, we can express the willingess to pay for the marginal policy change as: $-\partial e(w(1-\tau),u)/\partial \tau + dy/d\tau$ where $u$ is utility in the baseline, $e(w(1-\tau),u) = \min (1-\tau)wl + c$ s.t. $u(c)+v(1-l)\geq u$ is the Hicksian expenditure function, and $y=(1-\tau)w + b$ is full income. Shephard's lemma gives that the willingness to pay for the change in price is $lw$ which we can compare to $dy/d\tau$ which is $-w - \int (1-l_i)w_i di + \tau\int d((1-l_i)w_i)/d\tau di$. Averaging over everyone gives the total willingness to pay as $\varepsilon_{z,\tau}\int z_i di$ where $z_i = (1-l_i)w_i$ is earnings and $\varepsilon_{z,\tau}$ is the elasticity of taxable income with respect to taxes.
 
 There is a larger literature on similar so-called *sufficient statistics* in public finance, concerned with deriving approximations to the effect of local policy changes. Their appear is based on formula that tend to rely only on empirical quantities and elasticities, and less on specific functional form assumptions in the model.
 
@@ -290,19 +304,19 @@ Athough of course, as models get more elaborate, the number of elasticities you 
 ::: {#exr-static-labor-supply}
 Consider a static version of the labor supply model where earnings are the only source of income:
 
-$$ H_{n} = \arg\max_{h} \frac{(Wh)^{1-\sigma}}{1-\sigma} - \alpha_{n}^{-1}\frac{h^{1+1/\psi}}{1+1/\psi} $$
+$$ H_{n} = \arg\max_{h} \frac{(W_nh)^{1-\sigma}}{1-\sigma} - \alpha_{n}^{-1}\frac{h^{1+1/\psi}}{1+1/\psi} $$
 
 Assume that wages follow
 
-$$ \log(W) = \gamma_{0} + \gamma_{1}Z + \epsilon $$
+$$ \log(W_{n}) = \gamma_{0} + \gamma_{1}Z_{n} + \epsilon_{n} $$
 
 where $Z \perp \alpha$ but $\epsilon$ and $\alpha$ are potentially correlated.
 
-1. Solve for $H_{n}$ in terms of $W$
-2. Suppose you have cross-sectional data $(W_{n},Z_{n},H_{n},C_{n})_{n=1}^{N}$ used $Z$ as an instrument to estimate the relationship
+1. Solve for $H_{n}$ in terms of $W_{n}$
+2. Suppose you have cross-sectional data $(W_{n},Z_{n},H_{n})_{n=1}^{N}$ and that you use $Z$ as an instrument to estimate the relationship
 $$ \log(H) = \alpha_0 + \alpha_1 \log(W) + \varepsilon $$
-via 2SLS. What is the population limit of $\alpha_1$ as $N\rightarrow\infty$? (Hint: it should follow from your answer to part 1).
-3. Consider a policy reform that introduces a proportional subsidy, $\tau$, so that net wages are $(1+\tau)W$. Is the combination of parameters $\alpha_{1}$ sufficient for forecasting the effects of this policy? If this is your question of interst, what does Marschak's Maxim suggest about the need to separately identify parameters here?
+via 2SLS. Express the estimand $\alpha_1$ as a combination of structural parameters. (Hint: it should follow from your answer to part 1).
+3. Consider a policy reform that introduces a proportional subsidy, $\tau$, so that net wages are $(1+\tau)W$. Is $\alpha_{1}$ sufficient for forecasting the effects of this policy? If this is your question of interest, what does Marschak's Maxim suggest about the need to separately identify the parameters that combine to form $\alpha_1$?
 4. Now suppose an alternative policy reform that consists of a lump sum transfer $b$ and a proportional labor market tax, $\tau$, so that net income is $b + (1-\tau)WH$. Do you think $\alpha_{1}$ is sufficient to forecast the effect of this new policy on labor supply? An intuitive explanation is sufficient, but you can try calculating the local change $\partial H / \partial b |_{b=0}$ if you want to be more precise.
 5. Based on your answer to part 4, and assuming that the model we wrote down is the true data generating process, do you think it is even possible to forecast the effect of this alternative policy given these data?
 
