@@ -151,9 +151,9 @@ xlabel!("2SLS Estimate")
 1. Explain why this estimator appears to be showing asymptotic bias.
 2. Assume that $\zeta\sim\mathcal{N}(0,1)$ and $\epsilon\sim\mathcal(0,\sigma^2_\epsilon)$. Show that the *reduced form* for this model ($H$ and $W$ written in terms of exogenous variables) can be written as:
 $$ \log(W) = A_0 + A_1z + A_2\eta + \xi_1 $$
-$$ H = \mathbf{1}\{B_0 + B_1z + + B_2\eta + \xi_2 >0\} $$
+$$ H = \mathbf{1}\{B_0 + B_1z + B_2\eta + \xi_2 >0\} $$
 $$ X = \gamma_0 + \gamma_1 z + \eta $$
-where $[\xi_1,\ \xi_2]$ is a bivariate normal with non-zero covariance.
+where $[\xi_1,\ \xi_2]$ is a bivariate normal with non-zero covariance and the coefficients $A$ and $B$ are combinations of underlying structural parameters.
 3. Show that the parameters of the reduced form are identified (hint: start by identifying $[\gamma_0,\gamma_1]$ and then inverting $\eta$ from $Z$ and $X$, treating it as observable).
 4. Show that the structural parameters can be identified from this reduced form.
 5. Does this approach to identification work if we do not make these functional form assumptions? In other words, could we *nonparametrically* identify the reduced form parameters of the model?
