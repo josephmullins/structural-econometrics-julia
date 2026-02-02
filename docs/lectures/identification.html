@@ -20,7 +20,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -30,7 +50,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/extremum-estimators.html" rel="next">
+<link href="../lectures/identification_roy.html" rel="next">
 <link href="../lectures/why_models.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -160,8 +180,33 @@ ul.task-list li input[type="checkbox"] {
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
-      <span class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Identification and Credible Inference</span></span>
+      <div class="sidebar-item-container"> 
+            <a href="../lectures/identification.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Identification and Credible Inference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_roy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_labor_supply.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span></a>
+  </div>
+</li>
+      </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <span class="sidebar-item-text sidebar-link text-start">
@@ -236,8 +281,36 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<p>In this section of the course we will introduce the concept of identification and – with the help of our prototype models – examine some examples of different strategies for establishing identification of economic models.</p>
+<p>As a fan of cricket, one thing you realize when explaining the rules to a newcomer is that the word “wicket” can refer to one of several different things. That’s confusing! Likewise, economists tend to use the word “identification” in a semantically loose way, and it can mean one of two things depending on context:</p>
+<ol type="1">
+<li>Formally, identification refers to <em>whether</em> the mapping between model and data can be inverted to a unique parameter (point identification) or set of parameters (partial identification).</li>
+<li>Informally, identification discussions typically focus on <em>how</em> a particular model is identified, which has more to do with the particular estimation strategy than it does with the question of identification.</li>
+</ol>
+<p>Out of pragmatism, most quantitative models already impose parametric restrictions on functional forms (such as utilities, production functions, wage equations, and distributions of unobservables). We will see that this can often mean that there are many ways to identify and estimate parameters, and so much of our effort is directed at issue (2) instead of (1). When there are multiple paths to identification, it is worth considering whether one path might be considered more “credible” in the sense that it is more robust to mild extensions, or relies less heavily on strong functional form and / or distributional assumptions.</p>
+<p>In my experience, one issue that can be confusing for students is that economists in some fields spend more time talking about identification than they do actually <em>showing</em> identification. In this chapter, we’ll show identification of our simple prototype models, and then consider extensions that show that this identification can sometimes rest on overly strong assumptions. Then we’ll consider some common strategies as potential remedies to making these overly strong assumptions.</p>
+<p>As we work through the examples, I will (reluctantly) apply the labels “credible” and “incredible” inference, but only to help convey a broader understanding of what this labeling even means. I would like to establish, by way of these examples, that “credible inference” – a phrase you will hear more broadly in the profession <span class="citation" data-cites="AngristPischke2010">(<a href="../references.html#ref-AngristPischke2010" role="doc-biblioref">Angrist and Pischke 2010</a>)</span> – is not a particularly useful taxonomy for quantitative economics. Credibility is subjective and so-called “credible” inference strategies often contain quietly embedded structure, and require much stronger assumptions to draw any portable lessons from the exercise (we exhaustively discussed examples in the previous chapter). A more productive – and philosophically neutral – strategy is to be clear and transparent about the assumptions under which key parameters are identified, <em>how</em> they are identified, and therefore the sources of data that are most influential in determining the calculations from a given quantitative modeling exercise. That’s an honorable objective that satisfies the main imperative of the “credibility revolution”.</p>
+<!-- The rapid growth in causal inference methods reflects an obviously crucial imperative that we must take seriously: we should be as transparent as possible in showing *how* the available data identifies the key causal parameters in our model, so that readers can make their personal assessments of credibility. Let's go a head and review some simple examples of these ideas at work. 
+
+- also make the point that about a couple of themes:
+- potential for unobserved heterogeneity lies at heart of many causal inference problems
+- can ignore in the model but it's good to have a strategy that is robust to it
+- solutions: panel data or IV 
+
+1. Does this version of the model imply a "naive" approach to identification.
+2. Some simple models allow for naive approaches or less naive approaches. Mutiple paths, some more believable than others (in that they are robust to alternatives).
+3. Under what conditions would the model be identified without parametric restrictions, and do my data resemble those conditions at all?
+4. Can we show an example with many sources of identification? (yes! labor supply... panel approach robust and IV are robust in either case)
 
 
+-->
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-AngristPischke2010" class="csl-entry" role="listitem">
+Angrist, Joshua D., and Jörn-Steffen Pischke. 2010. <span>“The Credibility Revolution in Empirical Economics: How Better Research Design Is Taking the Con Out of Econometrics.”</span> <em>Journal of Economic Perspectives</em> 24 (2).
+</div>
+</div>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -664,8 +737,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/extremum-estimators.html" class="pagination-link" aria-label="Extremum Estimators">
-        <span class="nav-page-text">Extremum Estimators</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/identification_roy.html" class="pagination-link" aria-label="The Generalized Roy Model">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

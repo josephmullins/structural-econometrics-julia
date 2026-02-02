@@ -19,6 +19,10 @@ book:
       - models/dynamic-labor-supply.qmd
     - lectures/why_models.qmd
     - part: lectures/identification.qmd
+      chapters:
+      - lectures/identification_roy.qmd
+      - lectures/identification_search.qmd
+      - lectures/identification_labor_supply.qmd
     - part: lectures/extremum-estimators.qmd
     - part: lectures/discrete-choice.qmd
     #- summary.qmd

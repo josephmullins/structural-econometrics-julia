@@ -1,0 +1,68 @@
+# The Search Model
+
+## Identification of the Model without Heterogeneity
+
+The @Mccall Search Model that we introduced as a [prototype model](../models/search.qmd) is an excellent introduction to the identification of structural models. A classic treatment of identification of this model is provided by @flinn1982. 
+
+
+### Data
+
+Identification arguments *always* begin with an assumption on available data. Even though the model is dynamic, we will show that all we really need is a single cross-section of data:
+
+$$ (E_{n},t_{U,n},W_{n})_{n=0}^{N} $$
+
+where :
+
+- $E_{n}\in\{0,1\}$ indicates the employment status of individual $n$
+- If the individual is employed ($E_{n}=1$) we see the wage, $W_{n}$, which is otherwise assumed to be missing.
+- If the individual is unemployed ($E_{n}=0$), then we see the duration of unemployment $t_{U,n}$, which is otherwise assumed to be missing.
+
+### Steady State
+
+A key assumption for identification in this case is that the economy is in **steady state**. Let $U_{t}$ be fraction of individuals that are unemployed at time $t$. Let $p_{\tau,t}$ be the fraction of individuals at time $t$ with unemployment duration $\tau$. In general, these objects evolve according to the rules:
+
+\begin{eqnarray}
+U_{t+1} = (1-h)U_{t} + \delta (1-U_{t+1}) \\
+p_{\tau+1,t+1} = (1-h)p_{\tau,t} \\
+p_{0,t+1} = \delta (1-U_{t})
+\end{eqnarray}
+where $h$ is the "hazard rate" of exiting unemployment, $\lambda(1-F_{W}(w^*))$. Enforcing that these objects are constant between $t$ and $t+1$ (the steady state assumption) gives:
+
+\begin{eqnarray}
+U_{t} = \frac{\delta}{\delta+h} \\
+p_\tau = \frac{\delta h}{\delta+h}(1-h)^{\tau}
+\end{eqnarray}
+
+### Writing Joint Probabilities
+
+With these probabilities in hand, we can write the sampling distribution $\mathbb{P}$ in terms of equilibrium objects:
+
+$$ \mathbb{P}(E,t_U,W) = \left(\frac{h}{h+\delta}f_{W}(W|W>w^*)\right)^{E}\left(\frac{\delta h}{\delta+h}(1-h)^{t_{U}}\right)^{1-E} $$
+
+### Thinking Through Identification
+
+Often it is helpful to break down the joint distribution of observables into unconditional and conditional distributions. Notice here that:
+
+$$ \mathbb{P}(t_{U}|E=0) = h\times(1-h)^{t_{U}} $$
+
+and so the hazard rate $h$ can be inferred from the distribution of unemployment durations.
+
+Next, notice that the probability of being unemployed is 
+
+$$ \mathbb{P}(E=0) = \frac{\delta}{\delta+h} $$
+
+and so $\delta$ is given by $h$ (which we now know) and the fraction of unemployed.
+
+Finally, we see that
+
+$$ \mathbb{P}(W|E=1) = f_{W}(W|W>w^*) $$
+
+Observed wages are equal to the offer distribution *conditional on the wage offer being acceptable*. This tells us that, although the conditional distribution can be identifiable, we do not know the distribution of wage offers that are never accepted (those below $w^*$). This is still sufficient to identify $w^*$ however, since it is the lower bound on the support of this conditional distribution. 
+
+Can we identify the deeper structural parameters, $b$, $\lambda$, and $\beta$? Not quite. Let's rewrite the reservation wage equation as:
+
+$$ w^* = b + h\int_{w^*}\frac{1-F(W|W>w^*)}{1-\beta(1-\delta)}dw $$
+
+and we can see that infinitely many combinations of $b$ and $\beta$ can rationalize the same reservation wage. Assuming a plausible value for $\beta$ (you will learn that this is common across many structural estimation exercises), $b$ is identified by this equation.
+
+

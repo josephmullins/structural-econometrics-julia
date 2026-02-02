@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>7&nbsp; The Generalized Roy Model – Structural Econometrics with Julia</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../lectures/identification_search.html" rel="next">
+<link href="../lectures/identification.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-626149efe8f5d16e1d391ba177679bf0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/identification.html">Identification and Credible Inference</a></li><li class="breadcrumb-item"><a href="../lectures/identification_roy.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Structural Econometrics with Julia</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Five Prototype Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/generalized_roy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Job Search Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/savings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">A Life-Cycle Savings Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/entry-exit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/dynamic-labor-supply.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A Simple Labor Supply Model</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/why_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">How and Why to Use Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../lectures/identification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Identification and Credible Inference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_roy.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_labor_supply.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Extremum Estimators</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Discrete Choice</span></span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/autodiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Automatic Differentiation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Performance Tips</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#selection-in-general" id="toc-selection-in-general" class="nav-link active" data-scroll-target="#selection-in-general"><span class="header-section-number">7.1</span> Selection in General</a></li>
+  <li><a href="#identification-by-functional-form" id="toc-identification-by-functional-form" class="nav-link" data-scroll-target="#identification-by-functional-form"><span class="header-section-number">7.2</span> Identification by Functional Form</a></li>
+  <li><a href="#identification-with-exclusion-restrictions" id="toc-identification-with-exclusion-restrictions" class="nav-link" data-scroll-target="#identification-with-exclusion-restrictions"><span class="header-section-number">7.3</span> Identification with Exclusion Restrictions</a></li>
+  <li><a href="#monotonicity-and-potential-outcomes" id="toc-monotonicity-and-potential-outcomes" class="nav-link" data-scroll-target="#monotonicity-and-potential-outcomes"><span class="header-section-number">7.4</span> Monotonicity and Potential Outcomes</a>
+  <ul class="collapse">
+  <li><a href="#relationship-to-the-generalized-roy-model" id="toc-relationship-to-the-generalized-roy-model" class="nav-link" data-scroll-target="#relationship-to-the-generalized-roy-model"><span class="header-section-number">7.4.1</span> Relationship to the Generalized Roy Model</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/identification.html">Identification and Credible Inference</a></li><li class="breadcrumb-item"><a href="../lectures/identification_roy.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="selection-in-general" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="selection-in-general"><span class="header-section-number">7.1</span> Selection in General</h2>
+<p>Let us review the empirical content of this model without placing further restrictions on the functional forms. Let’s start with the selection equation. Let <span class="math inline">\(P(X,Z) = P[D=1|X,Z]\)</span>. For any distribution of <span class="math inline">\(V\)</span>, since <span class="math inline">\(F_{V}\)</span> is monotonically increasing (under support conditions on <span class="math inline">\(V\)</span>), we can write: <span class="math display">\[ D = \mathbf{1}\{\mu_{d}(X,Z) \geq V\} = \mathbf{1}\{F_{V}(\mu_{d}(X,Z)) \geq F_{V}(V)\}.\]</span> Since <span class="math inline">\(F_{V}(V)\)</span> is a uniform random variable in <span class="math inline">\([0,1]\)</span>, we can always write the selection equation without loss of generality as:</p>
+<p><span class="math display">\[ D = \mathbf{1}\{P(X,Z) - V \geq 0\},\qquad V\sim U[0,1] \]</span></p>
+<p>Now consider the conditional expectations: <span class="math display">\[ \mathbb{E}[Y|X,Z,D=1] = \mu_{1}(X) + \underbrace{\mathbb{E}[U_1 | V \leq P(X,Z)]}_{h_{1}(P(X,Z))} \]</span> <span class="math display">\[ \mathbb{E}[Y|X,Z,D=0] = \mu_{0}(X) + \underbrace{\mathbb{E}[U_0 | V &gt; P(X,Z)]}_{h_{0}(P(X,Z))} \]</span></p>
+<p>Two observations follow:</p>
+<ol type="1">
+<li>These equations illustrate the classic selection problem. If the unobservable that determines <span class="math inline">\(D\)</span> is related to the unobservables that determine the potential outcomes <span class="math inline">\((Y_0,Y_1)\)</span>, then the difference in conditional means is partly contaminated with this <em>selection effect</em>.</li>
+<li>The selection model implies <em>dimension reduction</em> in the conditional expectation of each <span class="math inline">\(U_{D}\)</span> given <span class="math inline">\(X\)</span> and <span class="math inline">\(Z\)</span>: the combined propensity <span class="math inline">\(P(X,Z)\)</span> encodes all the relevant information to control for selection. This is a useful property, but the underlying index model is <em>not</em> without loss of generality. We will explore a little more below.</li>
+</ol>
+</section>
+<section id="identification-by-functional-form" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="identification-by-functional-form"><span class="header-section-number">7.2</span> Identification by Functional Form</h2>
+<p>We’ll begin by considering identification under some additional functional form restrictions. First, consider the example where the triple <span class="math inline">\((V,U_0,U_1)\)</span> are jointly normally distributed:</p>
+<p><span class="math display">\[
+\left[\begin{array}{c}
+V \\ U_0 \\ U_1
+\end{array}\right] = \mathcal{N}\left(\mathbf{0},\left[
+    \begin{array}{ccc}
+    1 &amp; \sigma_{V0} &amp; \sigma_{V1} \\
+    \sigma_{V0} &amp; \sigma^2_{0} &amp; \sigma_{01} \\
+    \sigma_{V1} &amp; \sigma_{01} &amp; \sigma^2_{1}
+    \end{array}\right]
+    \right)
+\]</span></p>
+<p>where we have normalized the location of the unobservables by setting the mean to zero, and normalized the scale of <span class="math inline">\(V\)</span> by assuming a unit variance. Additionally, let us specify that each <span class="math inline">\(\mu_{D}\)</span> is linear in <span class="math inline">\(X\)</span>: <span class="math display">\[ \mu_{D}(X) = X\beta_{D} \]</span> Assume that our data is a single cross-section of observations <span class="math inline">\((Y_{D},D,X)\)</span>. Identification is a statement about population values, so can we take as given that we see the joint distribution <span class="math inline">\(\mathbb{P}_{Y_{D},D,X}\)</span>.</p>
+<p><strong>Step 1</strong> Note that the distribution of <span class="math inline">\(D\)</span> given <span class="math inline">\(X\)</span> is a probit model: <span class="math display">\[ P[D=1|X] = \Phi(\mu_{d}(X)) \]</span> where <span class="math inline">\(\Phi\)</span> is the cdf of the standard normal. Thus <span class="math inline">\(\mu_{d}(X)\)</span> is identified as <span class="math inline">\(\mu_{d}(X) = \Phi^{-1}(P[D=1|X])\)</span> for any <span class="math inline">\(X\)</span>. If we additionally impose that <span class="math inline">\(\mu_{d}(X) = X\gamma\)</span>, then identification of each <span class="math inline">\(\gamma\)</span> follows from the usual assumption that <span class="math inline">\(X\)</span> is full-rank with positive probability (just like OLS).</p>
+<p><strong>Step 2</strong> Now consider the identification of each <span class="math inline">\(\beta_{D}\)</span>. We have:</p>
+<p><span class="math display">\[\begin{align}
+\mathbb{E}[Y_{1}|X,D=1] &amp;= X\beta_{1} + \mathbb{E}[U_1 | V&lt;\mu_{d}(X)] \\
+&amp;= X\beta_{1} - \sigma_{V1}\frac{\phi(\mu_{d}(X))}{\Phi(\mu_{d}(X))}
+\end{align}\]</span> and similarly: <span class="math display">\[
+\mathbb{E}[Y_{0}|X,D=0] = X\beta_1 + \sigma_{V0}\frac{\phi(\mu_{d}(X))}{1-\Phi(\mu_{d}(X))}
+\]</span> Under the same rank conditions for <span class="math inline">\(X\)</span>, both <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are identified due to. This also means that <span class="math inline">\(ATE(X) = X(\beta_1 - \beta_0)\)</span> is identified for all <span class="math inline">\(X\)</span>.</p>
+<p>Although we cannot identify the full distribution of treatment effects, this also gives us the average treatment effect among individuals with treatment propensity <span class="math inline">\(V\)</span>: <span class="math display">\[\mathbb{E}[Y_0-Y_0|X,V] = X(\beta_1-\beta_0) + \underbrace{(\sigma_{V1}-\sigma_{V0})V}_{\mathbb{E}[U_1-U_0|V]}\]</span> We’ll come back to this object in the next section.</p>
+<p>Notice that identification holds here even <em>without</em> an excluded variable <span class="math inline">\(Z\)</span>. It follows from the assumption of linearity and normality of the error terms, which yield a particular parametric decomposition of the conditional expectation that can be identified.</p>
+<p>This is an example of <strong>identification by functional form</strong>: identification depends crucially on these particular functional form assumptions. Notice that without linearity in <span class="math inline">\(\mu_{d}\)</span>, it is not possible to separately identify <span class="math inline">\(\mu_{d}\)</span> from the selection correction. Would you say that this is a very credible approach to identifying the key causal parameters in the model? <span class="citation" data-cites="Lewbel">Lewbel (<a href="../references.html#ref-Lewbel" role="doc-biblioref">2019</a>)</span> provides a broad and satisfying discussion of these issues.</p>
+</section>
+<section id="identification-with-exclusion-restrictions" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="identification-with-exclusion-restrictions"><span class="header-section-number">7.3</span> Identification with Exclusion Restrictions</h2>
+<p>If we have access to an excluded regressor, we do not have to rely so much on seemingly arbitrary functional form restrictions. Formally, we make two assumptions:</p>
+<ol type="1">
+<li><span class="math inline">\(\mu_{D}(X,Z)=\mu_{D}(X)\)</span> almost everywhere (exclusion)</li>
+<li>$ Z(V,U_0,U_1) | X $ (independence)</li>
+</ol>
+<p>This implies that we can write: <span class="math display">\[\mathbb{E}[U_1|X,Z,D=1] = \mathbb{E}[U_1|V\leq P(X,Z)] \]</span> and similarly for <span class="math inline">\(\mathbb{E}[Y|X,Z,D=0]\)</span>. So the expectation of <span class="math inline">\(Y\)</span> (unconditional on <span class="math inline">\(D\)</span>) is: <span class="math display">\[\begin{align}
+\mathbb{E}[Y|X,P(X,Z)=p] &amp;= \mu_{0}(X) + p[\mu_{1}(X)-\mu_{0}(X)] + p\mathbb{E}[(U_{1}-U_{0})|V\leq P(X,Z)] \\
+&amp; \mu_{0}(X) + P(X,Z)[\mu_{1}(X)-\mu_{0}(X)] + \int_{0}^{p}\mathbb{E}[(U_1 - U_0)|V=u]du
+\end{align}\]</span></p>
+<p>Taking a derivative with respect to <span class="math inline">\(p\)</span> gives: <span class="math display">\[\begin{align}
+\frac{\partial \mathbb{E}[Y|X,P(X,Z)=p]}{\partial p} &amp;= \mu_{1}(X)-\mu_{0}(X) + \mathbb{E}[U_1 - U_0 | V = p] \\
+&amp; \mathbb{E}[Y_1 - Y_0 | V = p] \\
+&amp; MTE(p)
+\end{align}\]</span></p>
+<p><span class="citation" data-cites="HeckmanVytlacil2005">Heckman and Vytlacil (<a href="../references.html#ref-HeckmanVytlacil2005" role="doc-biblioref">2005</a>)</span> call this derivative <em>local instrumental variables</em> approach and define the estimand, <span class="math inline">\(MTE(p)\)</span> as the <strong>marginal treatment effect</strong>. It is the average treatment effect among individuals with a propensity <span class="math inline">\(1-p\)</span> to take the treatment. They show that, commonly used estimators (instrumental variables, difference-in-differences) are often weighted averages of this marginal treatment effect, and that the marginal treatment effect is a useful building block for.</p>
+<p>Note that under support conditions on <span class="math inline">\(Z\)</span>, as the support of <span class="math inline">\(P(X,Z)\)</span> approaches the unit interval <span class="math inline">\([0,1]\)</span>, the average treatment effect <span class="math inline">\(ATE(X) = \mu_{1}(X)-\mu_{0}(X)\)</span> is also identified.</p>
+<p><strong>Credibility</strong> Whether or not you think that this approach to identifying treatment effects is more or less credible than using functional form restrictions may depend on how valid you think the exclusion and independence restrictions are. However, assuming that we have access to a “good” instrument, it should be clear that this approach is preferable.</p>
+<p>In practice, even when we have access to an instrument, the data requirements for fully non-parametric estimation can be overly demanding. A reasonable compromise is to illustrate the conditions under which your instrument provides nonparametric identification, then introduce parametric assumptions that can interpolate this plausible variation. This is a way to establish that identification of your parameters of interest in not purely driven by functional form restrictions. See <span class="citation" data-cites="Cunha2010">Cunha, Heckman, and Schennach (<a href="../references.html#ref-Cunha2010" role="doc-biblioref">2010</a>)</span> and <span class="citation" data-cites="Carneiro2011">Carneiro, Heckman, and Vytlacil (<a href="../references.html#ref-Carneiro2011" role="doc-biblioref">2011</a>)</span> for two examples of this kind of approach.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-endog_selection" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 7.1</strong></span> Consider the following problem that features endogeneity <em>and</em> selection. Let <span class="math inline">\(W\)</span> be wages, let <span class="math inline">\(X\)</span> be an endogenous variable of interest, and let <span class="math inline">\(Z\)</span> be an instrument for <span class="math inline">\(X\)</span>. Wages are <em>selected</em> because we only observe then when the individual chooses to work (<span class="math inline">\(H=1\)</span>):</p>
+<p><span class="math display">\[\begin{eqnarray}
+\log(W) = \alpha_0 + \alpha_1 X + \epsilon + \rho\eta \\
+X = \gamma_0 + \gamma_1 Z + \eta \\
+H = \mathbf{1}\{\beta_0 + \beta_1\log(W) + \zeta &gt;0\}
+\end{eqnarray}\]</span></p>
+<p>Here is a function that simulates these data for a fixed set of parameter values:</p>
+<div id="413d0b3f" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span>, <span class="bu">Random</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">sim_data</span>(N)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    α <span class="op">=</span> [<span class="fl">1</span>., <span class="fl">0.5</span>]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    γ <span class="op">=</span> [<span class="fl">1</span>., <span class="fl">0.5</span>]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    ρ <span class="op">=</span> <span class="fl">0.4</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    β <span class="op">=</span> [<span class="op">-</span><span class="fl">0.25</span>, <span class="fl">0.5</span>]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    ϵ <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">Normal</span>(),N)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    η <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">Normal</span>(),N)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    ζ <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">Normal</span>(),N)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    Z <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">Normal</span>(),N)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> γ[<span class="fl">1</span>] <span class="op">.+</span> γ[<span class="fl">2</span>]<span class="op">*</span>Z <span class="op">.+</span> η</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    logW <span class="op">=</span> α[<span class="fl">1</span>] <span class="op">.+</span> α[<span class="fl">2</span>]<span class="op">*</span>X <span class="op">.+</span> ρ<span class="op">*</span>η <span class="op">.+</span> ϵ</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    H <span class="op">=</span> (β[<span class="fl">1</span>] <span class="op">.+</span> β[<span class="fl">2</span>]<span class="op">*</span>logW <span class="op">.+</span> ζ) <span class="op">.&gt;</span> <span class="fl">0</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    logW[H<span class="op">.==</span><span class="fl">0</span>] <span class="op">.=</span> <span class="op">-</span><span class="fl">1</span> <span class="co">#&lt;- set to missing if H=0</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (;logW,X,Z,H)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>sim_data (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>Suppose that you decide to handle the endogeneity problem by estimating <span class="math inline">\(\alpha_1\)</span> with 2SLS. Below is a monte-carlo simulation of the performance of this estimator:</p>
+<div id="c8816b94" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span>, <span class="bu">StatsBase</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">monte_carlo_trial</span>(N)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> <span class="fu">sim_data</span>(N)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># pull out non-missing data</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> data.logW[data.H<span class="op">.==</span><span class="fl">1</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    Z <span class="op">=</span> data.Z[data.H<span class="op">.==</span><span class="fl">1</span>]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> data.X[data.H<span class="op">.==</span><span class="fl">1</span>]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># run 2SLS</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    alpha_est <span class="op">=</span> <span class="fu">cov</span>(W,Z) <span class="op">/</span> <span class="fu">cov</span>(X,Z)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> alpha_est</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># run 500 trials</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>alpha_boot <span class="op">=</span> [<span class="fu">monte_carlo_trial</span>(<span class="fl">10_000</span>) for b <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">500</span>]</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">histogram</span>(alpha_boot,normalize<span class="op">=:</span>probability,label<span class="op">=</span><span class="cn">false</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>([<span class="fl">0.5</span>,<span class="fl">0.5</span>],[<span class="fl">0</span>.,<span class="fl">0.2</span>],color<span class="op">=</span><span class="st">"red"</span>,label <span class="op">=</span> <span class="st">"True Value"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">xlabel!</span>(<span class="st">"2SLS Estimate"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<img src="data:image/png;base64,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0FDrXj/++GO1vQAAgKpOZ1P/4Q9/+Otf/+rm5hYfH5+bmzt8+HAhxIYNGw4ePPjRRx81b9782WeffeGFFxYsWPDpp5/26NGjc+fO6l6vvPKKv79/SkpKamrqmDF8RAcAgDuwXbhwYa2DoqKiSkpKVqxYUVJSsnLlSvXI882bN00mU+/evYUQAwcOTEtL++yzzzw8PD744AMnJychREREhK2t7fLly2/cuLFy5cpqB7cBAICq9hO4AACAprg2NQAAkj0s16a+T3v27Dl9+nRkZGS1j2AJISoqKg4dOnT27Fm9Xt+vX7/g4GB1+65du0pK/n0efqdOnW6/hiikKCoq+vLLL8vKykaNGuXnd9crsu3bt0+v1/fv319dLS0t/fLLLwsLC0eMGNG2bduGaha1uHHjxvbt2/V6fUxMTA2fG/n666/9/PwiIyOFEBkZGUlJSdabYmJi6vdTlPjFjh49evTo0Y4dOw4bNuz2T3Zt27bNZDKpy127du3YsaO6nJKSEhcX165duxEjRthocMHjBtOIW28wCxYsmD17dmFhYWxs7Pvvv1/t1osXL77zzjuZmZnnzp3r37//2rVr1e2zZs364osv9u7du3fv3osXLzZ417iD0tLSXr167du379KlSxEREZcvX77jsISEhJEjRy5ZskRdNZlM/fr127Fjx88//xwZGaleYA7SZWVlRUREnD59+siRI5GRkQUFBXcctmnTpqeffnrFihXq6sGDB+fNm7f3/5jN5gZsGXe1atWq8ePHFxYWvvLKKy+++OLtAyZMmLBz5071Vbt69d+XH96yZcuIESMKCgreeuut2NjYhm25vimoUX5+vouLS0ZGhqIoKSkpPj4+FRUVdxu8YsWK/v37q8tBQUGpqakN1CXqZuXKlQMGDFCXX3zxRfWa6tWUl5f37Nlz/vz50dHR6pYtW7ZERkZaLBZFUf7+979PmDChwRpGDebPnz9lyhR1edSoUe+8887tY3Jycrp27TpjxoznnntO3bJ27doxY8Y0XJeoA5PJ1LZt27i4OEVRcnJyXFxcrl+/Xm2Mi4tLbm5utY2hoaFfffWVoijFxcVubm4XL15smIa1wDvjWhw7duyRRx555JFHhBARERE6na7a1UCtKisrk5OTq36cev369UuXLk1MTGygXlGbAwcODBkyRF0eMmRIXFzc7WMWLlz4zDPP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">
+</div>
+</div>
+<ol type="1">
+<li>Explain why this estimator appears to be showing asymptotic bias.</li>
+<li>Assume that <span class="math inline">\(\zeta\sim\mathcal{N}(0,1)\)</span> and <span class="math inline">\(\epsilon\sim\mathcal(0,\sigma^2_\epsilon)\)</span>. Show that the <em>reduced form</em> for this model (<span class="math inline">\(H\)</span> and <span class="math inline">\(W\)</span> written in terms of exogenous variables) can be written as: <span class="math display">\[ \log(W) = A_0 + A_1z + A_2\eta + \xi_1 \]</span> <span class="math display">\[ H = \mathbf{1}\{B_0 + B_1z + + B_2\eta + \xi_2 &gt;0\} \]</span> <span class="math display">\[ X = \gamma_0 + \gamma_1 z + \eta \]</span> where <span class="math inline">\([\xi_1,\ \xi_2]\)</span> is a bivariate normal with non-zero covariance.</li>
+<li>Show that the parameters of the reduced form are identified (hint: start by identifying <span class="math inline">\([\gamma_0,\gamma_1]\)</span> and then inverting <span class="math inline">\(\eta\)</span> from <span class="math inline">\(Z\)</span> and <span class="math inline">\(X\)</span>, treating it as observable).</li>
+<li>Show that the structural parameters can be identified from this reduced form.</li>
+<li>Does this approach to identification work if we do not make these functional form assumptions? In other words, could we <em>nonparametrically</em> identify the reduced form parameters of the model?</li>
+<li>Introduce a variable to this model that would allow you to nonparametrically estimate the reduced form once again (hint: think back to what allows this in the Generalized Roy Model).</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="monotonicity-and-potential-outcomes" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="monotonicity-and-potential-outcomes"><span class="header-section-number">7.4</span> Monotonicity and Potential Outcomes</h2>
+<p>Recall that the generalized roy model embeds the <strong>potential outcomes framework</strong> (this is the model you get if you throw away the selection equation). <span class="citation" data-cites="ImbensAngrist">Imbens and Angrist (<a href="../references.html#ref-ImbensAngrist" role="doc-biblioref">1994</a>)</span> consider what can be estimated from two stage least squares when you have access to an instrument <span class="math inline">\(Z\)</span> and heterogeneous potential outcomes. To formalize their setup, assume that individuals can be indexed in some measurable space <span class="math inline">\(\omega\in\Omega\)</span>, so that we write the model as a triple: <span class="math inline">\((Y_1(\omega),Y_0(\omega),D_{Z}(\omega))\)</span> where <span class="math inline">\(D_{Z}(\omega)\in\{0,1\}\)</span> indicates the choice of an individual of type <span class="math inline">\(\omega\)</span> when the instrument takes a value <span class="math inline">\(Z\)</span>.</p>
+<p>They combine four assumptions:</p>
+<ol type="1">
+<li>Exclusion: <span class="math inline">\(Y_{D}(\omega,Z) = Y_{D}(\omega)\)</span> for <span class="math inline">\(D\in\{0,1\}\)</span></li>
+<li>Independence: $Z $</li>
+<li><strong>Monotonicity</strong>: For any pair <span class="math inline">\((z,z')\)</span> in the support of <span class="math inline">\(Z\)</span>, either <span class="math inline">\(D_{Z}(\omega)\geq D_{Z'}(\omega)\)</span> for all <span class="math inline">\(\omega\in\Omega\)</span> or <span class="math inline">\(D_{Z}(\omega)\leq D_{Z'}(\omega)\)</span> for all <span class="math inline">\(\omega\in\Omega\)</span>.</li>
+<li>Relevance: <span class="math inline">\(P[\omega: D_{1}(\omega) \neq D_{0}(\omega)]&gt;0\)</span>.</li>
+</ol>
+<p>Monotonicity is easiest to understand when <span class="math inline">\(Z\in\{0,1\}\)</span>. In this case one can partition <span class="math inline">\(\Omega\)</span> into</p>
+<ol type="1">
+<li>Always takers: <span class="math inline">\(D_{1}(\omega)=D_{0}(\omega)=1\)</span></li>
+<li>Never takers: <span class="math inline">\(D_{1}(\omega)=D_{0}(\omega)=0\)</span></li>
+<li>Compliers: <span class="math inline">\(D_{1}(\omega)=1\)</span>, <span class="math inline">\(D_{0}(\omega)=0\)</span></li>
+<li>Defiers: <span class="math inline">\(D_{0}(\omega) = 0\)</span>, <span class="math inline">\(D_{1}(\omega)=1\)</span></li>
+</ol>
+<p>In this case, monotonicity rules out (without loss of generality) the existence of defiers.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-LATE" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 7.2</strong></span> Under these assumptions, show that the 2SLS estimand: <span class="math display">\[
+\frac{\mathbb{E}[Y|Z=1]-\mathbb{E}[Y|Z=0]}{P[D=1|Z=1]-P[D=1|Z=0]}
+\]</span> is equal to the average treatment effect among compliers: <span class="math inline">\(\mathbb{E}[Y_1(\omega)-Y_0(\omega)|\omega \in\text{Compliers}]\)</span>.</p>
+</div>
+</div>
+</div>
+<p><span class="citation" data-cites="ImbensAngrist">Imbens and Angrist (<a href="../references.html#ref-ImbensAngrist" role="doc-biblioref">1994</a>)</span> call this object the <em>Local Average Treatment Effect</em>. They show that for multi-valued instruments, 2SLS produces a weighted average of these LATES for difference complier groups.</p>
+<p>This interpretation of IV estimators is immensely widely used, so you should know the definition and the assumptions under which it works.</p>
+<section id="relationship-to-the-generalized-roy-model" class="level3" data-number="7.4.1">
+<h3 data-number="7.4.1" class="anchored" data-anchor-id="relationship-to-the-generalized-roy-model"><span class="header-section-number">7.4.1</span> Relationship to the Generalized Roy Model</h3>
+<p>There is a deeper relationship between the monotonicity assumption and the Generalized Roy Model. <span class="citation" data-cites="Vytlacil2002">Vytlacil (<a href="../references.html#ref-Vytlacil2002" role="doc-biblioref">2002</a>)</span> shows that the monotonicity assumption is <strong>equivalent</strong> to a latent index model representation. One direction of this proof is easy, since it is simple to verify that the latent index model: <span class="math display">\[D = \mathbf{1}\{P(Z)-V \geq 0\}\]</span> obeys monotonicity. Going the other way, it is relatively intuitive to see that one can construct a mapping from <span class="math inline">\(\Omega\)</span> to <span class="math inline">\([0,1]\)</span> such that: <span class="math display">\[ D_{Z}(\omega) = \mathbf{1}\{P(Z)-V(\omega) \geq 0\}. \]</span></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-roy-late" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 7.3</strong></span> Use the Generalized Roy Model to show that for some binary instrument <span class="math inline">\(Z\in\{0,1\}\)</span>, the 2SLS estimand is equal to: <span class="math display">\[\int_{P(Z=0)}^{P(Z=1)}MTE(u)du \]</span></p>
+</div>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-Carneiro2011" class="csl-entry" role="listitem">
+Carneiro, P., J. J. Heckman, and E. J. Vytlacil. 2011. <span>“Estimating Marginal Returns to Education.”</span> <em>American Economic Review</em> 101 (October): 2754–81. <a href="http://www.nber.org/papers/w16474">http://www.nber.org/papers/w16474</a>.
+</div>
+<div id="ref-Cunha2010" class="csl-entry" role="listitem">
+Cunha, Flavio, James Heckman, and Susanne Schennach. 2010. <span>“Estimating the Technology of Cognitive and Noncognitive Skill Formation.”</span> <em>Econometrica</em> 78 (3): 883–931.
+</div>
+<div id="ref-HeckmanVytlacil2005" class="csl-entry" role="listitem">
+Heckman, James, and Edward Vytlacil. 2005. <span>“<span class="nocase">Structural equations, treatment effects, and econometric policy evaluation</span>.”</span> <em>Econometrica</em> 73 (3): 669–738.
+</div>
+<div id="ref-ImbensAngrist" class="csl-entry" role="listitem">
+Imbens, Guido W., and Joshua D. Angrist. 1994. <span>“Identification and Estimation of Local Average Treatment Effects.”</span> <em>Econometrica</em> 62 (2): 467–75. <a href="http://www.jstor.org/stable/2951620">http://www.jstor.org/stable/2951620</a>.
+</div>
+<div id="ref-Lewbel" class="csl-entry" role="listitem">
+Lewbel, Arthur. 2019. <span>“The Identification Zoo: Meanings of Identification in Econometrics.”</span> <em>Journal of Economic Literature</em> 57 (4): 835–903. <a href="https://doi.org/10.1257/jel.20181361">https://doi.org/10.1257/jel.20181361</a>.
+</div>
+<div id="ref-Vytlacil2002" class="csl-entry" role="listitem">
+Vytlacil, Edward J. 2002. <span>“<span class="nocase">Independence , Monotonicity and Latent Index Models : An Equivalence Result</span>.”</span> <em>Econometrica</em> 70 (1): 331–41.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../lectures/identification.html" class="pagination-link" aria-label="Identification and Credible Inference">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Identification and Credible Inference</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../lectures/identification_search.html" class="pagination-link" aria-label="The Search Model">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

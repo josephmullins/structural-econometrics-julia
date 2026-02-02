@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Joseph Mullins">
 
-<title>Structural Econometrics with Julia</title>
+<title>8&nbsp; The Search Model – Structural Econometrics with Julia</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,26 +20,47 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./models.html" rel="next">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-626149efe8f5d16e1d391ba177679bf0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../lectures/identification_labor_supply.html" rel="next">
+<link href="../lectures/identification_roy.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-626149efe8f5d16e1d391ba177679bf0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -69,6 +89,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -81,7 +130,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Preface</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/identification.html">Identification and Credible Inference</a></li><li class="breadcrumb-item"><a href="../lectures/identification_search.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -96,7 +145,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Structural Econometrics with Julia</a> 
+      <a href="../">Structural Econometrics with Julia</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -108,13 +157,13 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preface</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./models.html" class="sidebar-item-text sidebar-link">
+            <a href="../models.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Five Prototype Models</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -123,31 +172,31 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./models/generalized_roy.html" class="sidebar-item-text sidebar-link">
+  <a href="../models/generalized_roy.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./models/search.html" class="sidebar-item-text sidebar-link">
+  <a href="../models/search.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Job Search Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./models/savings.html" class="sidebar-item-text sidebar-link">
+  <a href="../models/savings.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">A Life-Cycle Savings Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./models/entry-exit.html" class="sidebar-item-text sidebar-link">
+  <a href="../models/entry-exit.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./models/dynamic-labor-supply.html" class="sidebar-item-text sidebar-link">
+  <a href="../models/dynamic-labor-supply.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A Simple Labor Supply Model</span></span></a>
   </div>
 </li>
@@ -155,13 +204,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/why_models.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/why_models.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">How and Why to Use Models</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./lectures/identification.html" class="sidebar-item-text sidebar-link">
+            <a href="../lectures/identification.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Identification and Credible Inference</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -170,19 +219,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/identification_roy.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/identification_roy.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/identification_search.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/identification_search.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/identification_labor_supply.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/identification_labor_supply.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span></a>
   </div>
 </li>
@@ -198,7 +247,7 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link">
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
 </li>
@@ -213,19 +262,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./appendices/data.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Data</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./appendices/autodiff.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/autodiff.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Automatic Differentiation</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./appendices/performance.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/performance.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Performance Tips</span></span></a>
   </div>
 </li>
@@ -241,28 +290,28 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface" class="nav-link active" data-scroll-target="#preface">Preface</a></li>
+  <li><a href="#identification-of-the-model-without-heterogeneity" id="toc-identification-of-the-model-without-heterogeneity" class="nav-link active" data-scroll-target="#identification-of-the-model-without-heterogeneity"><span class="header-section-number">8.1</span> Identification of the Model without Heterogeneity</a>
+  <ul class="collapse">
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="header-section-number">8.1.1</span> Data</a></li>
+  <li><a href="#steady-state" id="toc-steady-state" class="nav-link" data-scroll-target="#steady-state"><span class="header-section-number">8.1.2</span> Steady State</a></li>
+  <li><a href="#writing-joint-probabilities" id="toc-writing-joint-probabilities" class="nav-link" data-scroll-target="#writing-joint-probabilities"><span class="header-section-number">8.1.3</span> Writing Joint Probabilities</a></li>
+  <li><a href="#thinking-through-identification" id="toc-thinking-through-identification" class="nav-link" data-scroll-target="#thinking-through-identification"><span class="header-section-number">8.1.4</span> Thinking Through Identification</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/identification.html">Identification and Credible Inference</a></li><li class="breadcrumb-item"><a href="../lectures/identification_search.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Structural Econometrics with Julia</h1>
+<h1 class="title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Joseph Mullins </p>
-          </div>
-  </div>
     
   
     
@@ -273,10 +322,63 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="preface" class="level1 unnumbered">
-<h1 class="unnumbered">Preface</h1>
+<section id="identification-of-the-model-without-heterogeneity" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="identification-of-the-model-without-heterogeneity"><span class="header-section-number">8.1</span> Identification of the Model without Heterogeneity</h2>
+<p>The <span class="citation" data-cites="Mccall">McCall (<a href="../references.html#ref-Mccall" role="doc-biblioref">1970</a>)</span> Search Model that we introduced as a <a href="../models/search.html">prototype model</a> is an excellent introduction to the identification of structural models. A classic treatment of identification of this model is provided by <span class="citation" data-cites="flinn1982">Flinn and Heckman (<a href="../references.html#ref-flinn1982" role="doc-biblioref">1982</a>)</span>.</p>
+<section id="data" class="level3" data-number="8.1.1">
+<h3 data-number="8.1.1" class="anchored" data-anchor-id="data"><span class="header-section-number">8.1.1</span> Data</h3>
+<p>Identification arguments <em>always</em> begin with an assumption on available data. Even though the model is dynamic, we will show that all we really need is a single cross-section of data:</p>
+<p><span class="math display">\[ (E_{n},t_{U,n},W_{n})_{n=0}^{N} \]</span></p>
+<p>where :</p>
+<ul>
+<li><span class="math inline">\(E_{n}\in\{0,1\}\)</span> indicates the employment status of individual <span class="math inline">\(n\)</span></li>
+<li>If the individual is employed (<span class="math inline">\(E_{n}=1\)</span>) we see the wage, <span class="math inline">\(W_{n}\)</span>, which is otherwise assumed to be missing.</li>
+<li>If the individual is unemployed (<span class="math inline">\(E_{n}=0\)</span>), then we see the duration of unemployment <span class="math inline">\(t_{U,n}\)</span>, which is otherwise assumed to be missing.</li>
+</ul>
+</section>
+<section id="steady-state" class="level3" data-number="8.1.2">
+<h3 data-number="8.1.2" class="anchored" data-anchor-id="steady-state"><span class="header-section-number">8.1.2</span> Steady State</h3>
+<p>A key assumption for identification in this case is that the economy is in <strong>steady state</strong>. Let <span class="math inline">\(U_{t}\)</span> be fraction of individuals that are unemployed at time <span class="math inline">\(t\)</span>. Let <span class="math inline">\(p_{\tau,t}\)</span> be the fraction of individuals at time <span class="math inline">\(t\)</span> with unemployment duration <span class="math inline">\(\tau\)</span>. In general, these objects evolve according to the rules:</p>
+<p><span class="math display">\[\begin{eqnarray}
+U_{t+1} = (1-h)U_{t} + \delta (1-U_{t+1}) \\
+p_{\tau+1,t+1} = (1-h)p_{\tau,t} \\
+p_{0,t+1} = \delta (1-U_{t})
+\end{eqnarray}\]</span> where <span class="math inline">\(h\)</span> is the “hazard rate” of exiting unemployment, <span class="math inline">\(\lambda(1-F_{W}(w^*))\)</span>. Enforcing that these objects are constant between <span class="math inline">\(t\)</span> and <span class="math inline">\(t+1\)</span> (the steady state assumption) gives:</p>
+<p><span class="math display">\[\begin{eqnarray}
+U_{t} = \frac{\delta}{\delta+h} \\
+p_\tau = \frac{\delta h}{\delta+h}(1-h)^{\tau}
+\end{eqnarray}\]</span></p>
+</section>
+<section id="writing-joint-probabilities" class="level3" data-number="8.1.3">
+<h3 data-number="8.1.3" class="anchored" data-anchor-id="writing-joint-probabilities"><span class="header-section-number">8.1.3</span> Writing Joint Probabilities</h3>
+<p>With these probabilities in hand, we can write the sampling distribution <span class="math inline">\(\mathbb{P}\)</span> in terms of equilibrium objects:</p>
+<p><span class="math display">\[ \mathbb{P}(E,t_U,W) = \left(\frac{h}{h+\delta}f_{W}(W|W&gt;w^*)\right)^{E}\left(\frac{\delta h}{\delta+h}(1-h)^{t_{U}}\right)^{1-E} \]</span></p>
+</section>
+<section id="thinking-through-identification" class="level3" data-number="8.1.4">
+<h3 data-number="8.1.4" class="anchored" data-anchor-id="thinking-through-identification"><span class="header-section-number">8.1.4</span> Thinking Through Identification</h3>
+<p>Often it is helpful to break down the joint distribution of observables into unconditional and conditional distributions. Notice here that:</p>
+<p><span class="math display">\[ \mathbb{P}(t_{U}|E=0) = h\times(1-h)^{t_{U}} \]</span></p>
+<p>and so the hazard rate <span class="math inline">\(h\)</span> can be inferred from the distribution of unemployment durations.</p>
+<p>Next, notice that the probability of being unemployed is</p>
+<p><span class="math display">\[ \mathbb{P}(E=0) = \frac{\delta}{\delta+h} \]</span></p>
+<p>and so <span class="math inline">\(\delta\)</span> is given by <span class="math inline">\(h\)</span> (which we now know) and the fraction of unemployed.</p>
+<p>Finally, we see that</p>
+<p><span class="math display">\[ \mathbb{P}(W|E=1) = f_{W}(W|W&gt;w^*) \]</span></p>
+<p>Observed wages are equal to the offer distribution <em>conditional on the wage offer being acceptable</em>. This tells us that, although the conditional distribution can be identifiable, we do not know the distribution of wage offers that are never accepted (those below <span class="math inline">\(w^*\)</span>). This is still sufficient to identify <span class="math inline">\(w^*\)</span> however, since it is the lower bound on the support of this conditional distribution.</p>
+<p>Can we identify the deeper structural parameters, <span class="math inline">\(b\)</span>, <span class="math inline">\(\lambda\)</span>, and <span class="math inline">\(\beta\)</span>? Not quite. Let’s rewrite the reservation wage equation as:</p>
+<p><span class="math display">\[ w^* = b + h\int_{w^*}\frac{1-F(W|W&gt;w^*)}{1-\beta(1-\delta)}dw \]</span></p>
+<p>and we can see that infinitely many combinations of <span class="math inline">\(b\)</span> and <span class="math inline">\(\beta\)</span> can rationalize the same reservation wage. Assuming a plausible value for <span class="math inline">\(\beta\)</span> (you will learn that this is common across many structural estimation exercises), <span class="math inline">\(b\)</span> is identified by this equation.</p>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-flinn1982" class="csl-entry" role="listitem">
+Flinn, Christopher, and James Heckman. 1982. <span>“New Methods for Analyzing Structural Models of Labor Force Dynamics.”</span> <em>Journal of Econometrics</em> 18 (1): 115–68.
+</div>
+<div id="ref-Mccall" class="csl-entry" role="listitem">
+McCall, John Joseph. 1970. <span>“Economics of Information and Job Search.”</span> <em>The Quarterly Journal of Economics</em> 84 (1): 113–26.
+</div>
+</div>
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -699,10 +801,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="../lectures/identification_roy.html" class="pagination-link" aria-label="The Generalized Roy Model">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./models.html" class="pagination-link" aria-label="Five Prototype Models">
-        <span class="nav-page-text">Five Prototype Models</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/identification_labor_supply.html" class="pagination-link" aria-label="The Dynamic Labor Supply Model">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

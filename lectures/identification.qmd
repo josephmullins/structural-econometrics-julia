@@ -1,1 +1,30 @@
 # Identification and Credible Inference
+
+In this section of the course we will introduce the concept of identification and -- with the help of our prototype models -- examine some examples of different strategies for establishing identification of economic models.
+
+As a fan of cricket, one thing you realize when explaining the rules to a newcomer is that the word "wicket" can refer to one of several different things. That's confusing! Likewise, economists tend to use the word "identification" in a semantically loose way, and it can mean one of two things depending on context:
+
+1. Formally, identification refers to *whether* the mapping between model and data can be inverted to a unique parameter (point identification) or set of parameters (partial identification).
+2. Informally, identification discussions typically focus on *how* a particular model is identified, which has more to do with the particular estimation strategy than it does with the question of identification.
+
+Out of pragmatism, most quantitative models already impose parametric restrictions on functional forms (such as utilities, production functions, wage equations, and distributions of unobservables). We will see that this can often mean that there are many ways to identify and estimate parameters, and so much of our effort is directed at issue (2) instead of (1).  When there are multiple paths to identification, it is worth considering whether one path might be considered more "credible" in the sense that it is more robust to mild extensions, or relies less heavily on strong functional form and / or distributional assumptions.
+
+In my experience, one issue that can be confusing for students is that economists in some fields spend more time talking about identification than they do actually *showing* identification. In this chapter, we'll show identification of our simple prototype models, and then consider extensions that show that this identification can sometimes rest on overly strong assumptions. Then we'll consider some common strategies as potential remedies to making these overly strong assumptions.
+
+As we work through the examples, I will (reluctantly) apply the labels "credible" and "incredible" inference, but only to help convey a broader understanding of what this labeling even means. I would like to establish, by way of these examples, that "credible inference" -- a phrase you will hear more broadly in the profession [@AngristPischke2010] -- is not a particularly useful taxonomy for quantitative economics. Credibility is subjective and so-called "credible" inference strategies often contain quietly embedded structure, and require much stronger assumptions to draw any portable lessons from the exercise (we exhaustively discussed examples in the previous chapter).  A more productive -- and philosophically neutral -- strategy is to be clear and transparent about the assumptions under which key parameters are identified, *how* they are identified, and therefore the sources of data that are most influential in determining the calculations from a given quantitative modeling exercise. That's an honorable objective that satisfies the main imperative of the "credibility revolution".
+
+<!-- The rapid growth in causal inference methods reflects an obviously crucial imperative that we must take seriously: we should be as transparent as possible in showing *how* the available data identifies the key causal parameters in our model, so that readers can make their personal assessments of credibility. Let's go a head and review some simple examples of these ideas at work. 
+
+- also make the point that about a couple of themes:
+- potential for unobserved heterogeneity lies at heart of many causal inference problems
+- can ignore in the model but it's good to have a strategy that is robust to it
+- solutions: panel data or IV 
+
+1. Does this version of the model imply a "naive" approach to identification.
+2. Some simple models allow for naive approaches or less naive approaches. Mutiple paths, some more believable than others (in that they are robust to alternatives).
+3. Under what conditions would the model be identified without parametric restrictions, and do my data resemble those conditions at all?
+4. Can we show an example with many sources of identification? (yes! labor supply... panel approach robust and IV are robust in either case)
+
+
+-->
+

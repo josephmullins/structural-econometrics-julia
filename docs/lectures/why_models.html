@@ -212,8 +212,33 @@ window.Quarto = {
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
-      <span class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Identification and Credible Inference</span></span>
+      <div class="sidebar-item-container"> 
+            <a href="../lectures/identification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Identification and Credible Inference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_roy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_labor_supply.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span></a>
+  </div>
+</li>
+      </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <span class="sidebar-item-text sidebar-link text-start">
@@ -504,6 +529,18 @@ Figure&nbsp;6.1: Shifting supply and demand curves trace out equilibrium points 
 </section>
 <section id="exercises" class="level2" data-number="6.4">
 <h2 data-number="6.4" class="anchored" data-anchor-id="exercises"><span class="header-section-number">6.4</span> Exercises</h2>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <div id="exr-static-labor-supply" class="theorem exercise">
 <p><span class="theorem-title"><strong>Exercise 6.1</strong></span> Consider a static version of the labor supply model where earnings are the only source of income:</p>
 <p><span class="math display">\[ H_{n} = \arg\max_{h} \frac{(W_nh)^{1-\sigma}}{1-\sigma} - \alpha_{n}^{-1}\frac{h^{1+1/\psi}}{1+1/\psi} \]</span></p>
@@ -518,6 +555,21 @@ Figure&nbsp;6.1: Shifting supply and demand curves trace out equilibrium points 
 <li>Based on your answer to part 4, and assuming that the model we wrote down is the true data generating process, do you think it is even possible to forecast the effect of this alternative policy given these data?</li>
 </ol>
 </div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <div id="exr-time-allocation" class="theorem exercise">
 <p><span class="theorem-title"><strong>Exercise 6.2</strong></span> Consider the following simple model of time allocation. Individual utility is given by:</p>
 <p><span class="math display">\[ U(C,L) = (\phi C^{\rho} + (1-\phi) L^{\rho})^{1/\rho} \]</span></p>
@@ -534,6 +586,9 @@ Figure&nbsp;6.1: Shifting supply and demand curves trace out equilibrium points 
 <li><p>Based on your answer to the above, you simplify the model to the following specification: <span class="math display">\[ h^* = \arg\max (\phi (wh)^{\rho} + (1-\phi) (1-h)^{\rho})^{1/\rho} \]</span> and you derive the following relationship: <span class="math display">\[ \log\left(\frac{C}{L}\right) =  \frac{1}{1-\rho}\log\left(\frac{\phi}{1-\phi}\right) + \frac{1}{1-\rho}\log(w) \]</span> where <span class="math inline">\(C=wh^*\)</span> is total labor income and <span class="math inline">\(L=1-h^*\)</span> is non-market time. Suppose you have a cross-section of data <span class="math inline">\((C_{n},L_{n},W_{n})\)</span> where <span class="math inline">\(C_{n}\)</span> is labor market earnings, <span class="math inline">\(L_{n}\)</span> is non-market time, and <span class="math inline">\(W_{n}\)</span> is the wage-rate for person <span class="math inline">\(n\)</span>. This could be taken (for example) from the Outgoing Rotation Group of the CPS monthly survey. Does the model, as written, allow for any randomness in the relationship between <span class="math inline">\(C_{n}/L_{n}\)</span> and <span class="math inline">\(W_{n}\)</span>? Is this likely to be replicated in the data?</p></li>
 <li><p>Suppose now you augment the model to acommodate some randomness in how much individuals work by allowing for heterogeneity in preferences (<span class="math inline">\(\phi\)</span>): <span class="math display">\[ \log\left(\frac{C}{L}\right) =  \frac{1}{1-\rho}\log\left(\frac{\phi_{n}}{1-\phi_{n}}\right) + \frac{1}{1-\rho}\log(w) \]</span> What assumption do you need for an OLS regression of <span class="math inline">\(\log(C_{n}/L_{n})\)</span> on <span class="math inline">\(\log(W_{n})\)</span> to consistently recover the elasticity of labor supply, <span class="math inline">\(1/(1-\rho)\)</span>? Do you consider this credible? Why/why not?</p></li>
 </ol>
+</div>
+</div>
+</div>
 </div>
 
 
