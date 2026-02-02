@@ -4,8 +4,9 @@ In this section of the course we will introduce the concept of identification an
 
 As a fan of cricket, one thing you realize when explaining the rules to a newcomer is that the word "wicket" can refer to one of several different things. That's confusing! Likewise, economists tend to use the word "identification" in a semantically loose way, and it can mean one of two things depending on context:
 
-1. Formally, identification refers to *whether* the mapping between model and data can be inverted to a unique parameter (point identification) or set of parameters (partial identification).
-2. Informally, identification discussions typically focus on *how* a particular model is identified, which has more to do with the particular estimation strategy than it does with the question of identification.
+1. Let $P_{\theta}$ be the distribution over data implied by model parameters $\theta\in\Theta$. Formally, identification refers to *whether* the mapping between model and data can be inverted to a unique parameter (point identification) or set of parameters (partial identification). A model is point identified if for all $\theta$ and $\theta'$ in $\Theta$:
+$$ P_{\theta}=P_{\theta'}\ \Rightarrow \theta = \theta' $$
+2. Informally, identification discussions typically focus on *how* a particular model is identified, which has more to do with the estimation strategy than it does with the question of identification.
 
 Out of pragmatism, most quantitative models already impose parametric restrictions on functional forms (such as utilities, production functions, wage equations, and distributions of unobservables). We will see that this can often mean that there are many ways to identify and estimate parameters, and so much of our effort is directed at issue (2) instead of (1).  When there are multiple paths to identification, it is worth considering whether one path might be considered more "credible" in the sense that it is more robust to mild extensions, or relies less heavily on strong functional form and / or distributional assumptions.
 

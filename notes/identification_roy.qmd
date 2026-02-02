@@ -1,0 +1,375 @@
+---
+title: "The Generalized Roy Model"
+subtitle: "Lecture Notes"
+format:
+  pdf:
+    documentclass: article
+    geometry:
+      - margin=1in
+    fontsize: 11pt
+    toc: false
+---
+
+# Selection in General
+
+## The Selection Equation
+
+- Start with the selection equation without functional form restrictions
+- Let $P(X,Z) = P[D=1|X,Z]$ be the propensity score
+
+### Normalization
+
+- For any distribution of $V$, since $F_V$ is monotonically increasing (under support conditions), we can write:
+$$D = \mathbf{1}\{\mu_{d}(X,Z) \geq V\} = \mathbf{1}\{F_{V}(\mu_{d}(X,Z)) \geq F_{V}(V)\}$$
+
+- Since $F_V(V)$ is a uniform random variable in $[0,1]$, we can write without loss of generality:
+$$D = \mathbf{1}\{P(X,Z) - V \geq 0\},\qquad V\sim U[0,1]$$
+
+- This is a normalization: we're expressing selection in terms of the propensity score
+
+---
+
+## Conditional Expectations and Selection
+
+- Consider the conditional expectations of outcomes:
+$$\mathbb{E}[Y|X,Z,D=1] = \mu_{1}(X) + \underbrace{\mathbb{E}[U_1 | V \leq P(X,Z)]}_{h_{1}(P(X,Z))}$$
+$$\mathbb{E}[Y|X,Z,D=0] = \mu_{0}(X) + \underbrace{\mathbb{E}[U_0 | V > P(X,Z)]}_{h_{0}(P(X,Z))}$$
+
+### Two Key Observations
+
+1. **The Classic Selection Problem**
+   - If unobservable $V$ determining $D$ is related to unobservables $(U_0, U_1)$ determining potential outcomes
+   - Then difference in conditional means is contaminated by the *selection effect*
+   - Cannot simply compare treated vs untreated means
+
+2. **Dimension Reduction**
+   - Selection model implies dimension reduction in $\mathbb{E}[U_D | X, Z]$
+   - The combined propensity $P(X,Z)$ encodes all relevant information to control for selection
+   - This is a useful property
+   - But the underlying index model is *not* without loss of generality
+
+---
+
+# Identification by Functional Form
+
+## Setup: Joint Normality
+
+- Assume $(V, U_0, U_1)$ are jointly normally distributed:
+$$\left[\begin{array}{c} V \\ U_0 \\ U_1 \end{array}\right] = \mathcal{N}\left(\mathbf{0},\left[\begin{array}{ccc} 1 & \sigma_{V0} & \sigma_{V1} \\ \sigma_{V0} & \sigma^2_{0} & \sigma_{01} \\ \sigma_{V1} & \sigma_{01} & \sigma^2_{1} \end{array}\right]\right)$$
+
+### Normalizations
+
+- Location normalized: mean set to zero
+- Scale of $V$ normalized: unit variance
+
+### Additional Assumptions
+
+- Each $\mu_D$ is linear in $X$: $\mu_D(X) = X\beta_D$
+- Data: single cross-section $(Y_D, D, X)$
+- Identification is about population values, so take joint distribution $\mathbb{P}_{Y_D,D,X}$ as given
+
+---
+
+## Step 1: Identifying the Selection Equation
+
+- Distribution of $D$ given $X$ is a **probit model**:
+$$P[D=1|X] = \Phi(\mu_d(X))$$
+  where $\Phi$ is the standard normal CDF
+
+- Thus $\mu_d(X)$ is identified:
+$$\mu_d(X) = \Phi^{-1}(P[D=1|X])$$
+  for any $X$
+
+- If we impose $\mu_d(X) = X\gamma$:
+  - Identification of each $\gamma$ follows from usual rank condition
+  - $X$ must be full-rank with positive probability (like OLS)
+
+---
+
+## Step 2: Identifying the Outcome Equations
+
+### For the Treated
+
+$$\mathbb{E}[Y_1|X,D=1] = X\beta_1 + \mathbb{E}[U_1 | V < \mu_d(X)]$$
+
+- Under joint normality, the conditional expectation has a closed form:
+$$\mathbb{E}[Y_1|X,D=1] = X\beta_1 - \sigma_{V1}\frac{\phi(\mu_d(X))}{\Phi(\mu_d(X))}$$
+
+- The term $\frac{\phi(\mu_d(X))}{\Phi(\mu_d(X))}$ is the **inverse Mills ratio**
+
+### For the Untreated
+
+$$\mathbb{E}[Y_0|X,D=0] = X\beta_0 + \sigma_{V0}\frac{\phi(\mu_d(X))}{1-\Phi(\mu_d(X))}$$
+
+### Identification Result
+
+- Under rank conditions for $X$, both $\beta_0$ and $\beta_1$ are identified
+- Therefore $ATE(X) = X(\beta_1 - \beta_0)$ is identified for all $X$
+
+---
+
+## Treatment Effect Heterogeneity
+
+- Cannot identify the full distribution of treatment effects
+- But can identify the ATE among individuals with treatment propensity $V$:
+$$\mathbb{E}[Y_1 - Y_0|X,V] = X(\beta_1 - \beta_0) + \underbrace{(\sigma_{V1} - \sigma_{V0})V}_{\mathbb{E}[U_1 - U_0|V]}$$
+
+- This shows how treatment effects vary with unobserved selection propensity
+- We'll return to this object (the MTE) later
+
+---
+
+## No Exclusion Restriction Needed?
+
+- Notice: identification holds *without* an excluded variable $Z$
+- Follows entirely from assumptions of:
+  - Linearity in $\mu_d$
+  - Normality of error terms
+- These yield a particular parametric decomposition of conditional expectations
+
+### The Problem
+
+- This is **identification by functional form**
+- Identification depends crucially on these functional form assumptions
+- Without linearity in $\mu_d$: cannot separately identify $\mu_d$ from selection correction
+- Is this credible for identifying key causal parameters?
+- See Lewbel for broad discussion of these issues
+
+---
+
+# Identification with Exclusion Restrictions
+
+## Formal Assumptions
+
+1. **Exclusion:** $\mu_D(X,Z) = \mu_D(X)$ almost everywhere
+   - $Z$ does not directly affect potential outcomes
+
+2. **Independence:** $Z \perp (V, U_0, U_1) | X$
+   - $Z$ is independent of unobservables conditional on $X$
+
+---
+
+## Implications of the Exclusion Restriction
+
+- We can write:
+$$\mathbb{E}[U_1|X,Z,D=1] = \mathbb{E}[U_1|V \leq P(X,Z)]$$
+  and similarly for $D=0$
+
+- The expectation of $Y$ (unconditional on $D$):
+\begin{align}
+\mathbb{E}[Y|X,P(X,Z)=p] &= \mu_0(X) + p[\mu_1(X) - \mu_0(X)] \\
+&\quad + p\mathbb{E}[(U_1 - U_0)|V \leq P(X,Z)] \\
+&= \mu_0(X) + p[\mu_1(X) - \mu_0(X)] + \int_0^p \mathbb{E}[(U_1 - U_0)|V=u]\,du
+\end{align}
+
+---
+
+## The Marginal Treatment Effect (MTE)
+
+### Derivation
+
+- Take derivative with respect to $p$:
+\begin{align}
+\frac{\partial \mathbb{E}[Y|X,P(X,Z)=p]}{\partial p} &= \mu_1(X) - \mu_0(X) + \mathbb{E}[U_1 - U_0 | V = p] \\
+&= \mathbb{E}[Y_1 - Y_0 | V = p] \\
+&= MTE(p)
+\end{align}
+
+### Interpretation
+
+- Heckman and Vytlacil (2005) call this the **Local Instrumental Variables** approach
+- Define $MTE(p)$ as the **Marginal Treatment Effect**
+- It is the average treatment effect among individuals with propensity $1-p$ to take treatment
+- Individuals with $V = p$ are exactly indifferent when $P(X,Z) = p$
+
+### Key Result
+
+- Commonly used estimators (IV, DD) are weighted averages of MTE
+- MTE is a useful building block for understanding what different estimators identify
+
+---
+
+## Identifying the ATE
+
+- Under support conditions on $Z$:
+- As support of $P(X,Z)$ approaches $[0,1]$:
+- The average treatment effect is identified:
+$$ATE(X) = \mu_1(X) - \mu_0(X)$$
+
+- Requires variation in $Z$ that pushes propensity to both extremes
+
+---
+
+## Credibility: Functional Form vs Exclusion Restrictions
+
+- Which is more credible?
+  - Functional form restrictions (normality, linearity)
+  - Exclusion and independence restrictions
+
+- Assuming a "good" instrument exists, exclusion approach is preferable
+- Functional form identification is fragile: results can change with different assumptions
+
+### Practical Compromise
+
+- Even with an instrument, fully nonparametric estimation can be demanding
+- Reasonable approach:
+  1. Show conditions under which instrument provides nonparametric identification
+  2. Introduce parametric assumptions that interpolate this plausible variation
+  3. Establishes that identification is *not purely* driven by functional form
+
+- See Cunha et al. (2010) and Carneiro et al. (2011) for examples
+
+---
+
+# Monotonicity and Potential Outcomes
+
+## The Imbens-Angrist Framework
+
+- Generalized Roy model embeds the **potential outcomes framework**
+- Imbens and Angrist (1994) consider what 2SLS estimates with heterogeneous treatment effects
+
+### Setup
+
+- Index individuals by $\omega \in \Omega$
+- Model as a triple: $(Y_1(\omega), Y_0(\omega), D_Z(\omega))$
+- $D_Z(\omega) \in \{0,1\}$: choice of individual $\omega$ when instrument takes value $Z$
+
+---
+
+## Four Key Assumptions
+
+1. **Exclusion:** $Y_D(\omega, Z) = Y_D(\omega)$ for $D \in \{0,1\}$
+   - Potential outcomes do not depend on $Z$
+
+2. **Independence:** $Z \perp \omega$
+   - Instrument is independent of individual type
+
+3. **Monotonicity:** For any pair $(z, z')$ in support of $Z$:
+   - Either $D_Z(\omega) \geq D_{Z'}(\omega)$ for all $\omega$
+   - Or $D_Z(\omega) \leq D_{Z'}(\omega)$ for all $\omega$
+   - No "defiers" exist
+
+4. **Relevance:** $P[\omega: D_1(\omega) \neq D_0(\omega)] > 0$
+   - Instrument affects treatment for some individuals
+
+---
+
+## Understanding Monotonicity with Binary $Z$
+
+- When $Z \in \{0,1\}$, partition $\Omega$ into four groups:
+
+1. **Always takers:** $D_1(\omega) = D_0(\omega) = 1$
+   - Always treated regardless of $Z$
+
+2. **Never takers:** $D_1(\omega) = D_0(\omega) = 0$
+   - Never treated regardless of $Z$
+
+3. **Compliers:** $D_1(\omega) = 1$, $D_0(\omega) = 0$
+   - Treated when $Z=1$, untreated when $Z=0$
+   - "Comply" with the instrument
+
+4. **Defiers:** $D_1(\omega) = 0$, $D_0(\omega) = 1$
+   - Do the opposite of what instrument suggests
+
+- **Monotonicity rules out defiers** (without loss of generality)
+
+---
+
+## The Local Average Treatment Effect (LATE)
+
+### The 2SLS Estimand
+
+$$\frac{\mathbb{E}[Y|Z=1] - \mathbb{E}[Y|Z=0]}{P[D=1|Z=1] - P[D=1|Z=0]}$$
+
+### Result (Imbens-Angrist)
+
+- Under the four assumptions, this equals:
+$$\mathbb{E}[Y_1(\omega) - Y_0(\omega) | \omega \in \text{Compliers}]$$
+
+- The **Local Average Treatment Effect (LATE)**
+- Average treatment effect *among compliers only*
+
+### Multi-valued Instruments
+
+- For multi-valued $Z$: 2SLS produces a weighted average of LATEs
+- Different complier groups for different values of $Z$
+
+### Importance
+
+- This interpretation of IV is immensely widely used
+- Know the definition and the assumptions
+- LATE may differ from ATE if compliers are selected
+
+---
+
+# Relationship to the Generalized Roy Model
+
+## Equivalence Result (Vytlacil 2002)
+
+- The monotonicity assumption is **equivalent** to a latent index model
+
+### One Direction (Easy)
+
+- The latent index model:
+$$D = \mathbf{1}\{P(Z) - V \geq 0\}$$
+  obeys monotonicity by construction
+
+- Higher $P(Z)$ means weakly more people select treatment
+
+### Other Direction (Intuitive)
+
+- Can construct a mapping from $\Omega$ to $[0,1]$ such that:
+$$D_Z(\omega) = \mathbf{1}\{P(Z) - V(\omega) \geq 0\}$$
+
+- The ranking $V(\omega)$ orders individuals by their resistance to treatment
+- Monotonicity ensures this ranking is consistent across values of $Z$
+
+---
+
+## Connecting LATE and MTE
+
+### Key Result
+
+- For binary instrument $Z \in \{0,1\}$, the 2SLS estimand equals:
+$$\int_{P(Z=0)}^{P(Z=1)} MTE(u)\,du$$
+
+### Interpretation
+
+- 2SLS averages the MTE over compliers
+- Compliers are those with $V \in [P(Z=0), P(Z=1)]$
+- These are the individuals induced to switch treatment status by the instrument
+
+### Implications
+
+- LATE weights different parts of the MTE curve
+- Different instruments weight different parts
+- Understanding MTE helps understand what any particular IV estimate captures
+
+---
+
+# Summary
+
+## Key Takeaways
+
+- **Selection Problem:** Comparing treated vs untreated confounded by selection on unobservables
+
+- **Dimension Reduction:** Propensity score $P(X,Z)$ summarizes selection-relevant information
+
+- **Identification by Functional Form:**
+  - Joint normality + linearity identifies parameters without exclusion
+  - But identification is fragile and driven by functional form
+
+- **Identification with Exclusion:**
+  - Exclusion + independence assumptions provide more credible identification
+  - MTE is identified by derivative of $\mathbb{E}[Y|X,P]$ with respect to $P$
+  - ATE identified if propensity has full support
+
+- **Monotonicity and LATE:**
+  - Imbens-Angrist: 2SLS identifies LATE under monotonicity
+  - Vytlacil: Monotonicity equivalent to latent index model
+  - LATE = integral of MTE over compliers
+
+- **Practical Guidance:**
+  - Show nonparametric identification conditions
+  - Use parametric assumptions to interpolate
+  - Establishes identification is not purely functional form
