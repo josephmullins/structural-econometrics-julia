@@ -17,6 +17,112 @@ where :
 - If the individual is employed ($E_{n}=1$) we see the wage, $W_{n}$, which is otherwise assumed to be missing.
 - If the individual is unemployed ($E_{n}=0$), then we see the duration of unemployment $t_{U,n}$, which is otherwise assumed to be missing.
 
+::: {.callout-note icon="false" collapse="true"}
+## Example: CPS Data
+
+::: {#exm-CPS_data}
+### Reading the data
+Let's take a look at data from the CPS on wages, employment status, and labor market transitions. Here is code to read in the data:
+
+```{julia}
+using CSV, DataFrames, DataFramesMeta, Statistics
+
+data = CSV.read("../data/cps_00019.csv",DataFrame)
+```
+
+As you can see from the preview of the data, the data is taken from January-March 2018. Here is a quick snippet of code to see how many observations we have on average per person:
+
+```{julia}
+@chain data begin
+    groupby(:CPSIDP)
+    @combine :T = length(:EMPSTAT)
+    @combine :average = mean(:T) :frac_panel = mean(:T.>1)
+end
+```
+
+So we see that more than half of the individuals in this sample can be found in more than one month of the data.
+
+The `@chain` macro comes from the package `DataFramesMeta` and is a convenient syntax for composing operations into one block. For example:
+
+```{julia}
+#| eval: false
+@chain x begin
+    func1(y1)
+    func2(y2)
+    func3(y3)
+end
+```
+
+is equivalent to
+
+```{julia}
+#| eval: false
+func3(func2(func1(x,y1),y2),y3)
+```
+:::
+
+::: {#exm-CPS_moments}
+### Calculating some moments
+
+You may find the [codebook](/data/CPS-Codebook.html) useful for understanding particular variables. We have already limited the data to individuals who are working (`EMPSTAT`=10), have a job but did not work last week (`EMPSTAT`==12), or are unemployed (`EMPSTAT`==21).
+
+Suppose we wanted to use the panel dimension to measure transition rates. Here is a simple way to do that by simply measuring transitions between January and Feburary.
+
+```{julia}
+data[!,:E] .= data.EMPSTAT.<21 #<- code the employment variable
+
+data_jan = @chain data begin
+    @subset :MONTH.==1
+    @select :CPSIDP :AGE :SEX :EDUC :RACE :E
+    @rename :E_lag = :E
+end
+
+data_merged = @chain data begin
+    @subset :MONTH.==2
+    @select :CPSIDP :E
+    innerjoin(data_jan,on=:CPSIDP)
+end
+
+```
+
+So now we can calculate the overall transition rate out of unemployment:
+
+```{julia}
+
+@combine data_merged begin
+    :EU =  1-mean(:E[:E_lag.==1])
+    :UE = mean(:E[:E_lag.==0])
+end 
+
+```
+
+So here we're estimating a very low separation rate and a pretty high hazard rate out of unemployment.
+:::
+:::{#exm-CPS_hetero}
+#### Observable heterogeneity
+
+Next we'll define a very simple education classification (Bachelor's degree or not) and race classification (white vs non-white), and use `groupby` to calculate rates separately by demographics:
+
+```{julia}
+
+@chain data_merged begin
+    @transform begin
+        :bachelors = :EDUC.>=111
+        :nonwhite = :RACE.!=100 
+    end
+    groupby([:bachelors,:nonwhite,:SEX])
+    @combine begin
+       :EU =  1-mean(:E[:E_lag.==1])
+       :UE = mean(:E[:E_lag.==0])
+    end 
+end
+
+```
+
+What do these differences in transition rates tell you about how we should extend the simple model with homogenous parameters?
+:::
+:::
+
 ### Steady State
 
 A key assumption for identification in this case is that the economy is in **steady state**. Let $U_{t}$ be fraction of individuals that are unemployed at time $t$. Let $p_{\tau,t}$ be the fraction of individuals at time $t$ with unemployment duration $\tau$. In general, these objects evolve according to the rules:
@@ -37,7 +143,7 @@ p_\tau = \frac{\delta h}{\delta+h}(1-h)^{\tau}
 
 With these probabilities in hand, we can write the sampling distribution $\mathbb{P}$ in terms of equilibrium objects:
 
-$$ \mathbb{P}(E,t_U,W) = \left(\frac{h}{h+\delta}f_{W}(W|W>w^*)\right)^{E}\left(\frac{\delta h}{\delta+h}(1-h)^{t_{U}}\right)^{1-E} $$
+$$ \mathbb{P}(E,t_U,W) = \left(\frac{h}{h+\delta}F_{W}(W|W>w^*)\right)^{E}\left(\frac{\delta h}{\delta+h}(1-h)^{t_{U}}\right)^{1-E} $$
 
 ### Thinking Through Identification
 
@@ -55,14 +161,108 @@ and so $\delta$ is given by $h$ (which we now know) and the fraction of unemploy
 
 Finally, we see that
 
-$$ \mathbb{P}(W|E=1) = f_{W}(W|W>w^*) $$
+$$ \mathbb{P}(W|E=1) = F_{W}(W|W>w^*) $$
 
-Observed wages are equal to the offer distribution *conditional on the wage offer being acceptable*. This tells us that, although the conditional distribution can be identifiable, we do not know the distribution of wage offers that are never accepted (those below $w^*$). This is still sufficient to identify $w^*$ however, since it is the lower bound on the support of this conditional distribution. 
+Observed wages are equal to the offer distribution *conditional on the wage offer being acceptable*. This tells us that, although the conditional distribution can be identifiable, we do not know the distribution of wage offers that are never accepted (those below $w^*$). Let $\underline{w}$ be the lower bound on the support of the sampling distribution $\mathbb{P}$. Clearly, $w^*$ is identified since:
+
+$$ w^* = \underline{w} $$
 
 Can we identify the deeper structural parameters, $b$, $\lambda$, and $\beta$? Not quite. Let's rewrite the reservation wage equation as:
 
-$$ w^* = b + h\int_{w^*}\frac{1-F(W|W>w^*)}{1-\beta(1-\delta)}dw $$
+$$ w^* = b + \beta h\int_{w^*}\frac{1-F(W|W>w^*)}{1-\beta(1-\delta)}dw $$
 
 and we can see that infinitely many combinations of $b$ and $\beta$ can rationalize the same reservation wage. Assuming a plausible value for $\beta$ (you will learn that this is common across many structural estimation exercises), $b$ is identified by this equation.
 
+## Credibility and a Policy Counterfactual
 
+Suppose we used this model to forecast the effect of a tax credit $\tau$ that is proportional to earnings. Under the counterfactual the value function $V$ becomes:
+
+$$ V(w) = (1+\tau)w + \delta U + (1-\delta) V(w) $$
+
+Repeating the previous derivation gives a new reservation wage equation:
+
+$$ w^* = \frac{b}{1+\tau} + \frac{\beta\lambda}{1-\beta(1-\delta)} \int_{w^*}[1-F_{W}(w)]dw $$
+
+and so we see that the effect of the subsidy in the model is equivalent to reducing the flow utility of unemployment. 
+
+It is simple to forecast the effect of the policy counterfactual: we take our estimates and re-calculate the reservation wage. However notice that since the reservation wage will decrease in response to the tax credit, our forecast of the effect depends on an arbitrary parametric assumption that we had to make in order to identify the distribution of wages below the reservation wage $w^*$.
+
+Things look slightly better if we were to impose a tax ($\tau<0$) since this at would use information about the wage distribution that is directly observable, but the underlying identifying assumption is particularly stark: it says that the policy's effect can essentially be inferred from the cross-sectional distribution of wages without any existing policy variation to speak of.
+
+::: {.callout-warning icon="false"}
+## Discussion
+Does this seem like a credible way to identify the causal impact of the tax subsidy?
+:::
+
+::: {.callout-note}
+One thing to note about this discussion: while the initial identification discussion seems intuitive and reasonable, it takes a new light once we arrive that the *specific research question of interest*. Conceptually it is important to view the strengths and weaknesses of identification through the lens of desired counterfactuals.
+:::
+
+## Identification of the model with an exclusion restriction
+
+Suppose that we have access to a variable $Z$ that enters the model only by moving the flow utility from unemployment. We can re-write the reservation wage equation as:
+
+$$ w^*(z) = b(z) + \frac{\beta\lambda}{1-\beta(1-\delta)}\int_{w^*(z)}[1-F_{W}(w)]dw $$
+
+We'll refer to $Z$ as an excluded variable because it effects selection into and out of jobs without moving the distribution of offered wages. Let $\underline{w}(z)$ be the lower bound on the support of the *conditional* sampling distribution of wages $\mathbb{P}(W|E=1,Z)$ and let $\underline{w}_{F}$ be the lower bound on the support of the offer distribution $F_{W}$. 
+
+As before, we know that $w^*(z) = \underline{w}(z)$. Now suppose there is sufficient movement in $Z$ such that the set
+
+$$ \underline{\mathcal{Z}} = \{z: w^*(z)\leq \underline{w}_{F}\} $$
+
+has positive measure. This gives $\underline{w}_{F} = \inf_{z}\underline{w}(z) = \underline{w}$ and the set itself is identified as:
+
+$$ \underline{\mathcal{Z}} = \{z: \underline{w}(z)=\underline{w}\} $$
+
+The unconditional distribution $F_{W}$ is non-parametrically identified by simply looking at the distribution of wages for values of $Z$ where the lower bound of the support achieves this minimum:
+
+Identification of all other parameters can be pursued non-parametrically as a function of $z$.
+
+
+$$ F_{W}(w) = \mathbb{P}(w | E = 1, z),\ z \in \underline{\mathcal{Z}} $$
+
+:::{.callout-note}
+Forecasting the effect of the policy now makes use of *articulated variation*. The model casts variation that scales wages as being equivalent to variation in the value of unemployment $b$, for which we now have a source. This means that we can recreate the experiment by interpolating existing variation in $b$. 
+:::
+
+### Further identification by functional form
+
+Suppose that $b(z)$ takes a linear form:
+
+$$ b(z) = b_0 + b_1 z. $$
+
+In this case, for three values ($z,z',z''$) we can write:
+
+$$ w^*(z')-w^*(z) = b_1(z'-z) + \frac{\beta\lambda}{1-\beta(1-\delta)}\int_{w^*(z)}^{w*(z')}[1-F_{W}(w)]dw $$
+$$ w^*(z'')-w^*(z) = b_1(z''-z) + \frac{\beta\lambda}{1-\beta(1-\delta)}\int_{w^*(z)}^{w*(z'')}[1-F_{W}(w)]dw $$
+
+which is sufficient to identify the two unknowns in the equation, $\beta$ and $b_1$. Thus, $\beta$ is identified by additional functional form restrictions.
+
+:::{.callout-warning icon="false"}
+## Discussion
+- Notice that now the policy counterfactual is given by additional parameters that attempt to match how wages and hazard rates respond to existing policy variation. 
+- How do you feel about this approach relative to the case without variation? 
+- How do you feel about the model's key implication that variation in $b$ is equivalent to variation in $\tau$?
+- What would be an alternative and potentially preferable source of variation?
+:::
+
+### Identification with known scale restrictions
+
+There are cases where it would be reasonable to assume a known relationship $b(z)$. For example, if $Z$ is a random policy variable that tells us the generosity of welfare payments. To be consistent with our specification of utility while employed, we should then write:
+
+$$ b(z) = b_0 + Z $$
+
+and here $\beta$ would be identified. 
+
+:::{.callout-note}
+Not only is $\beta$ identified in this case, but we can see that it is a key parameter for matching the effect of $Z$, and hence will be a key parameter in determining the response of reservation wages and hazard rates.
+:::
+
+
+### The Whether vs How of Identification
+
+
+## Identification with unobserved heterogeneity
+
+
+<!-- Can we show that the model is not identified and that we need panel data? -->
