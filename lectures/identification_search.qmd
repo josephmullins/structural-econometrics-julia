@@ -255,7 +255,7 @@ $$ b(z) = b_0 + Z $$
 and here $\beta$ would be identified. 
 
 :::{.callout-note}
-Not only is $\beta$ identified in this case, but we can see that it is a key parameter for matching the effect of $Z$, and hence will be a key parameter in determining the response of reservation wages and hazard rates.
+Not only is $\beta$ identified in this case, but we can see that it is a key parameter for matching the effect of $Z$, and hence will be a key parameter in determining the response of reservation wages and hazard rates to the policy.
 :::
 
 
@@ -269,17 +269,22 @@ where $\omega \sim F_{\omega}$ is the component of wages net of $Z_{2}$. The res
 
 $$ \omega^*(z_1,z_2) = \frac{b(z_1)}{\mu(z_2)} + \frac{\beta\lambda}{1-\beta(1-\delta)}\int_{\omega^*(z_1,z_2)}(1-F_{\omega}(\omega))d\omega $$
 
-Fixing $Z_{2}$, let $Z_{1}$ have the same support conditions as in the previous section, implying that $F_{W}(W|Z_2)$ is identified for all $Z_{2}$. Notice that the location of the distribution of $F_{\omega}$ and the location of $\mu$ are not separately identified. Hence, we are free to normalize $\mathbb{E}[\omega] = 0$ such that $\log(\mu(Z)) = \mathbb{E}[\log(W)|Z_2]$, and hence $\mu(z)$ is non-parametrically identified by the conditional mean of $\log(W)$ when $Z_{1}$ is in the region of it's support where $\omega^*(Z_1,Z_2)\leq \underline{\omega}$.
+Fixing $Z_{2}$, let $Z_{1}$ have the same support conditions as in the previous section, implying that $F_{W}(W|Z_2)$ is identified for all $Z_{2}$ in an appropriately defined subset of its support. Notice that the location of the distribution of $F_{\omega}$ and the location of $\mu$ are not separately identified. Hence, we are free to normalize $\mathbb{E}[\omega] = 0$ such that $\log(\mu(Z)) = \mathbb{E}[\log(W)|Z_2]$, and hence $\mu(z)$ is non-parametrically identified by the conditional mean of $\log(W)$ when $Z_{1}$ is in the region of it's support where $\omega^*(Z_1,Z_2)\leq \underline{\omega}$.
 
-Reviewing the reservation wage, we see that the model is really *over-identified*: we only need a subset of the available data to identify the model. For example, note that hazard rates out of unemployment are:
+In order to introduce the **whether** versus the **how** of identification, let us begin with the observation that the model is *over-identified*: we only need a subset of the available data to identify the model. For example, note that hazard rates out of unemployment are:
 
 $$ h(z_1,z_2) = \lambda (1-F_{\omega}(\omega^*(z_1,z_2))) $$
 
-As we know, the hazard rate $h(z_1,z_2)$ can be identified directly by the distribution of durations, conditional on $z_1,z_2$. But notice that $h(z'_1,z'_2)/h(z_1,z_2) = (1-F_\omega(\omega^*(z_1,z_2)))/(1-F_{\omega}(\omega^*(z_1,z_2)))$ where the right hand side consists of objects that are directly identified from wage data. 
+As we now know, the hazard rate $h(z_1,z_2)$ can be identified directly by the distribution of durations, conditional on $z_1,z_2$. But notice that $h(z'_1,z'_2)/h(z_1,z_2) = (1-F_\omega(\omega^*(z_1,z_2)))/(1-F_{\omega}(\omega^*(z_1,z_2)))$ where the right hand side consists of objects that are directly identified from wage data. 
 
-Now you can go one of two ways: you can enrich the model based on the observation that you have many "spare" features of the data that could be used to identify this extra richness. **Or** you could decide that your model is sufficiently rich to answer your question of interest, and choose the estimation approach that you feel is most robust to misspecification. Since the model is undoubtedly misspecified, you will have to make peace with the idea that your model will not match every feature of the data simultaneously. This is the **how** of identification: which features of the data can you match to make the answer to your question of interest most credible?
+Now you can go one of two ways: you can enrich the model based on the observation that you have many "spare" features of the data that could be used to identify this extra richness. **Or** you could decide that your model is sufficiently detailed to answer your question of interest (shout out @Marschak1953), and choose the estimation approach that makes your answer most credible. Since the model is undoubtedly misspecified, you will have to make peace with the idea that your model will not match every feature of the data simultaneously. This is the **how** of identification: which features of the data will you use to identify and estimate your model to make the answer to your question of interest most credible?
 
-Here are two examples of potential tensions:
+:::{.callout-important icon="false"}
+## The "how" of identification
+When your model is over-identified, which features of the data will you use to identify and estimate your model?
+:::
+
+Here are two potential tensions from our example:
 
 1. As we discussed above: the shape of the hazard function is identified directly from wage data. Hazard rates are important because they determine unemployment rates, and their responsiveness to $Z_1$ and $Z_2$ determine the how unemployment rates shift with these variables.
 2. The reservation wage equation above shows that the model treats changes in $Z_1$ and $Z_2$ through the same mechanism. The model requires that variation in these two variables have an identical effect on reservation wages (and hence hazard rates). This is a strong restriction that would likely not hold in extended versions of the model. Would we want identification to rely on this property if we didn't have to?
@@ -290,6 +295,8 @@ How should we approach these tensions? Just as @Marschak1953 did, let's return t
 2. [Indirect Inference] Compute some quasi-experimental estimates of the effect of $Z_2$ on wages and hazard rates, and 
 3. [Maximum Likelihood] Maximize the log-likelihood, and validate ex-post that the model can fit observed changes in the hazard rate with respect to $Z_2$, or replicate the results of a quasi-experimental study. This would show that even though the model is overi-identified, it is still using the sources of variation that we view conceptually as being most appropriate.
 
+In the next section of this course, we will review the asymptotic properties of these estimators and discuss practical issues related to implementation.
+
 ::: {.callout-warning icon="false"}
 ## Discussion
 - How do you think approach compares to the case where we did not have plausible exogenous variation in wages?
@@ -298,13 +305,13 @@ How should we approach these tensions? Just as @Marschak1953 did, let's return t
 
 ## Identification with unobserved heterogeneity
 
-Now suppose that we allow for $K$ *unobserved types* with population proportions given by $\pi=\{\pi_{k}\}_{k=1}^{K}$ that enter the model through the value of unemployment. Assume that we have on instrument $Z$ that shifts the flow value of unemployment in a known way:
+Now suppose that we allow for $K$ *unobserved types* with population proportions given by $\pi=\{\pi_{k}\}_{k=1}^{K}$ that enter the model through the value of unemployment. Assume that we have an instrument $Z$ that shifts the flow value of unemployment in a known way:
 
 $$ b_{k}(Z) = b_{k} + Z $$
 
 such that we get $K$ latent reservation wages:
 
-$$ w^*_{k}(z) = b_{k} + Z + \frac{\beta\lambda}{1-\beta(1-\delta)}\int_{w^*_{k}(z)} $$
+$$ w^*_{k}(z) = b_{k} + Z + \frac{\beta\lambda}{1-\beta(1-\delta)}\int_{w^*_{k}(z)}[1-F_{W}(w)]dw $$
 
 This gives a vector of latent hazard rates $h_{k}(z)$ for all values of the instrument $z$. The distribution of hazard rates is itself a mixture:
 

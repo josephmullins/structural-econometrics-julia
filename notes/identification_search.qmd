@@ -1,0 +1,329 @@
+---
+title: "The Search Model"
+subtitle: "Lecture Notes"
+format:
+  pdf:
+    documentclass: article
+    geometry:
+      - margin=1in
+    fontsize: 11pt
+    toc: false
+---
+
+# Identification of the Model without Heterogeneity
+
+- The McCall Search Model is an excellent introduction to identification of structural models
+- Classic treatment: Flinn and Heckman (1982)
+
+---
+
+## Data
+
+- Identification arguments *always* begin with an assumption on available data
+- Even though the model is dynamic, we only need a single cross-section:
+$$(E_n, t_{U,n}, W_n)_{n=0}^{N}$$
+
+### Variables
+
+- $E_n \in \{0,1\}$: employment status of individual $n$
+- If employed ($E_n = 1$): observe wage $W_n$ (otherwise missing)
+- If unemployed ($E_n = 0$): observe unemployment duration $t_{U,n}$ (otherwise missing)
+
+### CPS Data Example (Key Results)
+
+- Panel dimension: more than half of individuals appear in multiple months
+- Transition rates can be measured from panel:
+  - Low separation rate (EU)
+  - Relatively high hazard rate out of unemployment (UE)
+- Observable heterogeneity matters: transition rates differ by education, race, sex
+
+---
+
+## Steady State Assumption
+
+- Key assumption for identification: economy is in **steady state**
+- Let $U_t$ = fraction unemployed at time $t$
+- Let $p_{\tau,t}$ = fraction with unemployment duration $\tau$ at time $t$
+
+### Laws of Motion
+
+\begin{eqnarray}
+U_{t+1} &=& (1-h)U_t + \delta(1-U_{t+1}) \\
+p_{\tau+1,t+1} &=& (1-h)p_{\tau,t} \\
+p_{0,t+1} &=& \delta(1-U_t)
+\end{eqnarray}
+
+- $h$ = hazard rate of exiting unemployment $= \lambda(1-F_W(w^*))$
+- $\delta$ = separation rate
+
+### Steady State Distribution
+
+- Enforcing constant values between $t$ and $t+1$:
+\begin{eqnarray}
+U_t &=& \frac{\delta}{\delta + h} \\
+p_\tau &=& \frac{\delta h}{\delta + h}(1-h)^\tau
+\end{eqnarray}
+
+---
+
+## Writing Joint Probabilities
+
+- Sampling distribution in terms of equilibrium objects:
+$$\mathbb{P}(E, t_U, W) = \left(\frac{h}{h+\delta}F_W(W|W>w^*)\right)^E \left(\frac{\delta h}{\delta+h}(1-h)^{t_U}\right)^{1-E}$$
+
+---
+
+## Thinking Through Identification
+
+### Step 1: Identify $h$ from duration distribution
+
+- Conditional distribution of unemployment durations:
+$$\mathbb{P}(t_U | E=0) = h \times (1-h)^{t_U}$$
+- The hazard rate $h$ is directly identified from the distribution of durations
+
+### Step 2: Identify $\delta$ from unemployment rate
+
+- Probability of being unemployed:
+$$\mathbb{P}(E=0) = \frac{\delta}{\delta + h}$$
+- Since $h$ is now known, $\delta$ is identified from the unemployment rate
+
+### Step 3: Wage distribution and reservation wage
+
+- Observed wages equal the offer distribution *conditional on acceptance*:
+$$\mathbb{P}(W|E=1) = F_W(W|W>w^*)$$
+- The conditional distribution is identified, but not offers below $w^*$
+- Let $\underline{w}$ = lower bound on observed wage distribution
+- The reservation wage is identified: $w^* = \underline{w}$
+
+### Step 4: Deeper structural parameters
+
+- Rewrite the reservation wage equation:
+$$w^* = b + \beta h \int_{w^*} \frac{1-F(W|W>w^*)}{1-\beta(1-\delta)} dw$$
+- Infinitely many combinations of $b$ and $\beta$ rationalize the same $w^*$
+- Common approach: **assume a plausible value for $\beta$**, then $b$ is identified
+
+---
+
+# Credibility and a Policy Counterfactual
+
+## The Policy
+
+- Consider a tax credit $\tau$ proportional to earnings
+- Under the counterfactual, value function becomes:
+$$V(w) = (1+\tau)w + \delta U + (1-\delta)V(w)$$
+
+## New Reservation Wage Equation
+
+$$w^* = \frac{b}{1+\tau} + \frac{\beta\lambda}{1-\beta(1-\delta)} \int_{w^*}[1-F_W(w)]dw$$
+
+- Effect of subsidy: equivalent to reducing flow utility of unemployment
+
+## Credibility Concerns
+
+- Forecasting the counterfactual: re-calculate reservation wage with estimates
+- **Problem:** Forecast depends on arbitrary parametric assumptions about wage distribution below $w^*$
+- For a tax ($\tau < 0$): slightly better since it uses observable wage distribution
+- But underlying assumption is stark: policy effect inferred from cross-sectional wage distribution without any policy variation
+
+### Key Observation
+
+- Initial identification seems reasonable
+- But credibility must be viewed through the lens of the **specific research question**
+- Evaluate identification strengths/weaknesses relative to desired counterfactuals
+
+---
+
+# Identification with an Exclusion Restriction
+
+## Setup
+
+- Variable $Z$ enters model only through flow utility of unemployment
+- Reservation wage equation becomes:
+$$w^*(z) = b(z) + \frac{\beta\lambda}{1-\beta(1-\delta)} \int_{w^*(z)}[1-F_W(w)]dw$$
+- $Z$ is an **excluded variable**: affects selection into/out of jobs without moving wage offer distribution
+
+## Key Definitions
+
+- $\underline{w}(z)$ = lower bound on conditional sampling distribution $\mathbb{P}(W|E=1,Z)$
+- $\underline{w}_F$ = lower bound on support of offer distribution $F_W$
+- As before: $w^*(z) = \underline{w}(z)$
+
+## Identification Strategy
+
+- Suppose $Z$ has sufficient variation such that:
+$$\underline{\mathcal{Z}} = \{z: w^*(z) \leq \underline{w}_F\}$$
+has positive measure
+
+- Then:
+  - $\underline{w}_F = \inf_z \underline{w}(z) = \underline{w}$
+  - The set is identified: $\underline{\mathcal{Z}} = \{z: \underline{w}(z) = \underline{w}\}$
+  - $F_W$ is nonparametrically identified:
+  $$F_W(w) = \mathbb{P}(w|E=1,z), \quad z \in \underline{\mathcal{Z}}$$
+
+### Key Insight
+
+- Policy forecast now uses **articulated variation**
+- Model treats wage scaling as equivalent to variation in $b$
+- Can recreate experiment by interpolating existing variation in $b$
+
+---
+
+## Further Identification by Functional Form
+
+- Suppose $b(z)$ is linear: $b(z) = b_0 + b_1 z$
+- For three values $(z, z', z'')$:
+$$w^*(z') - w^*(z) = b_1(z'-z) + \frac{\beta\lambda}{1-\beta(1-\delta)} \int_{w^*(z)}^{w^*(z')}[1-F_W(w)]dw$$
+$$w^*(z'') - w^*(z) = b_1(z''-z) + \frac{\beta\lambda}{1-\beta(1-\delta)} \int_{w^*(z)}^{w^*(z'')}[1-F_W(w)]dw$$
+
+- Two equations, two unknowns ($\beta$ and $b_1$)
+- Thus $\beta$ is identified by functional form restrictions
+
+### Discussion Points
+
+- Policy counterfactual now determined by parameters matching response to existing variation
+- How does this compare to the case without variation?
+- Key model implication: variation in $b$ equivalent to variation in $\tau$
+- What would be preferable sources of variation?
+
+---
+
+## Identification with Known Scale Restrictions
+
+- If $Z$ is a policy variable (e.g., welfare payment generosity):
+$$b(z) = b_0 + Z$$
+- Here $\beta$ is identified directly
+
+### Importance of $\beta$
+
+- Key parameter for matching effect of $Z$
+- Determines response of reservation wages and hazard rates to policy
+
+---
+
+# The Whether vs How of Identification
+
+## Setup with Two Instruments
+
+- $(Z_1, Z_2)$: $Z_1$ shifts $b$, $Z_2$ shifts wages
+- $Z_2$: labor demand shifter or marginal tax rate policy
+- Assume:
+$$\log(W) = \log(\omega) + \log(\mu(Z_2)), \quad Z_2 \perp \omega$$
+
+- Reservation wage in terms of $\omega^*$:
+$$\omega^*(z_1,z_2) = \frac{b(z_1)}{\mu(z_2)} + \frac{\beta\lambda}{1-\beta(1-\delta)} \int_{\omega^*(z_1,z_2)}(1-F_\omega(\omega))d\omega$$
+
+## Over-Identification
+
+- Model is **over-identified**: only need subset of data
+- Hazard rates:
+$$h(z_1,z_2) = \lambda(1-F_\omega(\omega^*(z_1,z_2)))$$
+- Hazard rate identified from duration distribution, conditional on $(z_1, z_2)$
+- But ratio $h(z'_1,z'_2)/h(z_1,z_2)$ also determined by wage data alone
+
+## Two Approaches to Over-Identification
+
+1. **Enrich the model** using "spare" features of data
+2. **Choose estimation approach** to make answer most credible (Marschak's maxim)
+   - Model is misspecified
+   - Cannot match every feature simultaneously
+   - **The "how" of identification:** which features will you use?
+
+---
+
+## Key Tensions
+
+1. **Shape of hazard function** identified from wage data
+   - Hazard rates determine unemployment rates
+   - Responsiveness to $Z_1, Z_2$ determines how unemployment shifts
+
+2. **Model restriction:** $Z_1$ and $Z_2$ work through same mechanism
+   - Identical effect on reservation wages
+   - Strong restriction unlikely to hold in extended models
+   - Do we want identification to rely on this if we don't have to?
+
+---
+
+## Returning to the Question of Interest
+
+- Want to evaluate policy varying marginal tax rates
+- Most convincing: show parameters replicate effects of pre-existing, functionally identical variation
+
+### Options
+
+1. **Minimum Distance:** Match moments from joint distribution of durations and $z_2$
+2. **Indirect Inference:** Match quasi-experimental estimates of $Z_2$ effects on wages/hazard rates
+3. **Maximum Likelihood:** Maximize likelihood, validate ex-post that model fits observed changes in hazard rate w.r.t. $Z_2$
+
+### Key Point
+
+- Even if over-identified, use variation most appropriate for the question
+- Validation shows model uses conceptually appropriate sources of variation
+
+---
+
+# Identification with Unobserved Heterogeneity
+
+## Setup
+
+- $K$ unobserved types with population proportions $\pi = \{\pi_k\}_{k=1}^K$
+- Types enter through value of unemployment
+- Instrument $Z$ shifts flow value in known way:
+$$b_k(Z) = b_k + Z$$
+
+## Latent Reservation Wages
+
+$$w_k^*(z) = b_k + Z + \frac{\beta\lambda}{1-\beta(1-\delta)} \int_{w_k^*(z)}[1-F_W(w)]dw$$
+
+- Gives vector of latent hazard rates $h_k(z)$
+
+## Duration Distribution as Mixture
+
+$$\mathbb{P}(t_U = t | E=0, Z) = \sum_k \tilde{\pi}_k h_k(z)(1-h_k(z))^t$$
+
+- $\tilde{\pi}_k$ = representation of type $k$ among unemployed:
+$$\tilde{\pi}_k = \frac{\pi_k \frac{\delta}{\delta + h_k(z)}}{U(z)}$$
+
+## Identification Result (Heckman and Singer, 1984)
+
+- For fixed $K$: parameters $(\tilde{\pi}_k, h_k(z))$ are identified from duration distribution
+
+### Completing the Argument (Exercise)
+
+1. Invert $\pi$ and $\delta$ from $\tilde{\pi}$ and unemployment rate $U(z)$
+2. State support assumption on $Z$ such that $F_W$ is identified
+3. Argue $\lambda$ is identified in this region
+4. Argue each $w_k^*(z)$ is identified from $h_k(z)$ and $F_W$
+5. Use reservation wage equation to identify each $b_k$ and $\beta$
+
+---
+
+# Summary
+
+## Key Takeaways
+
+- **Data Requirements:** Cross-sectional data on employment status, wages, and unemployment durations
+
+- **Steady State:** Essential assumption for identification; gives closed-form expressions for distributions
+
+- **Basic Identification:**
+  - Hazard rate $h$ from duration distribution
+  - Separation rate $\delta$ from unemployment rate
+  - Reservation wage $w^*$ from lower bound of observed wages
+  - Deep parameters $(b, \beta)$ require normalization
+
+- **Policy Counterfactuals:** Credibility depends on whether identification relies on:
+  - Arbitrary parametric assumptions (less credible)
+  - Articulated variation from excluded instruments (more credible)
+
+- **Exclusion Restrictions:**
+  - Variable affecting only $b$ enables nonparametric identification of $F_W$
+  - Known scale restrictions can identify $\beta$
+
+- **The "How" of Identification:**
+  - Over-identified models require choosing which moments to match
+  - Choose estimation approach to make answer to research question most credible
+  - Marschak's maxim: sufficiency for the question of interest
+
+- **Unobserved Heterogeneity:**
+  - Mixture models with latent types
+  - Identified under support conditions on instruments
