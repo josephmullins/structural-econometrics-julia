@@ -261,8 +261,73 @@ Not only is $\beta$ identified in this case, but we can see that it is a key par
 
 ### The Whether vs How of Identification
 
+Let's now assume that we have access to two instruments, $(Z_{1},Z_{2})$. The former shifts $b$, as in the previous example, while the latter shifts wages. $Z_{2}$ could be a plausible instrument for labor demand, or if we wanted to think of $W$ as net wages, $Z_{2}$ could represent a policy variable that sets marginal tax rates. Let's assume that:
+
+$$ \log(W) = \log(\omega) + \log(\mu(Z_{2})),\ Z_{2} \perp \omega $$
+
+where $\omega \sim F_{\omega}$ is the component of wages net of $Z_{2}$. The reservation wage formula can be written in terms of $\omega^*$:
+
+$$ \omega^*(z_1,z_2) = \frac{b(z_1)}{\mu(z_2)} + \frac{\beta\lambda}{1-\beta(1-\delta)}\int_{\omega^*(z_1,z_2)}(1-F_{\omega}(\omega))d\omega $$
+
+Fixing $Z_{2}$, let $Z_{1}$ have the same support conditions as in the previous section, implying that $F_{W}(W|Z_2)$ is identified for all $Z_{2}$. Notice that the location of the distribution of $F_{\omega}$ and the location of $\mu$ are not separately identified. Hence, we are free to normalize $\mathbb{E}[\omega] = 0$ such that $\log(\mu(Z)) = \mathbb{E}[\log(W)|Z_2]$, and hence $\mu(z)$ is non-parametrically identified by the conditional mean of $\log(W)$ when $Z_{1}$ is in the region of it's support where $\omega^*(Z_1,Z_2)\leq \underline{\omega}$.
+
+Reviewing the reservation wage, we see that the model is really *over-identified*: we only need a subset of the available data to identify the model. For example, note that hazard rates out of unemployment are:
+
+$$ h(z_1,z_2) = \lambda (1-F_{\omega}(\omega^*(z_1,z_2))) $$
+
+As we know, the hazard rate $h(z_1,z_2)$ can be identified directly by the distribution of durations, conditional on $z_1,z_2$. But notice that $h(z'_1,z'_2)/h(z_1,z_2) = (1-F_\omega(\omega^*(z_1,z_2)))/(1-F_{\omega}(\omega^*(z_1,z_2)))$ where the right hand side consists of objects that are directly identified from wage data. 
+
+Now you can go one of two ways: you can enrich the model based on the observation that you have many "spare" features of the data that could be used to identify this extra richness. **Or** you could decide that your model is sufficiently rich to answer your question of interest, and choose the estimation approach that you feel is most robust to misspecification. Since the model is undoubtedly misspecified, you will have to make peace with the idea that your model will not match every feature of the data simultaneously. This is the **how** of identification: which features of the data can you match to make the answer to your question of interest most credible?
+
+Here are two examples of potential tensions:
+
+1. As we discussed above: the shape of the hazard function is identified directly from wage data. Hazard rates are important because they determine unemployment rates, and their responsiveness to $Z_1$ and $Z_2$ determine the how unemployment rates shift with these variables.
+2. The reservation wage equation above shows that the model treats changes in $Z_1$ and $Z_2$ through the same mechanism. The model requires that variation in these two variables have an identical effect on reservation wages (and hence hazard rates). This is a strong restriction that would likely not hold in extended versions of the model. Would we want identification to rely on this property if we didn't have to?
+
+How should we approach these tensions? Just as @Marschak1953 did, let's return to the **question of interest**. We want to evaluate a policy counterfactual that varies marginal tax rates. Wouldn't this be most convincing if we show that the model parameters have been chosen to replicate the effects of pre-existing variation that is functionally identical? Some options along these lines:
+
+1. [Minimum Distance] Choose structural parameters to match --- along with more fundamental moments --- moments based on the joint distribution of unemployment durations and $z_2$. 
+2. [Indirect Inference] Compute some quasi-experimental estimates of the effect of $Z_2$ on wages and hazard rates, and 
+3. [Maximum Likelihood] Maximize the log-likelihood, and validate ex-post that the model can fit observed changes in the hazard rate with respect to $Z_2$, or replicate the results of a quasi-experimental study. This would show that even though the model is overi-identified, it is still using the sources of variation that we view conceptually as being most appropriate.
+
+::: {.callout-warning icon="false"}
+## Discussion
+- How do you think approach compares to the case where we did not have plausible exogenous variation in wages?
+- How do you think it compares to the case where we had exogenous variation in tax rates explicitly (rather than intepolating via articulated variation: wage rates and marginal tax rates have identical effects).
+:::
 
 ## Identification with unobserved heterogeneity
+
+Now suppose that we allow for $K$ *unobserved types* with population proportions given by $\pi=\{\pi_{k}\}_{k=1}^{K}$ that enter the model through the value of unemployment. Assume that we have on instrument $Z$ that shifts the flow value of unemployment in a known way:
+
+$$ b_{k}(Z) = b_{k} + Z $$
+
+such that we get $K$ latent reservation wages:
+
+$$ w^*_{k}(z) = b_{k} + Z + \frac{\beta\lambda}{1-\beta(1-\delta)}\int_{w^*_{k}(z)} $$
+
+This gives a vector of latent hazard rates $h_{k}(z)$ for all values of the instrument $z$. The distribution of hazard rates is itself a mixture:
+
+$$ \mathbb{P}(t_U=t|E=0,Z) = \sum_{k}\tilde{\pi}_{k}h_{k}(z)(1-h_{k}(z))^{t} $$
+
+where $\tilde{\pi}_{k}$ denotes the representation of each type among the unemployed: 
+
+$$\tilde{\pi}_{k} = \frac{\pi_{k}\frac{\delta}{\delta+h_{k}(z)}}{U(z)} $$
+
+@heckman1984 show that, for a fixed $K$, the parameters $(\tilde{\pi}_{k},h_{k}(z))$ are identified from this distribution of durations.
+
+::: {.callout-tip icon="false"}
+## Exercise
+::: {#exr-search_unobs_hetero}
+Complete the identification argument for this model by following these steps:
+
+1. Argue that the vector $\pi$ and $\delta$ can be inverted from $\tilde{\pi}$ and the unemployment rate $U(z)$.
+1. State an assumption on the support of $Z$ such that $F_{W}$ is identified in some part of the support of $Z$.
+2. Argue that $\lambda$ is identified for $Z$ in this same region of the support.
+3. Argue that each $w_{k}^*(z)$ is identified from $h_{k}(z)$ and $F_{W}$.
+4. Use the reservation wage equation to argue that each $b_{k}$ and $\beta$ is identified.
+:::
+:::
 
 
 <!-- Can we show that the model is not identified and that we need panel data? -->

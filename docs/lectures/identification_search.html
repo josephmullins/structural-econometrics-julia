@@ -394,11 +394,11 @@ Example: CPS Data
 <div class="callout-body-container callout-body">
 <div id="exm-CPS_data" class="theorem example">
 <p><span class="theorem-title"><strong>Example 8.1 (Reading the data)</strong></span> Let’s take a look at data from the CPS on wages, employment status, and labor market transitions. Here is code to read in the data:</p>
-<div id="5be13b19" class="cell" data-execution_count="1">
+<div id="4ba2155a" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span>, <span class="bu">DataFrames</span>, <span class="bu">DataFramesMeta</span>, <span class="bu">Statistics</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="st">"../data/cps_00019.csv"</span>,DataFrame)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+<div class="cell-output cell-output-display" data-execution_count="9">
 <div><div style="float: left;"><span>183277×22 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">183252 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
@@ -1110,13 +1110,13 @@ Example: CPS Data
 </div>
 </div>
 <p>As you can see from the preview of the data, the data is taken from January-March 2018. Here is a quick snippet of code to see how many observations we have on average per person:</p>
-<div id="2caba3c1" class="cell" data-execution_count="2">
+<div id="3a3dfde3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@chain</span> data <span class="cf">begin</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">groupby</span>(<span class="op">:</span>CPSIDP)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@combine</span> <span class="op">:</span>T <span class="op">=</span> <span class="fu">length</span>(<span class="op">:</span>EMPSTAT)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@combine</span> <span class="op">:</span>average <span class="op">=</span> <span class="fu">mean</span>(<span class="op">:</span>T) <span class="op">:</span>frac_panel <span class="op">=</span> <span class="fu">mean</span>(<span class="op">:</span>T<span class="op">.&gt;</span><span class="fl">1</span>)</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="10">
 <div><div style="float: left;"><span>1×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
@@ -1144,7 +1144,7 @@ Example: CPS Data
 </div>
 <p>So we see that more than half of the individuals in this sample can be found in more than one month of the data.</p>
 <p>The <code>@chain</code> macro comes from the package <code>DataFramesMeta</code> and is a convenient syntax for composing operations into one block. For example:</p>
-<div id="28785094" class="cell" data-execution_count="3">
+<div id="e6ea824f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@chain</span> x <span class="cf">begin</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">func1</span>(y1)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">func2</span>(y2)</span>
@@ -1152,14 +1152,14 @@ Example: CPS Data
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>is equivalent to</p>
-<div id="2bc846dd" class="cell" data-execution_count="4">
+<div id="ea811e8c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">func3</span>(<span class="fu">func2</span>(<span class="fu">func1</span>(x,y1),y2),y3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="exm-CPS_moments" class="theorem example">
 <p><span class="theorem-title"><strong>Example 8.2 (Calculating some moments)</strong></span> You may find the <a href="../data/CPS-Codebook.html">codebook</a> useful for understanding particular variables. We have already limited the data to individuals who are working (<code>EMPSTAT</code>=10), have a job but did not work last week (<code>EMPSTAT</code>==12), or are unemployed (<code>EMPSTAT</code>==21).</p>
 <p>Suppose we wanted to use the panel dimension to measure transition rates. Here is a simple way to do that by simply measuring transitions between January and Feburary.</p>
-<div id="7b38d77e" class="cell" data-execution_count="5">
+<div id="bb184980" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>data[!,<span class="op">:</span>E] <span class="op">.=</span> data.EMPSTAT<span class="op">.&lt;</span><span class="fl">21</span> <span class="co">#&lt;- code the employment variable</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>data_jan <span class="op">=</span> <span class="pp">@chain</span> data <span class="cf">begin</span></span>
@@ -1173,7 +1173,7 @@ Example: CPS Data
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@select</span> <span class="op">:</span>CPSIDP <span class="op">:</span>E</span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">innerjoin</span>(data_jan,on<span class="op">=:</span>CPSIDP)</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="11">
 <div><div style="float: left;"><span>41262×7 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">41237 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
@@ -1465,12 +1465,12 @@ Example: CPS Data
 </div>
 </div>
 <p>So now we can calculate the overall transition rate out of unemployment:</p>
-<div id="a9fc0e26" class="cell" data-execution_count="6">
+<div id="b0649bcd" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@combine</span> data_merged <span class="cf">begin</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>EU <span class="op">=</span>  <span class="fl">1</span><span class="fu">-mean</span>(<span class="op">:</span>E[<span class="op">:</span>E_lag<span class="op">.==</span><span class="fl">1</span>])</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>UE <span class="op">=</span> <span class="fu">mean</span>(<span class="op">:</span>E[<span class="op">:</span>E_lag<span class="op">.==</span><span class="fl">0</span>])</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="12">
 <div><div style="float: left;"><span>1×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
@@ -1500,7 +1500,7 @@ Example: CPS Data
 </div>
 <div id="exm-CPS_hetero" class="theorem example">
 <p><span class="theorem-title"><strong>Example 8.3 (Observable heterogeneity)</strong></span> Next we’ll define a very simple education classification (Bachelor’s degree or not) and race classification (white vs non-white), and use <code>groupby</code> to calculate rates separately by demographics:</p>
-<div id="d17037af" class="cell" data-execution_count="7">
+<div id="574ce495" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@chain</span> data_merged <span class="cf">begin</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="cf">begin</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span>bachelors <span class="op">=</span> <span class="op">:</span>EDUC<span class="op">.&gt;=</span><span class="fl">111</span></span>
@@ -1512,7 +1512,7 @@ Example: CPS Data
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>       <span class="op">:</span>UE <span class="op">=</span> <span class="fu">mean</span>(<span class="op">:</span>E[<span class="op">:</span>E_lag<span class="op">.==</span><span class="fl">0</span>])</span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span> </span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="13">
 <div><div style="float: left;"><span>8×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
@@ -1752,16 +1752,89 @@ Note
 </section>
 <section id="the-whether-vs-how-of-identification" class="level3" data-number="8.3.3">
 <h3 data-number="8.3.3" class="anchored" data-anchor-id="the-whether-vs-how-of-identification"><span class="header-section-number">8.3.3</span> The Whether vs How of Identification</h3>
+<p>Let’s now assume that we have access to two instruments, <span class="math inline">\((Z_{1},Z_{2})\)</span>. The former shifts <span class="math inline">\(b\)</span>, as in the previous example, while the latter shifts wages. <span class="math inline">\(Z_{2}\)</span> could be a plausible instrument for labor demand, or if we wanted to think of <span class="math inline">\(W\)</span> as net wages, <span class="math inline">\(Z_{2}\)</span> could represent a policy variable that sets marginal tax rates. Let’s assume that:</p>
+<p><span class="math display">\[ \log(W) = \log(\omega) + \log(\mu(Z_{2})),\ Z_{2} \perp \omega \]</span></p>
+<p>where <span class="math inline">\(\omega \sim F_{\omega}\)</span> is the component of wages net of <span class="math inline">\(Z_{2}\)</span>. The reservation wage formula can be written in terms of <span class="math inline">\(\omega^*\)</span>:</p>
+<p><span class="math display">\[ \omega^*(z_1,z_2) = \frac{b(z_1)}{\mu(z_2)} + \frac{\beta\lambda}{1-\beta(1-\delta)}\int_{\omega^*(z_1,z_2)}(1-F_{\omega}(\omega))d\omega \]</span></p>
+<p>Fixing <span class="math inline">\(Z_{2}\)</span>, let <span class="math inline">\(Z_{1}\)</span> have the same support conditions as in the previous section, implying that <span class="math inline">\(F_{W}(W|Z_2)\)</span> is identified for all <span class="math inline">\(Z_{2}\)</span>. Notice that the location of the distribution of <span class="math inline">\(F_{\omega}\)</span> and the location of <span class="math inline">\(\mu\)</span> are not separately identified. Hence, we are free to normalize <span class="math inline">\(\mathbb{E}[\omega] = 0\)</span> such that <span class="math inline">\(\log(\mu(Z)) = \mathbb{E}[\log(W)|Z_2]\)</span>, and hence <span class="math inline">\(\mu(z)\)</span> is non-parametrically identified by the conditional mean of <span class="math inline">\(\log(W)\)</span> when <span class="math inline">\(Z_{1}\)</span> is in the region of it’s support where <span class="math inline">\(\omega^*(Z_1,Z_2)\leq \underline{\omega}\)</span>.</p>
+<p>Reviewing the reservation wage, we see that the model is really <em>over-identified</em>: we only need a subset of the available data to identify the model. For example, note that hazard rates out of unemployment are:</p>
+<p><span class="math display">\[ h(z_1,z_2) = \lambda (1-F_{\omega}(\omega^*(z_1,z_2))) \]</span></p>
+<p>As we know, the hazard rate <span class="math inline">\(h(z_1,z_2)\)</span> can be identified directly by the distribution of durations, conditional on <span class="math inline">\(z_1,z_2\)</span>. But notice that <span class="math inline">\(h(z'_1,z'_2)/h(z_1,z_2) = (1-F_\omega(\omega^*(z_1,z_2)))/(1-F_{\omega}(\omega^*(z_1,z_2)))\)</span> where the right hand side consists of objects that are directly identified from wage data.</p>
+<p>Now you can go one of two ways: you can enrich the model based on the observation that you have many “spare” features of the data that could be used to identify this extra richness. <strong>Or</strong> you could decide that your model is sufficiently rich to answer your question of interest, and choose the estimation approach that you feel is most robust to misspecification. Since the model is undoubtedly misspecified, you will have to make peace with the idea that your model will not match every feature of the data simultaneously. This is the <strong>how</strong> of identification: which features of the data can you match to make the answer to your question of interest most credible?</p>
+<p>Here are two examples of potential tensions:</p>
+<ol type="1">
+<li>As we discussed above: the shape of the hazard function is identified directly from wage data. Hazard rates are important because they determine unemployment rates, and their responsiveness to <span class="math inline">\(Z_1\)</span> and <span class="math inline">\(Z_2\)</span> determine the how unemployment rates shift with these variables.</li>
+<li>The reservation wage equation above shows that the model treats changes in <span class="math inline">\(Z_1\)</span> and <span class="math inline">\(Z_2\)</span> through the same mechanism. The model requires that variation in these two variables have an identical effect on reservation wages (and hence hazard rates). This is a strong restriction that would likely not hold in extended versions of the model. Would we want identification to rely on this property if we didn’t have to?</li>
+</ol>
+<p>How should we approach these tensions? Just as <span class="citation" data-cites="Marschak1953">Marschak (<a href="../references.html#ref-Marschak1953" role="doc-biblioref">1953</a>)</span> did, let’s return to the <strong>question of interest</strong>. We want to evaluate a policy counterfactual that varies marginal tax rates. Wouldn’t this be most convincing if we show that the model parameters have been chosen to replicate the effects of pre-existing variation that is functionally identical? Some options along these lines:</p>
+<ol type="1">
+<li>[Minimum Distance] Choose structural parameters to match — along with more fundamental moments — moments based on the joint distribution of unemployment durations and <span class="math inline">\(z_2\)</span>.</li>
+<li>[Indirect Inference] Compute some quasi-experimental estimates of the effect of <span class="math inline">\(Z_2\)</span> on wages and hazard rates, and</li>
+<li>[Maximum Likelihood] Maximize the log-likelihood, and validate ex-post that the model can fit observed changes in the hazard rate with respect to <span class="math inline">\(Z_2\)</span>, or replicate the results of a quasi-experimental study. This would show that even though the model is overi-identified, it is still using the sources of variation that we view conceptually as being most appropriate.</li>
+</ol>
+<div class="callout callout-style-default callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Discussion
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>How do you think approach compares to the case where we did not have plausible exogenous variation in wages?</li>
+<li>How do you think it compares to the case where we had exogenous variation in tax rates explicitly (rather than intepolating via articulated variation: wage rates and marginal tax rates have identical effects).</li>
+</ul>
+</div>
+</div>
 </section>
 </section>
 <section id="identification-with-unobserved-heterogeneity" class="level2" data-number="8.4">
 <h2 data-number="8.4" class="anchored" data-anchor-id="identification-with-unobserved-heterogeneity"><span class="header-section-number">8.4</span> Identification with unobserved heterogeneity</h2>
+<p>Now suppose that we allow for <span class="math inline">\(K\)</span> <em>unobserved types</em> with population proportions given by <span class="math inline">\(\pi=\{\pi_{k}\}_{k=1}^{K}\)</span> that enter the model through the value of unemployment. Assume that we have on instrument <span class="math inline">\(Z\)</span> that shifts the flow value of unemployment in a known way:</p>
+<p><span class="math display">\[ b_{k}(Z) = b_{k} + Z \]</span></p>
+<p>such that we get <span class="math inline">\(K\)</span> latent reservation wages:</p>
+<p><span class="math display">\[ w^*_{k}(z) = b_{k} + Z + \frac{\beta\lambda}{1-\beta(1-\delta)}\int_{w^*_{k}(z)} \]</span></p>
+<p>This gives a vector of latent hazard rates <span class="math inline">\(h_{k}(z)\)</span> for all values of the instrument <span class="math inline">\(z\)</span>. The distribution of hazard rates is itself a mixture:</p>
+<p><span class="math display">\[ \mathbb{P}(t_U=t|E=0,Z) = \sum_{k}\tilde{\pi}_{k}h_{k}(z)(1-h_{k}(z))^{t} \]</span></p>
+<p>where <span class="math inline">\(\tilde{\pi}_{k}\)</span> denotes the representation of each type among the unemployed:</p>
+<p><span class="math display">\[\tilde{\pi}_{k} = \frac{\pi_{k}\frac{\delta}{\delta+h_{k}(z)}}{U(z)} \]</span></p>
+<p><span class="citation" data-cites="heckman1984">Heckman and Singer (<a href="../references.html#ref-heckman1984" role="doc-biblioref">1984</a>)</span> show that, for a fixed <span class="math inline">\(K\)</span>, the parameters <span class="math inline">\((\tilde{\pi}_{k},h_{k}(z))\)</span> are identified from this distribution of durations.</p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-search_unobs_hetero" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 8.1</strong></span> Complete the identification argument for this model by following these steps:</p>
+<ol type="1">
+<li>Argue that the vector <span class="math inline">\(\pi\)</span> and <span class="math inline">\(\delta\)</span> can be inverted from <span class="math inline">\(\tilde{\pi}\)</span> and the unemployment rate <span class="math inline">\(U(z)\)</span>.</li>
+<li>State an assumption on the support of <span class="math inline">\(Z\)</span> such that <span class="math inline">\(F_{W}\)</span> is identified in some part of the support of <span class="math inline">\(Z\)</span>.</li>
+<li>Argue that <span class="math inline">\(\lambda\)</span> is identified for <span class="math inline">\(Z\)</span> in this same region of the support.</li>
+<li>Argue that each <span class="math inline">\(w_{k}^*(z)\)</span> is identified from <span class="math inline">\(h_{k}(z)\)</span> and <span class="math inline">\(F_{W}\)</span>.</li>
+<li>Use the reservation wage equation to argue that each <span class="math inline">\(b_{k}\)</span> and <span class="math inline">\(\beta\)</span> is identified.</li>
+</ol>
+</div>
+</div>
+</div>
 <!-- Can we show that the model is not identified and that we need panel data? -->
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
 <div id="ref-flinn1982" class="csl-entry" role="listitem">
 Flinn, Christopher, and James Heckman. 1982. <span>“New Methods for Analyzing Structural Models of Labor Force Dynamics.”</span> <em>Journal of Econometrics</em> 18 (1): 115–68.
+</div>
+<div id="ref-heckman1984" class="csl-entry" role="listitem">
+Heckman, James, and Burton Singer. 1984. <span>“A Method for Minimizing the Impact of Distributional Assumptions in Econometric Models for Duration Data.”</span> <em>Econometrica: Journal of the Econometric Society</em>, 271–320.
+</div>
+<div id="ref-Marschak1953" class="csl-entry" role="listitem">
+Marschak, Jacob. 1953. <span>“Economic Measurements for Policy and Prediction.”</span> In <em>Studies in Econometric Method</em>, edited by W. Hood and C. Koopmans. John Wiley &amp; Sons.
 </div>
 <div id="ref-Mccall" class="csl-entry" role="listitem">
 McCall, John Joseph. 1970. <span>“Economics of Information and Job Search.”</span> <em>The Quarterly Journal of Economics</em> 84 (1): 113–26.

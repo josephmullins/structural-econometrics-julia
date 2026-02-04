@@ -218,7 +218,7 @@ plot!(pl[4],[0.5,0.5],[0,150],color="red",label="True Value")
 ::: {.callout-tip icon="false"}
 ## Exercise
 ::: {#exr-id_functional_form}
-Using Example @exm-roy_estimation, try setting $\gamma_{3} = 0$ and verify that identification by functional form works in practice: the model can still be estimated using the parametric selection correction.
+Using @exm-roy_estimation, try setting $\gamma_{3} = 0$ and verify that identification by functional form works in practice: the model can still be estimated using the parametric selection correction.
 :::
 :::
 
