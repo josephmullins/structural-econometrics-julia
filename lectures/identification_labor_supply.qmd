@@ -1,1 +1,313 @@
 # The Dynamic Labor Supply Model
+
+For this example, let's remind ourselves how labor supply looks in this model without heterogeneity and with quasilinear preferences ($\sigma=0$):
+
+$$ \log(H_{n,t}) = \psi\log(\alpha) + \psi\log(W_{n,t}) $$
+
+Clearly, we need more assumptions to brings this model to data, since it predicts that the relationship between log hours and log wages is a perfectly straight line.
+
+Consider now the following extension of the model. Let preferences be heterogeneous and decomposed as:
+
+$$ \psi\log(\alpha_{n}) = \mu_{\alpha} + \varepsilon_{n},\ \mathbb{E}[\varepsilon] = 0 $$
+
+and assume that hours are observed with additive measurement error ($\xi_{n,t}$), such that:
+
+$$ \log(H_{n,t}) = \mu_{\alpha} + \psi\log(W_{n,t}) + \varepsilon_{n} + \xi_{n,t}.$$
+
+For wages, likewise assume that:
+
+$$\log(W_{n,t}) = \gamma_{0} + Z_{n,t}\gamma_{1} + \zeta_{n} + \upsilon_{n,t} $$
+
+where $\zeta_{n}$ reflects an unobserved permanent component of $n$'s productivity and $\nu_{n,t}$ is a time-varying shock. $Z_{n,t}$ is a variable that we think ought to shift labor demand in ways that are essentially random with respect to individual-level unobservables.
+
+
+:::{.callout-note}
+
+When you extend a model in this way (to account for randomness in outcomes), you should keep two things in mind:
+
+1. What is *my* theory for why this residual exists? As in: what is the structural error term in my model?
+2. What other components could explain part of this residual that are *not* in my model?
+
+Accordingly when you think about identification, you have two important tasks (in order of importance):
+
+1. Craft an argument and approach to identification that is  consistent with the assumptions of your model. Your model may already pose important enodgenity problems to solve.
+2. Craft an argument and approach to identification that is plausible and robust to potential mechanisms (members of the residual) that are *not* in your model.
+
+If you don't have (1), then there's no point in moving on to (2), but addressing (2) goes a long way to convincing your audience.
+:::
+
+## Simple Identification
+
+The simplest approach to identification would be to assume that the unobservables are simply independent of each other:
+
+$$ (\varepsilon_{n}, \xi_{n,t}) \perp (\zeta_{n},\upsilon_{n,t}) $$
+
+This modeling assumption would imply that 
+
+$$ \mathbb{E}[\varepsilon_{n}+\xi_{n,t}|W_{n,t}] = 0 $$
+
+which is sufficient for OLS to consistently recover $\psi$. This would mean we could estimate $\psi$ with a single cross-section of wages and hours by simply regressing log hours on log wages.
+
+Returning to our discussion above, given these assumptions:
+
+1. It is easy to make an identification argument that is consistent *inside* the model.
+2. The modeling assumptions themselves are much harder to justify (think in terms of modeled and unmodeled unobservables).
+
+:::{.callout-warning icon="false"}
+## Discussion
+Below is code to plot average log hours against log wages using our [CPS data](../appendices/data.qmd).
+```{julia}
+using CSV, DataFrames, DataFramesMeta, Statistics, Binscatters, Plots
+
+data = CSV.read("../data/cps_00019.csv",DataFrame)
+data = @chain data begin
+    @subset :EMPSTAT.<21
+    @transform @byrow :wage = begin
+        if :PAIDHOUR==0
+            return missing
+        elseif :PAIDHOUR==2
+            if :HOURWAGE<99.99 && :HOURWAGE>0
+                return :HOURWAGE
+            else
+                return missing
+            end
+        elseif :PAIDHOUR==1
+            if :EARNWEEK>0 && :UHRSWORKT<997 && :UHRSWORKT>0
+                return :EARNWEEK / :UHRSWORKT
+            else
+                return missing
+            end
+        end
+    end
+    @subset :MONTH.==1
+    @select :AGE :SEX :RACE :EDUC :wage :UHRSWORKT
+    @subset .!ismissing.(:wage) :UHRSWORKT.<997 :UHRSWORKT.>0
+    @transform :log_wage = log.(:wage) :log_hours = log.(:UHRSWORKT)
+    binscatter(_, @formula(log_hours ~ log_wage))
+end
+```
+
+- Think of all the reasons why wages vary across people
+- Think of all the reasons why hours vary across individuals
+- Recall that $\psi$ is a *causal* parameter. Is there anything even remotely plausible about the assumption that the unobserved determinants of wages are uncorrelated with unobserved determinants of hours?
+
+:::
+
+## Identification with Instrumental Variables
+
+In the simple (naive) approach above, by running OLS, our key identification condition was:
+
+$$ \mathbb{E}[\varepsilon + \xi | W] = 0$$
+
+which implicitly assumed that *all* of the variation that goes into $W$ ($Z$, $\upsilon$, and $\zeta$) is essentially random (and therefore valid).
+
+The instrumental variables approach instead extracts the "plausibly random" component of wages given by the instrument, and requires instead that:
+
+$$ \mathbb{E}[\varepsilon + \xi | Z] = 0 $$
+
+which, depending on the nature of $Z$, can be a much easier assumption to believe and defend. So when people say that this approach is more *credible*, what they mean is that the required assumptions for identification are weaker, easier to defend, and robust to the kinds of mechanisms that discredited the OLS approach.
+
+:::{.callout-tip icon="false"}
+## Exercise
+
+:::{#exr-labor_supply_2SLS}
+Recall that the population estimand of 2SLS for one endogenous variable and one instrument is:
+
+$$ \alpha_{2SLS} = \frac{\mathbb{C}(\log(H),Z)}{\mathbb{C}(\log(W),Z)} $$
+
+Show that when $\mathbb{E}[\varepsilon + \xi | Z]=0$ and $\gamma_1\neq0$, we get:
+
+$$ \alpha_{2SLS} = \psi $$
+:::
+:::
+
+:::{.callout-important icon="false"}
+## Whether vs How
+
+Note that in this case, proving sufficient conditions for identification in either case is very straightforward.  This is the "whether". They are usually taken as given without further discussion. The "how" is more interesting, because it refers more to the *nature* of the respective independence assumptions. Note how the independence condition for IV is strictly weaker than the condition for OLS, and may (depending on $Z$) be much easier to defend *a priori*. 
+
+**An additional key point is this**: sometimes out of necessity, we write simple models of supply and demand that imply that a naive identification strategy is valid *inside the model*. For example, in heterogeneous agent macro models, it is common to assume a homogeneous set of preferences, implying no unobserved heterogeneity in labor supply. If the model generated the data, we could consistently recover labor supply elasticities with OLS. Here, you have to *think outside the model* and ask whether that identification stategy is robust to mild extensions or mechanisms in the data that were too complicated for your model.
+:::
+
+<!-- :::{.callout-note}
+## Unobserved Heterogeneity
+Another important point is that **unobserved heterogeneity** is the key
+::: -->
+
+## Identification of the Model with Income Effects
+
+To simplify our discussion so far, we have assumed away income effects. From this point, let's once again assume $\sigma>0$ and think about how this might complicate inference when using instrumental variables. Labor supply becomes:
+
+$$ \log(H_{n,t}) = \mu_{\alpha} + \psi\log(W_{n,t}) - \sigma\psi\log(C_{n,t}) + \varepsilon_{n} + \xi_{n,t}.$$
+
+Suppose that we now have access to one cross-section, giving the joint distribution $\mathbb{P}_{Z,W,H,A,C}$ where $A$ is assets.
+
+:::{.callout-tip icon="false"}
+## Exercise
+:::{#exr-labor_supply_IV}
+Suppose that $Z_{n,t}$ is a binary policy variable (let's say a tax credit) that is correctly perceived as permanent and is effectively randomly assigned. In this case you can assume that $W$ is the wage *net of taxes*.
+
+1. Consider the result of estimating the following system by 2SLS:
+$$\log(H) = \beta_0 + \beta_1\log(W) + \epsilon_0 $$
+$$\log(W) = \kappa_0 + \kappa_1Z + \epsilon_1 $$
+Since $Z\in\{0,1\}$, recall that the 2SLS estimand is:
+$$ \alpha_{2SLS} = \frac{\mathbb{E}[\log(H)|Z=1] - \mathbb{E}[\log(H)|Z=0]}{\mathbb{E}[\log(W)|Z=1] - \mathbb{E}[\log(W)|Z=0]} $$ 
+Does $\alpha_{2SLS}$ identify a structural parameter of interest in this case? Hint: you should be able to write $\alpha_{2SLS}$ in terms of structural parameters and $\mathbb{E}[\log(C)|Z=1]-\mathbb{E}[\log(C)|Z=0]$.
+
+2. What very specific research question of interest does this 2SLS parameter identify?
+
+3. Recall that the rank conditions for IV suggest that we need two instruments given that we have two endogenous variables. Define $\tilde{Z} = M\times Z$ where $M\in\{0,1\}$ is an indicator for whether $A$ is above or below the median. Note that the conditional expectation of log consumption can be written *wlog* as:
+$$ \mathbb{E}[\log(C)|M,Z] = \delta_{0} + \delta_{1}M + \delta_{2}Z + \delta_{3}\underbrace{MZ}_{=\tilde{Z}}$$
+**Use the model to argue** that $\delta_{3}\neq0$.
+
+4. Now show that one can write:
+$$ \mathbb{E}[\log(H)|M,Z] = \kappa_{0} + \kappa_{1}M + \psi\gamma_{1} Z - \psi\sigma \delta_{2}Z - \psi\sigma \delta_{3}\tilde{Z}.$$
+And combine these two expressions with the wage equation to argue that $\psi$ and $\sigma$ are identified. Why is important that $\delta_{3}\neq 0$?
+
+5. Now we're going to write code to estimate the structural parameters with 2SLS and use a monte-carlo simulation to evaluate the performance of the estimator. The code below uses the same approach as in our [description of the model](../models/dynamic-labor-supply.qmd) and does almost everything for you! You just have to write one line to finish calculating the 2SLS estimate in each monte-carlo trial and output the results.
+
+```{julia}
+#| eval: false
+
+# this function solves for consumption given constant wages
+function solve_consumption(r,α,W,A,σ,ψ)
+    Q = 1/ (1 - 1/(1+r))
+    f(c) = (Q * c - Q * W^(1 + ψ) * α^ψ * c^(-σ*ψ) - A)^2
+    r = Optim.optimize(f,0.,A+W)
+    return r.minimizer
+end
+# this function simulates the data
+function simulate_data(σ,ψ,r,γ,N)
+    ch = [0.3 0. 0.; 0.5 0.5 0.; 0.4 0.8 1.8]
+    Σ = ch * ch'
+    X = rand(MvNormal(Σ),N)
+    Z = rand(N) .< 0.5
+    α = exp.(X[1,:])
+    W = exp.(X[2,:])
+    W_net = exp.(Z .* γ) .* W
+    A = exp.(X[3,:])
+    C = [solve_consumption(r,α[i],W_net[i],A[i],σ,ψ) for i in eachindex(A)]
+    @views H = exp.( X[1,:] .+ ψ .* log.(W_net) .- σ * ψ .* log.(C) )
+    return (;α,W,A,C,H,W_net,Z)
+end
+
+# assume risk-aversion of 2 and frisch of 0.5
+σ = 2.
+ψ = 0.5
+r = 0.05
+γ = 0.2
+
+N = 10_000
+
+# here we run a the monte-carlo using 500 trials
+ψ_est = zeros(500)
+ψ_ols = zeros(500)
+for b in 1:500
+    dat = simulate_data(σ,ψ,r,γ,N)
+    #M = dat.A .< quantile(dat.A,0.75)
+    M = dat.A .< median(dat.A)
+    # construct instruments:
+    Z = [ones(N) M dat.Z dat.Z .* M]
+    X = [ones(N) M log.(dat.W_net) log.(dat.C)]
+    # first stage:
+    δ = inv(Z' * Z) * Z'*X
+    Xh = Z * δ
+    # ----- YOU HAVE TO FILL IN THE LINE HERE
+    # second stage:
+    β = ## <- WRITE THE FORMULA TO GET THE 2SLS ESTIMATE
+    # -------------------------------------- #
+    ψ_est[b] = β[3]
+    X = [ones(N) log.(dat.W_net) log.(dat.C)]
+    β_ols = inv(X' * X) * X' * log.(dat.H)
+    ψ_ols[b] = β_ols[2]
+end
+# this will plot the distribution relative to the OLS estimate
+histogram(ψ_est,alpha=0.4)
+histogram!(ψ_ols,alpha=0.4)
+xlims!((-2,2))
+
+```
+
+:::
+:::
+
+:::{.callout-note icon="false"}
+## Example: Difference in Differences
+:::{#exm-labor_supply_dd}
+Suppose that we have a two cross-sections of data $(H,W,Z,G)$ from two periods $t\in\{1,2\}$ where $G\in\{A,B\}$ indicates membership in one of two demographic groups. In this setting, let $Z\in\{0,1\}$ indicate the presence of a proportional tax subsidy, $\tau$, and that only group $B$ is eligible for the subsidy. Accordingly, assume that net wages follow:
+
+$$\mathbb{E}[\log(W)|G,t] = \gamma_{t} + \log(1+\tau)Z_{t}\mathbf{1}\{G=B\} + \omega_{B}\mathbf{1}\{G=B\}$$
+
+The parameter $\omega_{B}$ captures persistent differences in labor market productivity between groups $A$ and $B$ and $\gamma_{t}$ captures aggregate trends.
+
+The model also gives us:
+
+$$\mathbb{E}[\log(H)|G,t] = \mu + \kappa_{B}\mathbf{1}\{G=N\} + \psi\mathbb{E}[\log(W)|G,t] - \psi\sigma\mathbb{E}[\log(C)|G,t] $$
+
+Let $\Delta$ indicate changes from period to period. Recall that the euler equation implies that, under full information and no shocks:
+
+$$ \Delta\mathbb{E}[\log(C)|G] = \log(\beta(1+r))$$
+
+This means that *if the policy were never introduced*, we would also get:
+
+$$ \Delta\mathbb{E}[\log(H)|G] = \psi(\gamma_{2}-\gamma_{1})$$
+
+Thus we know that the **parallel trends assumption holds** for both log hours and log consumption. Suppose the policy is introduced **unexpectedly** in period 2. Parallel trends suggests that we could learn about the effect of this policy on hours. Recall that the difference-in-differences estimand is:
+
+$$ \alpha^{H}_{DD} =  \Delta\mathbb{E}[\log(H)|B] - \Delta\mathbb{E}[\log(H)|A] $$
+
+Substituting terms gives
+
+$$ \alpha^{H}_{DD} = \psi\log(1+\tau) - \sigma\psi\alpha^{C}_{DD} .$$
+
+where $\alpha^C_{DD}$ is the effect of the policy on log consumption, which also happens to be the effect of the policy on the group B's log consumption.
+
+Some observations from this exercise:
+
+1. $\alpha^{H}_{DD}$ identifies a very specific causal parameter: the effect of an unannounced policy introduction on hours for group B.
+2. If we had data on consumption and hours, we could combine $\alpha^{C}_{DD}$ and $\alpha^{H}_{DD}$ to learn $\psi$ and $\sigma$.
+3. To the extend that group A and B differ in the their preferences, wages, and assets, the policy is likely to have a different effect on their consumption. This heterogeneity income effects means that neither $\alpha^{C}_{DD}$ nor $\alpha^{C},\alpha^{H}_{DD}$ combined identify the effect of the exact same tax subsidy on group A.
+4. These estimands also do not identify the effect of the policy on group $B$ when there is a different perceived persistence of the policy.
+5. If the policy was announced in period 1 and implemented in period 2, then the *parallel trends assumption would be violated*.
+6. We are able to achieve identification here withou assuming that $Z$ is independent of observables, but rather by noting and exploiting the existence of parallel trends.
+
+:::
+:::
+
+
+
+<!-- do we use the diff-in-diff example? put this exercise in here?? -->
+
+## Identification with Panel Data
+
+Suppose now that we have **panel data** on hours and wages for each individual. We now see the population distribution $\mathbb{P}_{(H_t,W_t,C_t)_{t=1}^{T}}$ for some $T$ periods of data. Taking first differences gives:
+
+$$ \Delta\log(H) = \psi\Delta\log(W) - \psi\sigma\Delta\log(C) + \Delta \xi_{n,t} $$
+
+Notice that we can now identify $\psi$ and $\sigma$ under the assumption that
+
+$$ \mathbb{E}[\Delta \xi_{n,t}|\Delta\log(W),\Delta\log(C)] =  0$$
+
+which guarantees that the OLS estimand from regression the change in log hours on the change in log wages and log consumption would recover $\psi$ and $\psi\sigma$.
+
+:::{.callout-warning icon="false"}
+## Panel vs Instrumental Approaches
+
+This example introduces a fairly consistent theme for solving identification problems in economics. Since unobserved heterogeneity lies at the heart of causal inference problems, one can typically find good solutions either by finding variation that is plausibly random (IV) or by using repeated observations to learn about and handle the unobserved variation. Later in this text we will cover some more advanced results on the panel data approach, which reaches much further than the simpled fixed effects approach in this example.
+
+:::
+
+Here are six additional comments on this panel data example:
+
+1. Much like the IV example, this approach essentially extracts a "more credible" source of variation in wages, using changes from year to year and differencing out permanent differences across individuals.
+2. Thinking *inside* the model, since $\xi$ is assumed to be iid measurement error, this identification approach is valid.  
+3. What about outside it? Are there mechanisms outside the model that are likely to confound identification? One view is that this approach involves assumptions that are weaker than using OLS in the cross-section, but stronger than using a good instrument.
+4. If there is also measurement error in wages, the cure could be worse than the disease, since it could be driving most of the variation in wages from one period to the next.
+
+:::{.callout-important icon="false"}
+## Whether vs How
+
+Note that, much like the IV strategy above, this panel data approach will consistently recover the parameters of interest regardless of whether unobserved heterogeneity is an issue or not. Thus, one could consider using this approach even if the plan is to use these parameters inside a simpler model of supply without unobserved heterogeneity.
+
+:::
+

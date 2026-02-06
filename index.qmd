@@ -1,2 +1,5 @@
 # Preface {.unnumbered}
 
+This online textbook contains lecture notes, exercises, and examples for classes I teach in structural econometrics.
+
+This content is still incomplete and a work in progress, but you are free to peruse what is available.

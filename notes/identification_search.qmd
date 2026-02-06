@@ -133,6 +133,16 @@ $$w^* = \frac{b}{1+\tau} + \frac{\beta\lambda}{1-\beta(1-\delta)} \int_{w^*}[1-F
 
 ---
 
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\textbf{STOP FOR DISCUSSION}
+
+Does this seem like a credible way to identify the causal impact of the tax subsidy?
+}}
+\end{center}
+
+---
+
 # Identification with an Exclusion Restriction
 
 ## Setup
@@ -178,12 +188,20 @@ $$w^*(z'') - w^*(z) = b_1(z''-z) + \frac{\beta\lambda}{1-\beta(1-\delta)} \int_{
 - Two equations, two unknowns ($\beta$ and $b_1$)
 - Thus $\beta$ is identified by functional form restrictions
 
-### Discussion Points
+---
 
-- Policy counterfactual now determined by parameters matching response to existing variation
-- How does this compare to the case without variation?
-- Key model implication: variation in $b$ equivalent to variation in $\tau$
-- What would be preferable sources of variation?
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\textbf{STOP FOR DISCUSSION}
+
+\begin{itemize}
+\item Notice that now the policy counterfactual is given by additional parameters that attempt to match how wages and hazard rates respond to existing policy variation.
+\item How do you feel about this approach relative to the case without variation?
+\item How do you feel about the model's key implication that variation in $b$ is equivalent to variation in $\tau$?
+\item What would be an alternative and potentially preferable source of variation?
+\end{itemize}
+}}
+\end{center}
 
 ---
 
@@ -258,6 +276,19 @@ $$h(z_1,z_2) = \lambda(1-F_\omega(\omega^*(z_1,z_2)))$$
 
 - Even if over-identified, use variation most appropriate for the question
 - Validation shows model uses conceptually appropriate sources of variation
+
+---
+
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\textbf{STOP FOR DISCUSSION}
+
+\begin{itemize}
+\item How do you think this approach compares to the case where we did not have plausible exogenous variation in wages?
+\item How do you think it compares to the case where we had exogenous variation in tax rates explicitly (rather than interpolating via articulated variation: wage rates and marginal tax rates have identical effects)?
+\end{itemize}
+}}
+\end{center}
 
 ---
 

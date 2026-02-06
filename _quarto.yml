@@ -23,7 +23,11 @@ book:
       - lectures/identification_roy.qmd
       - lectures/identification_search.qmd
       - lectures/identification_labor_supply.qmd
-    - part: lectures/extremum-estimators.qmd
+    - part: Extremum Estimators
+      chapters:
+      - lectures/extremum_intro_examples.qmd
+      - lectures/extremum_theory.qmd
+    - part: Simulation Methods
     - part: lectures/discrete-choice.qmd
     #- summary.qmd
     - references.qmd

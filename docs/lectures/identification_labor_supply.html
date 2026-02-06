@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.40">
+<meta name="generator" content="quarto-1.4.539">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>9&nbsp; The Dynamic Labor Supply Model – Structural Econometrics with Julia</title>
+<title>Structural Econometrics with Julia - 9&nbsp; The Dynamic Labor Supply Model</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,27 +20,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/extremum-estimators.html" rel="next">
+<link href="../lectures/extremum_intro_examples.html" rel="next">
 <link href="../lectures/identification_search.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-626149efe8f5d16e1d391ba177679bf0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -68,7 +102,39 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -78,13 +144,13 @@ ul.task-list li input[type="checkbox"] {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/identification.html">Identification and Credible Inference</a></li><li class="breadcrumb-item"><a href="../lectures/identification_labor_supply.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -116,7 +182,7 @@ ul.task-list li input[type="checkbox"] {
       <div class="sidebar-item-container"> 
             <a href="../models.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Five Prototype Models</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -163,7 +229,7 @@ ul.task-list li input[type="checkbox"] {
       <div class="sidebar-item-container"> 
             <a href="../lectures/identification.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Identification and Credible Inference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -189,8 +255,31 @@ ul.task-list li input[type="checkbox"] {
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Extremum Estimators</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/extremum_intro_examples.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/extremum_theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
       <span class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Extremum Estimators</span></span>
+ <span class="menu-text">Simulation Methods</span></span>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <span class="sidebar-item-text sidebar-link text-start">
@@ -204,13 +293,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
  <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../appendices/data.html" class="sidebar-item-text sidebar-link">
@@ -236,8 +325,17 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#simple-identification" id="toc-simple-identification" class="nav-link active" data-scroll-target="#simple-identification"><span class="header-section-number">9.1</span> Simple Identification</a></li>
+  <li><a href="#identification-with-instrumental-variables" id="toc-identification-with-instrumental-variables" class="nav-link" data-scroll-target="#identification-with-instrumental-variables"><span class="header-section-number">9.2</span> Identification with Instrumental Variables</a></li>
+  <li><a href="#identification-of-the-model-with-income-effects" id="toc-identification-of-the-model-with-income-effects" class="nav-link" data-scroll-target="#identification-of-the-model-with-income-effects"><span class="header-section-number">9.3</span> Identification of the Model with Income Effects</a></li>
+  <li><a href="#identification-with-panel-data" id="toc-identification-with-panel-data" class="nav-link" data-scroll-target="#identification-with-panel-data"><span class="header-section-number">9.4</span> Identification with Panel Data</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -261,8 +359,316 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<p>For this example, let’s remind ourselves how labor supply looks in this model without heterogeneity and with quasilinear preferences (<span class="math inline">\(\sigma=0\)</span>):</p>
+<p><span class="math display">\[ \log(H_{n,t}) = \psi\log(\alpha) + \psi\log(W_{n,t}) \]</span></p>
+<p>Clearly, we need more assumptions to brings this model to data, since it predicts that the relationship between log hours and log wages is a perfectly straight line.</p>
+<p>Consider now the following extension of the model. Let preferences be heterogeneous and decomposed as:</p>
+<p><span class="math display">\[ \psi\log(\alpha_{n}) = \mu_{\alpha} + \varepsilon_{n},\ \mathbb{E}[\varepsilon] = 0 \]</span></p>
+<p>and assume that hours are observed with additive measurement error (<span class="math inline">\(\xi_{n,t}\)</span>), such that:</p>
+<p><span class="math display">\[ \log(H_{n,t}) = \mu_{\alpha} + \psi\log(W_{n,t}) + \varepsilon_{n} + \xi_{n,t}.\]</span></p>
+<p>For wages, likewise assume that:</p>
+<p><span class="math display">\[\log(W_{n,t}) = \gamma_{0} + Z_{n,t}\gamma_{1} + \zeta_{n} + \upsilon_{n,t} \]</span></p>
+<p>where <span class="math inline">\(\zeta_{n}\)</span> reflects an unobserved permanent component of <span class="math inline">\(n\)</span>’s productivity and <span class="math inline">\(\nu_{n,t}\)</span> is a time-varying shock. <span class="math inline">\(Z_{n,t}\)</span> is a variable that we think ought to shift labor demand in ways that are essentially random with respect to individual-level unobservables.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When you extend a model in this way (to account for randomness in outcomes), you should keep two things in mind:</p>
+<ol type="1">
+<li>What is <em>my</em> theory for why this residual exists? As in: what is the structural error term in my model?</li>
+<li>What other components could explain part of this residual that are <em>not</em> in my model?</li>
+</ol>
+<p>Accordingly when you think about identification, you have two important tasks (in order of importance):</p>
+<ol type="1">
+<li>Craft an argument and approach to identification that is consistent with the assumptions of your model. Your model may already pose important enodgenity problems to solve.</li>
+<li>Craft an argument and approach to identification that is plausible and robust to potential mechanisms (members of the residual) that are <em>not</em> in your model.</li>
+</ol>
+<p>If you don’t have (1), then there’s no point in moving on to (2), but addressing (2) goes a long way to convincing your audience.</p>
+</div>
+</div>
+<section id="simple-identification" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="simple-identification"><span class="header-section-number">9.1</span> Simple Identification</h2>
+<p>The simplest approach to identification would be to assume that the unobservables are simply independent of each other:</p>
+<p><span class="math display">\[ (\varepsilon_{n}, \xi_{n,t}) \perp (\zeta_{n},\upsilon_{n,t}) \]</span></p>
+<p>This modeling assumption would imply that</p>
+<p><span class="math display">\[ \mathbb{E}[\varepsilon_{n}+\xi_{n,t}|W_{n,t}] = 0 \]</span></p>
+<p>which is sufficient for OLS to consistently recover <span class="math inline">\(\psi\)</span>. This would mean we could estimate <span class="math inline">\(\psi\)</span> with a single cross-section of wages and hours by simply regressing log hours on log wages.</p>
+<p>Returning to our discussion above, given these assumptions:</p>
+<ol type="1">
+<li>It is easy to make an identification argument that is consistent <em>inside</em> the model.</li>
+<li>The modeling assumptions themselves are much harder to justify (think in terms of modeled and unmodeled unobservables).</li>
+</ol>
+<div class="callout callout-style-default callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Discussion
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Below is code to plot average log hours against log wages using our <a href="../appendices/data.html">CPS data</a>.</p>
+<div id="d393fde6" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span>, <span class="bu">DataFrames</span>, <span class="bu">DataFramesMeta</span>, <span class="bu">Statistics</span>, <span class="bu">Binscatters</span>, <span class="bu">Plots</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="st">"../data/cps_00019.csv"</span>,DataFrame)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> <span class="pp">@chain</span> data <span class="cf">begin</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@subset</span> <span class="op">:</span>EMPSTAT<span class="op">.&lt;</span><span class="fl">21</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="pp">@byrow</span> <span class="op">:</span>wage <span class="op">=</span> <span class="cf">begin</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">:</span>PAIDHOUR<span class="op">==</span><span class="fl">0</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="cn">missing</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elseif</span> <span class="op">:</span>PAIDHOUR<span class="op">==</span><span class="fl">2</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">:</span>HOURWAGE<span class="op">&lt;</span><span class="fl">99.99</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>HOURWAGE<span class="op">&gt;</span><span class="fl">0</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="op">:</span>HOURWAGE</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="cn">missing</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elseif</span> <span class="op">:</span>PAIDHOUR<span class="op">==</span><span class="fl">1</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">:</span>EARNWEEK<span class="op">&gt;</span><span class="fl">0</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>UHRSWORKT<span class="op">&lt;</span><span class="fl">997</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>UHRSWORKT<span class="op">&gt;</span><span class="fl">0</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="op">:</span>EARNWEEK <span class="op">/</span> <span class="op">:</span>UHRSWORKT</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="cn">missing</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@subset</span> <span class="op">:</span>MONTH<span class="op">.==</span><span class="fl">1</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@select</span> <span class="op">:</span>AGE <span class="op">:</span>SEX <span class="op">:</span>RACE <span class="op">:</span>EDUC <span class="op">:</span>wage <span class="op">:</span>UHRSWORKT</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@subset</span> .!<span class="fu">ismissing</span>.(<span class="op">:</span>wage) <span class="op">:</span>UHRSWORKT<span class="op">.&lt;</span><span class="fl">997</span> <span class="op">:</span>UHRSWORKT<span class="op">.&gt;</span><span class="fl">0</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="op">:</span>log_wage <span class="op">=</span> <span class="fu">log</span>.(<span class="op">:</span>wage) <span class="op">:</span>log_hours <span class="op">=</span> <span class="fu">log</span>.(<span class="op">:</span>UHRSWORKT)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">binscatter</span>(_, <span class="pp">@formula</span>(log_hours <span class="op">~</span> log_wage))</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<img src="data:image/png;base64,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">
+</div>
+</div>
+<ul>
+<li>Think of all the reasons why wages vary across people</li>
+<li>Think of all the reasons why hours vary across individuals</li>
+<li>Recall that <span class="math inline">\(\psi\)</span> is a <em>causal</em> parameter. Is there anything even remotely plausible about the assumption that the unobserved determinants of wages are uncorrelated with unobserved determinants of hours?</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="identification-with-instrumental-variables" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="identification-with-instrumental-variables"><span class="header-section-number">9.2</span> Identification with Instrumental Variables</h2>
+<p>In the simple (naive) approach above, by running OLS, our key identification condition was:</p>
+<p><span class="math display">\[ \mathbb{E}[\varepsilon + \xi | W] = 0\]</span></p>
+<p>which implicitly assumed that <em>all</em> of the variation that goes into <span class="math inline">\(W\)</span> (<span class="math inline">\(Z\)</span>, <span class="math inline">\(\upsilon\)</span>, and <span class="math inline">\(\zeta\)</span>) is essentially random (and therefore valid).</p>
+<p>The instrumental variables approach instead extracts the “plausibly random” component of wages given by the instrument, and requires instead that:</p>
+<p><span class="math display">\[ \mathbb{E}[\varepsilon + \xi | Z] = 0 \]</span></p>
+<p>which, depending on the nature of <span class="math inline">\(Z\)</span>, can be a much easier assumption to believe and defend. So when people say that this approach is more <em>credible</em>, what they mean is that the required assumptions for identification are weaker, easier to defend, and robust to the kinds of mechanisms that discredited the OLS approach.</p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-labor_supply_2SLS" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 9.1</strong></span> Recall that the population estimand of 2SLS for one endogenous variable and one instrument is:</p>
+<p><span class="math display">\[ \alpha_{2SLS} = \frac{\mathbb{C}(\log(H),Z)}{\mathbb{C}(\log(W),Z)} \]</span></p>
+<p>Show that when <span class="math inline">\(\mathbb{E}[\varepsilon + \xi | Z]=0\)</span> and <span class="math inline">\(\gamma_1\neq0\)</span>, we get:</p>
+<p><span class="math display">\[ \alpha_{2SLS} = \psi \]</span></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Whether vs How
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that in this case, proving sufficient conditions for identification in either case is very straightforward. This is the “whether”. They are usually taken as given without further discussion. The “how” is more interesting, because it refers more to the <em>nature</em> of the respective independence assumptions. Note how the independence condition for IV is strictly weaker than the condition for OLS, and may (depending on <span class="math inline">\(Z\)</span>) be much easier to defend <em>a priori</em>.</p>
+<p><strong>An additional key point is this</strong>: sometimes out of necessity, we write simple models of supply and demand that imply that a naive identification strategy is valid <em>inside the model</em>. For example, in heterogeneous agent macro models, it is common to assume a homogeneous set of preferences, implying no unobserved heterogeneity in labor supply. If the model generated the data, we could consistently recover labor supply elasticities with OLS. Here, you have to <em>think outside the model</em> and ask whether that identification stategy is robust to mild extensions or mechanisms in the data that were too complicated for your model.</p>
+</div>
+</div>
+<!-- :::{.callout-note}
+## Unobserved Heterogeneity
+Another important point is that **unobserved heterogeneity** is the key
+::: -->
+</section>
+<section id="identification-of-the-model-with-income-effects" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="identification-of-the-model-with-income-effects"><span class="header-section-number">9.3</span> Identification of the Model with Income Effects</h2>
+<p>To simplify our discussion so far, we have assumed away income effects. From this point, let’s once again assume <span class="math inline">\(\sigma&gt;0\)</span> and think about how this might complicate inference when using instrumental variables. Labor supply becomes:</p>
+<p><span class="math display">\[ \log(H_{n,t}) = \mu_{\alpha} + \psi\log(W_{n,t}) - \sigma\psi\log(C_{n,t}) + \varepsilon_{n} + \xi_{n,t}.\]</span></p>
+<p>Suppose that we now have access to one cross-section, giving the joint distribution <span class="math inline">\(\mathbb{P}_{Z,W,H,A,C}\)</span> where <span class="math inline">\(A\)</span> is assets.</p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-labor_supply_IV" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 9.2</strong></span> Suppose that <span class="math inline">\(Z_{n,t}\)</span> is a binary policy variable (let’s say a tax credit) that is correctly perceived as permanent and is effectively randomly assigned. In this case you can assume that <span class="math inline">\(W\)</span> is the wage <em>net of taxes</em>.</p>
+<ol type="1">
+<li><p>Consider the result of estimating the following system by 2SLS: <span class="math display">\[\log(H) = \beta_0 + \beta_1\log(W) + \epsilon_0 \]</span> <span class="math display">\[\log(W) = \kappa_0 + \kappa_1Z + \epsilon_1 \]</span> Since <span class="math inline">\(Z\in\{0,1\}\)</span>, recall that the 2SLS estimand is: <span class="math display">\[ \alpha_{2SLS} = \frac{\mathbb{E}[\log(H)|Z=1] - \mathbb{E}[\log(H)|Z=0]}{\mathbb{E}[\log(W)|Z=1] - \mathbb{E}[\log(W)|Z=0]} \]</span> Does <span class="math inline">\(\alpha_{2SLS}\)</span> identify a structural parameter of interest in this case? Hint: you should be able to write <span class="math inline">\(\alpha_{2SLS}\)</span> in terms of structural parameters and <span class="math inline">\(\mathbb{E}[\log(C)|Z=1]-\mathbb{E}[\log(C)|Z=0]\)</span>.</p></li>
+<li><p>What very specific research question of interest does this 2SLS parameter identify?</p></li>
+<li><p>Recall that the rank conditions for IV suggest that we need two instruments given that we have two endogenous variables. Define <span class="math inline">\(\tilde{Z} = M\times Z\)</span> where <span class="math inline">\(M\in\{0,1\}\)</span> is an indicator for whether <span class="math inline">\(A\)</span> is above or below the median. Note that the conditional expectation of log consumption can be written <em>wlog</em> as: <span class="math display">\[ \mathbb{E}[\log(C)|M,Z] = \delta_{0} + \delta_{1}M + \delta_{2}Z + \delta_{3}\underbrace{MZ}_{=\tilde{Z}}\]</span> <strong>Use the model to argue</strong> that <span class="math inline">\(\delta_{3}\neq0\)</span>.</p></li>
+<li><p>Now show that one can write: <span class="math display">\[ \mathbb{E}[\log(H)|M,Z] = \kappa_{0} + \kappa_{1}M + \psi\gamma_{1} Z - \psi\sigma \delta_{2}Z - \psi\sigma \delta_{3}\tilde{Z}.\]</span> And combine these two expressions with the wage equation to argue that <span class="math inline">\(\psi\)</span> and <span class="math inline">\(\sigma\)</span> are identified. Why is important that <span class="math inline">\(\delta_{3}\neq 0\)</span>?</p></li>
+<li><p>Now we’re going to write code to estimate the structural parameters with 2SLS and use a monte-carlo simulation to evaluate the performance of the estimator. The code below uses the same approach as in our <a href="../models/dynamic-labor-supply.html">description of the model</a> and does almost everything for you! You just have to write one line to finish calculating the 2SLS estimate in each monte-carlo trial and output the results.</p></li>
+</ol>
+<div id="562e27bc" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># this function solves for consumption given constant wages</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">solve_consumption</span>(r,α,W,A,σ,ψ)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> <span class="fl">1</span><span class="op">/</span> (<span class="fl">1</span> <span class="op">-</span> <span class="fl">1</span><span class="op">/</span>(<span class="fl">1</span><span class="op">+</span>r))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">f</span>(c) <span class="op">=</span> (Q <span class="op">*</span> c <span class="op">-</span> Q <span class="op">*</span> W<span class="op">^</span>(<span class="fl">1</span> <span class="op">+</span> ψ) <span class="op">*</span> α<span class="op">^</span>ψ <span class="op">*</span> c<span class="op">^</span>(<span class="op">-</span>σ<span class="op">*</span>ψ) <span class="op">-</span> A)<span class="op">^</span><span class="fl">2</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> Optim.<span class="fu">optimize</span>(f,<span class="fl">0</span>.,A<span class="op">+</span>W)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> r.minimizer</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># this function simulates the data</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">simulate_data</span>(σ,ψ,r,γ,N)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    ch <span class="op">=</span> [<span class="fl">0.3</span> <span class="fl">0</span>. <span class="fl">0</span>.; <span class="fl">0.5</span> <span class="fl">0.5</span> <span class="fl">0</span>.; <span class="fl">0.4</span> <span class="fl">0.8</span> <span class="fl">1.8</span>]</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    Σ <span class="op">=</span> ch <span class="op">*</span> ch<span class="op">'</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">MvNormal</span>(Σ),N)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    Z <span class="op">=</span> <span class="fu">rand</span>(N) <span class="op">.&lt;</span> <span class="fl">0.5</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    α <span class="op">=</span> <span class="fu">exp</span>.(X[<span class="fl">1</span>,<span class="op">:</span>])</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> <span class="fu">exp</span>.(X[<span class="fl">2</span>,<span class="op">:</span>])</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    W_net <span class="op">=</span> <span class="fu">exp</span>.(Z <span class="op">.*</span> γ) <span class="op">.*</span> W</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> <span class="fu">exp</span>.(X[<span class="fl">3</span>,<span class="op">:</span>])</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> [<span class="fu">solve_consumption</span>(r,α[i],W_net[i],A[i],σ,ψ) for i <span class="kw">in</span> <span class="fu">eachindex</span>(A)]</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@views</span> H <span class="op">=</span> <span class="fu">exp</span>.( X[<span class="fl">1</span>,<span class="op">:</span>] <span class="op">.+</span> ψ <span class="op">.*</span> <span class="fu">log</span>.(W_net) <span class="op">.-</span> σ <span class="op">*</span> ψ <span class="op">.*</span> <span class="fu">log</span>.(C) )</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (;α,W,A,C,H,W_net,Z)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># assume risk-aversion of 2 and frisch of 0.5</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>σ <span class="op">=</span> <span class="fl">2</span>.</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>ψ <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>γ <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="fl">10_000</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># here we run a the monte-carlo using 500 trials</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>ψ_est <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">500</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>ψ_ols <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">500</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> b <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">500</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    dat <span class="op">=</span> <span class="fu">simulate_data</span>(σ,ψ,r,γ,N)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">#M = dat.A .&lt; quantile(dat.A,0.75)</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> dat.A <span class="op">.&lt;</span> <span class="fu">median</span>(dat.A)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># construct instruments:</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    Z <span class="op">=</span> [<span class="fu">ones</span>(N) M dat.Z dat.Z <span class="op">.*</span> M]</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> [<span class="fu">ones</span>(N) M <span class="fu">log</span>.(dat.W_net) <span class="fu">log</span>.(dat.C)]</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># first stage:</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    δ <span class="op">=</span> <span class="fu">inv</span>(Z<span class="op">'</span> <span class="op">*</span> Z) <span class="op">*</span> Z<span class="op">'*</span>X</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    Xh <span class="op">=</span> Z <span class="op">*</span> δ</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ----- YOU HAVE TO FILL IN THE LINE HERE</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># second stage:</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    β <span class="op">=</span> <span class="co">## &lt;- WRITE THE FORMULA TO GET THE 2SLS ESTIMATE</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># -------------------------------------- #</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    ψ_est[b] <span class="op">=</span> β[<span class="fl">3</span>]</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> [<span class="fu">ones</span>(N) <span class="fu">log</span>.(dat.W_net) <span class="fu">log</span>.(dat.C)]</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    β_ols <span class="op">=</span> <span class="fu">inv</span>(X<span class="op">'</span> <span class="op">*</span> X) <span class="op">*</span> X<span class="op">'</span> <span class="op">*</span> <span class="fu">log</span>.(dat.H)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    ψ_ols[b] <span class="op">=</span> β_ols[<span class="fl">2</span>]</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="co"># this will plot the distribution relative to the OLS estimate</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="fu">histogram</span>(ψ_est,alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="fu">histogram!</span>(ψ_ols,alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="fu">xlims!</span>((<span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Difference in Differences
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exm-labor_supply_dd" class="theorem example">
+<p><span class="theorem-title"><strong>Example 9.1</strong></span> Suppose that we have a two cross-sections of data <span class="math inline">\((H,W,Z,G)\)</span> from two periods <span class="math inline">\(t\in\{1,2\}\)</span> where <span class="math inline">\(G\in\{A,B\}\)</span> indicates membership in one of two demographic groups. In this setting, let <span class="math inline">\(Z\in\{0,1\}\)</span> indicate the presence of a proportional tax subsidy, <span class="math inline">\(\tau\)</span>, and that only group <span class="math inline">\(B\)</span> is eligible for the subsidy. Accordingly, assume that net wages follow:</p>
+<p><span class="math display">\[\mathbb{E}[\log(W)|G,t] = \gamma_{t} + \log(1+\tau)Z_{t}\mathbf{1}\{G=B\} + \omega_{B}\mathbf{1}\{G=B\}\]</span></p>
+<p>The parameter <span class="math inline">\(\omega_{B}\)</span> captures persistent differences in labor market productivity between groups <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> and <span class="math inline">\(\gamma_{t}\)</span> captures aggregate trends.</p>
+<p>The model also gives us:</p>
+<p><span class="math display">\[\mathbb{E}[\log(H)|G,t] = \mu + \kappa_{B}\mathbf{1}\{G=N\} + \psi\mathbb{E}[\log(W)|G,t] - \psi\sigma\mathbb{E}[\log(C)|G,t] \]</span></p>
+<p>Let <span class="math inline">\(\Delta\)</span> indicate changes from period to period. Recall that the euler equation implies that, under full information and no shocks:</p>
+<p><span class="math display">\[ \Delta\mathbb{E}[\log(C)|G] = \log(\beta(1+r))\]</span></p>
+<p>This means that <em>if the policy were never introduced</em>, we would also get:</p>
+<p><span class="math display">\[ \Delta\mathbb{E}[\log(H)|G] = \psi(\gamma_{2}-\gamma_{1})\]</span></p>
+<p>Thus we know that the <strong>parallel trends assumption holds</strong> for both log hours and log consumption. Suppose the policy is introduced <strong>unexpectedly</strong> in period 2. Parallel trends suggests that we could learn about the effect of this policy on hours. Recall that the difference-in-differences estimand is:</p>
+<p><span class="math display">\[ \alpha^{H}_{DD} =  \Delta\mathbb{E}[\log(H)|B] - \Delta\mathbb{E}[\log(H)|A] \]</span></p>
+<p>Substituting terms gives</p>
+<p><span class="math display">\[ \alpha^{H}_{DD} = \psi\log(1+\tau) - \sigma\psi\alpha^{C}_{DD} .\]</span></p>
+<p>where <span class="math inline">\(\alpha^C_{DD}\)</span> is the effect of the policy on log consumption, which also happens to be the effect of the policy on the group B’s log consumption.</p>
+<p>Some observations from this exercise:</p>
+<ol type="1">
+<li><span class="math inline">\(\alpha^{H}_{DD}\)</span> identifies a very specific causal parameter: the effect of an unannounced policy introduction on hours for group B.</li>
+<li>If we had data on consumption and hours, we could combine <span class="math inline">\(\alpha^{C}_{DD}\)</span> and <span class="math inline">\(\alpha^{H}_{DD}\)</span> to learn <span class="math inline">\(\psi\)</span> and <span class="math inline">\(\sigma\)</span>.</li>
+<li>To the extend that group A and B differ in the their preferences, wages, and assets, the policy is likely to have a different effect on their consumption. This heterogeneity income effects means that neither <span class="math inline">\(\alpha^{C}_{DD}\)</span> nor <span class="math inline">\(\alpha^{C},\alpha^{H}_{DD}\)</span> combined identify the effect of the exact same tax subsidy on group A.</li>
+<li>These estimands also do not identify the effect of the policy on group <span class="math inline">\(B\)</span> when there is a different perceived persistence of the policy.</li>
+<li>If the policy was announced in period 1 and implemented in period 2, then the <em>parallel trends assumption would be violated</em>.</li>
+<li>We are able to achieve identification here withou assuming that <span class="math inline">\(Z\)</span> is independent of observables, but rather by noting and exploiting the existence of parallel trends.</li>
+</ol>
+</div>
+</div>
+</div>
+<!-- do we use the diff-in-diff example? put this exercise in here?? -->
+</section>
+<section id="identification-with-panel-data" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="identification-with-panel-data"><span class="header-section-number">9.4</span> Identification with Panel Data</h2>
+<p>Suppose now that we have <strong>panel data</strong> on hours and wages for each individual. We now see the population distribution <span class="math inline">\(\mathbb{P}_{(H_t,W_t,C_t)_{t=1}^{T}}\)</span> for some <span class="math inline">\(T\)</span> periods of data. Taking first differences gives:</p>
+<p><span class="math display">\[ \Delta\log(H) = \psi\Delta\log(W) - \psi\sigma\Delta\log(C) + \Delta \xi_{n,t} \]</span></p>
+<p>Notice that we can now identify <span class="math inline">\(\psi\)</span> and <span class="math inline">\(\sigma\)</span> under the assumption that</p>
+<p><span class="math display">\[ \mathbb{E}[\Delta \xi_{n,t}|\Delta\log(W),\Delta\log(C)] =  0\]</span></p>
+<p>which guarantees that the OLS estimand from regression the change in log hours on the change in log wages and log consumption would recover <span class="math inline">\(\psi\)</span> and <span class="math inline">\(\psi\sigma\)</span>.</p>
+<div class="callout callout-style-default callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Panel vs Instrumental Approaches
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This example introduces a fairly consistent theme for solving identification problems in economics. Since unobserved heterogeneity lies at the heart of causal inference problems, one can typically find good solutions either by finding variation that is plausibly random (IV) or by using repeated observations to learn about and handle the unobserved variation. Later in this text we will cover some more advanced results on the panel data approach, which reaches much further than the simpled fixed effects approach in this example.</p>
+</div>
+</div>
+<p>Here are six additional comments on this panel data example:</p>
+<ol type="1">
+<li>Much like the IV example, this approach essentially extracts a “more credible” source of variation in wages, using changes from year to year and differencing out permanent differences across individuals.</li>
+<li>Thinking <em>inside</em> the model, since <span class="math inline">\(\xi\)</span> is assumed to be iid measurement error, this identification approach is valid.<br>
+</li>
+<li>What about outside it? Are there mechanisms outside the model that are likely to confound identification? One view is that this approach involves assumptions that are weaker than using OLS in the cross-section, but stronger than using a good instrument.</li>
+<li>If there is also measurement error in wages, the cure could be worse than the disease, since it could be driving most of the variation in wages from one period to the next.</li>
+</ol>
+<div class="callout callout-style-default callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Whether vs How
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that, much like the IV strategy above, this panel data approach will consistently recover the parameters of interest regardless of whether unobserved heterogeneity is an issue or not. Thus, one could consider using this approach even if the plan is to use these parameters inside a simpler model of supply without unobserved heterogeneity.</p>
+</div>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -300,7 +706,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const onCopySuccess = function(e) {
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -332,45 +749,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
   });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
-    });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -405,11 +784,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
+      return note.innerHTML;
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
@@ -457,11 +832,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
-      }
+      return note.innerHTML;
     }
   }
   for (var i=0; i<xrefs.length; i++) {
@@ -684,13 +1055,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../lectures/identification_search.html" class="pagination-link" aria-label="The Search Model">
+      <a href="../lectures/identification_search.html" class="pagination-link  aria-label=" &lt;span="" search="" model&lt;="" span&gt;"="">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/extremum-estimators.html" class="pagination-link" aria-label="Extremum Estimators">
-        <span class="nav-page-text">Extremum Estimators</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/extremum_intro_examples.html" class="pagination-link" aria-label="<span class='chapter-number'>10</span>&nbsp; <span class='chapter-title'>Introduction and Examples</span>">
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
