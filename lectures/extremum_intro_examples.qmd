@@ -1,1 +1,226 @@
 # Introduction and Examples
+
+Before diving into the statistical theory of each estimator, we will first propose an estimation method for each of our prototype models. In doing so, we will cover three workhorse techniques:
+
+1. Maximum Likelihood;
+2. The Generalized Method of Moments; and
+3. Minimum Distance.
+
+Just to clarify where we are going, it helps to reiterate what the key properties are that we would like to establish for each approach.
+
+:::{.callout-important}
+## Key Properties of Estimators
+
+The key theoretical questions we want to establish for each estimation approach described below are:
+
+1. [**Consistency**] Does our estimate approach the "true" parameters of the data generating process as we collect more data?
+2. [**Inference**] How is our estimate distributed around the true parameters? How uncertain are we about our key calculations of interest and can we place reasonable bounds on the correct answer?
+
+:::
+
+## The Generalized Roy Model
+
+Our identification argument suggested a **two-step** estimator for the Generalized Roy Model: 
+
+1. Estimate the selection equation by *maximum likelihood*.
+2. Estimate the outcome equations with *OLS* using a *selection correction*. 
+
+This model will give us a little more to chew on when we think about the properties of two-step estimators.
+
+## The Search Model
+
+For this example, let's assume that we observe wages with some small amount of *known* measurement error:
+
+$$ \log(W^{o}_{n,t}) = \log(W_{n,t}) + \zeta_{n,t}$$
+
+where $\zeta_{n,t} \sim \mathcal{N}(0,\sigma^2_\zeta)$ and $\sigma_\zeta = 0.05$. 
+
+Recall that without further variation, we must make a parametric assumption on the wage distribution, and so we assume that $W$ is log-normally distributed with mean $\mu$ and variance $\sigma^2_{W}$.
+
+Our strategy here is to estimate the parameters
+
+$$ \theta = (\mu,\sigma^2_{W},h,\delta,w^*) $$
+
+and invert out $\lambda$ and $b$ (the latter using the reservation wage equation). Let $X_{n} = (W^o,t_u,E)$ indicate the data. The log-likelihood of a single observation is:
+
+$$ l(X;\theta) = E \times \int f_{W|W>w^*}(\log(W^{o})-\zeta)\phi(\zeta;\sigma_\zeta)d\zeta + (1-E)\times[\log(h) + t_u\log(1-h)]  $$
+
+where, according to our parametric specifications:
+
+$$ f_{W|W>w^*}(w) = \frac{\phi(w;\sigma_{W})}{1-\Phi(w^*/\sigma_{W})}.$$
+
+$\phi(\cdot;\sigma)$ is the pdf of a normal with standard deviation $\sigma$ and $\Phi$ is the cdf of a standard normal.
+
+The maximum likelihood estimator is:
+
+$$ \hat{\theta} = \arg\max_\theta \frac{1}{N}\sum_{n}l(X_n;\theta) $$
+while the MLE estimates of $\lambda$ and $b$ are:
+
+$$ \hat{\lambda} = \hat{h} / (1 - \widehat{F}_{W|W>w^*}(\hat{w}^*) $$
+
+$$ \hat{b} = w^* - \frac{\hat{\lambda}}{1 - \beta(1-\hat{\delta})}\int_{\hat{w}^*}(1-\widehat{F}_{W|W>w^*}(w))dw $$
+
+When we get to the theory we will consider the asymptotic properties of not just $\hat{\theta}$ but also the derived estimates $\hat{b}$ and $\hat{\lambda}$. 
+
+:::{.callout-note}
+## Example: Coding the Log-Likelihood
+
+:::{#exm-search_likelihood}
+
+First, let's load the routines that we previously wrote to solve the model and take numerical integrals with quadrature. These are identical to what we've seen before and are available on the course github.
+
+```{julia}
+include("../scripts/search_model.jl")
+
+```
+
+Before writing the likelihood, let's  load the data, clean, and create the data frame. 
+
+```{julia}
+using CSV, DataFrames, DataFramesMeta, Statistics
+
+data = CSV.read("../data/cps_00019.csv",DataFrame)
+data = @chain data begin
+    @transform :E = :EMPSTAT.<21
+    @transform @byrow :wage = begin
+        if :PAIDHOUR==0
+            return missing
+        elseif :PAIDHOUR==2
+            if :HOURWAGE<99.99 && :HOURWAGE>0
+                return :HOURWAGE
+            else
+                return missing
+            end
+        elseif :PAIDHOUR==1
+            if :EARNWEEK>0 && :UHRSWORKT<997 && :UHRSWORKT>0
+                return :EARNWEEK / :UHRSWORKT
+            else
+                return missing
+            end
+        end
+    end
+    @subset :MONTH.==1
+    @select :AGE :SEX :RACE :EDUC :wage :E :DURUNEMP
+    @transform begin
+        :bachelors = :EDUC.>=111
+        :nonwhite = :RACE.!=100 
+        :female = :SEX.==2
+        :DURUNEMP = round.(:DURUNEMP .* 12/52)
+    end
+end
+
+# the whole dataset in a named tuple
+wage_missing = ismissing.(data.wage)
+wage = coalesce.(data.wage,1.)
+N = length(data.AGE)
+# create a named tuple with all variables to conveniently pass to the log-likelihood:
+dat = (;logwage = log.(wage),wage_missing,E = data.E,tU = data.DURUNEMP) 
+```
+
+Now, let's write the log-likelihood as above.
+```{julia}
+using Distributions, Optim
+
+ϕ(x,μ,σ) = pdf(Normal(μ,σ),x)
+Φ(x,μ,σ) = cdf(Normal(μ,σ),x)
+
+# a function for the log-likelihood of observed wages (integrating out measurement error)
+function logwage_likelihood(logwage,F,σζ,wres)
+    f(x) = pdf(F,x) / (1-cdf(F,wres)) * ϕ(logwage,log(x),σζ)
+    ub = quantile(F,0.9999)
+    return integrateGL(f,wres,ub)
+end
+
+# a function to get the log-likelihood of a single observation
+# note this function assumes that data holds vectors 
+# E, tU, and logwage
+function log_likelihood(n,data,pars)
+    (;h,δ,wres,F,σζ) = pars
+    ll = 0.
+    if data.E[n]
+        ll += log(h) - log(h + δ)
+        if !data.wage_missing[n]
+            ll += logwage_likelihood(data.logwage[n],F,σζ,wres)
+        end
+    else
+        ll += log(δ) - log(h + δ)
+        ll += log(h) + data.tU[n] * log(1-h)
+    end
+    return ll
+end
+
+# a function to iterate over all observations
+function log_likelihood_obj(x,pars,data)
+    pars = update(pars,x)
+    ll = 0.
+    for n in eachindex(data.E)
+        ll += log_likelihood(n,data,pars)
+    end
+    return ll / length(data.E)
+end
+
+
+
+```
+
+Finally, since routines like `Optim` optimize over vectors, we want to write an update routine that takes a vector `x` and maps it to new parameters. Here we are going to use transformation functions to ensure that parameters obey their bound constraints. There are other ways to ensure this, but this is one way that works.
+
+```{julia}
+logit(x) = exp(x) / (1+exp(x))
+logit_inv(x) = log(x/(1-x))
+
+function update(pars,x)
+    h = logit(x[1])
+    δ = logit(x[2])
+    μ = x[3]
+    σ = exp(x[4])
+    wres = exp(x[5])
+    F = LogNormal(μ,σ)
+    return (;pars...,h,δ,μ,σ,wres,F)
+end
+```
+
+Now we can finally test our likelihood to see how it runs:
+
+```{julia}
+x0 = [logit_inv(0.5),logit_inv(0.03),2.,log(1.),log(5.)]
+pars = (;σζ = 0.05, β = 0.995)
+log_likelihood_obj(x0,pars,dat) #<- test.
+res = optimize(x->-log_likelihood_obj(x,pars,dat),x0,Newton(),Optim.Options(show_trace=true))
+```
+
+Here we tell `Optim` to make use of automatic differentiation with `ForwardDiff`. Let's take a peek at the parameter estimates:
+
+```{julia}
+DataFrame(;update(pars,res.minimizer)...)
+```
+
+:::
+:::
+
+:::{.callout-important}
+## Performance Note
+
+Note that in @exm-search_likelihood we created a `NamedTuple` called `dat` from the data frame, which cements the type of each vector of data into `dat`.
+
+This is important for performance! Working with `DataFrame` types directly can dramatically slow down your code because the columns of these data frames are not typed concretely. See the [performance tips](../appendices/performance.qmd) for more discussion.
+
+:::
+
+:::{.callout-tip icon="false"}
+## Exercise
+
+:::{#exr-estimation_search}
+Extent the code above to
+1. Additionally estimate the parameters $b$ and $\lambda$.
+2. Estimate the search model separately for men with and without a bachelor's degree. 
+3. Report and comment on your estimates.
+:::
+
+:::
+
+## The Labor Supply Model
+
+## The Savings Model
+
+## The Entry-Exit Model

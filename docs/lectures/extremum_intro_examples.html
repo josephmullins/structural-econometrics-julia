@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>10&nbsp; Introduction and Examples – Structural Econometrics with Julia</title>
+<title>12&nbsp; Introduction and Examples – Structural Econometrics with Julia</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,10 +20,44 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -31,7 +65,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../lectures/extremum_theory.html" rel="next">
-<link href="../lectures/identification_labor_supply.html" rel="prev">
+<link href="../lectures/extremum-estimators.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -68,7 +102,39 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -81,7 +147,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/extremum_intro_examples.html">Extremum Estimators</a></li><li class="breadcrumb-item"><a href="../lectures/extremum_intro_examples.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/extremum-estimators.html">Extremum Estimators</a></li><li class="breadcrumb-item"><a href="../lectures/extremum_intro_examples.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -186,11 +252,23 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_savings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Life-Cycle Savings Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_duopoly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Entry-Exit Model</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+            <a href="../lectures/extremum-estimators.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Extremum Estimators</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -200,13 +278,13 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/extremum_intro_examples.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/extremum_theory.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span></a>
   </div>
 </li>
       </ul>
@@ -259,15 +337,25 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-generalized-roy-model" id="toc-the-generalized-roy-model" class="nav-link active" data-scroll-target="#the-generalized-roy-model"><span class="header-section-number">12.1</span> The Generalized Roy Model</a></li>
+  <li><a href="#the-search-model" id="toc-the-search-model" class="nav-link" data-scroll-target="#the-search-model"><span class="header-section-number">12.2</span> The Search Model</a></li>
+  <li><a href="#the-labor-supply-model" id="toc-the-labor-supply-model" class="nav-link" data-scroll-target="#the-labor-supply-model"><span class="header-section-number">12.3</span> The Labor Supply Model</a></li>
+  <li><a href="#the-savings-model" id="toc-the-savings-model" class="nav-link" data-scroll-target="#the-savings-model"><span class="header-section-number">12.4</span> The Savings Model</a></li>
+  <li><a href="#the-entry-exit-model" id="toc-the-entry-exit-model" class="nav-link" data-scroll-target="#the-entry-exit-model"><span class="header-section-number">12.5</span> The Entry-Exit Model</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/extremum_intro_examples.html">Extremum Estimators</a></li><li class="breadcrumb-item"><a href="../lectures/extremum_intro_examples.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/extremum-estimators.html">Extremum Estimators</a></li><li class="breadcrumb-item"><a href="../lectures/extremum_intro_examples.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></h1>
+<h1 class="title"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></h1>
 </div>
 
 
@@ -284,8 +372,350 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<p>Before diving into the statistical theory of each estimator, we will first propose an estimation method for each of our prototype models. In doing so, we will cover three workhorse techniques:</p>
+<ol type="1">
+<li>Maximum Likelihood;</li>
+<li>The Generalized Method of Moments; and</li>
+<li>Minimum Distance.</li>
+</ol>
+<p>Just to clarify where we are going, it helps to reiterate what the key properties are that we would like to establish for each approach.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key Properties of Estimators
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The key theoretical questions we want to establish for each estimation approach described below are:</p>
+<ol type="1">
+<li>[<strong>Consistency</strong>] Does our estimate approach the “true” parameters of the data generating process as we collect more data?</li>
+<li>[<strong>Inference</strong>] How is our estimate distributed around the true parameters? How uncertain are we about our key calculations of interest and can we place reasonable bounds on the correct answer?</li>
+</ol>
+</div>
+</div>
+<section id="the-generalized-roy-model" class="level2" data-number="12.1">
+<h2 data-number="12.1" class="anchored" data-anchor-id="the-generalized-roy-model"><span class="header-section-number">12.1</span> The Generalized Roy Model</h2>
+<p>Our identification argument suggested a <strong>two-step</strong> estimator for the Generalized Roy Model:</p>
+<ol type="1">
+<li>Estimate the selection equation by <em>maximum likelihood</em>.</li>
+<li>Estimate the outcome equations with <em>OLS</em> using a <em>selection correction</em>.</li>
+</ol>
+<p>This model will give us a little more to chew on when we think about the properties of two-step estimators.</p>
+</section>
+<section id="the-search-model" class="level2" data-number="12.2">
+<h2 data-number="12.2" class="anchored" data-anchor-id="the-search-model"><span class="header-section-number">12.2</span> The Search Model</h2>
+<p>For this example, let’s assume that we observe wages with some small amount of <em>known</em> measurement error:</p>
+<p><span class="math display">\[ \log(W^{o}_{n,t}) = \log(W_{n,t}) + \zeta_{n,t}\]</span></p>
+<p>where <span class="math inline">\(\zeta_{n,t} \sim \mathcal{N}(0,\sigma^2_\zeta)\)</span> and <span class="math inline">\(\sigma_\zeta = 0.05\)</span>.</p>
+<p>Recall that without further variation, we must make a parametric assumption on the wage distribution, and so we assume that <span class="math inline">\(W\)</span> is log-normally distributed with mean <span class="math inline">\(\mu\)</span> and variance <span class="math inline">\(\sigma^2_{W}\)</span>.</p>
+<p>Our strategy here is to estimate the parameters</p>
+<p><span class="math display">\[ \theta = (\mu,\sigma^2_{W},h,\delta,w^*) \]</span></p>
+<p>and invert out <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(b\)</span> (the latter using the reservation wage equation). Let <span class="math inline">\(X_{n} = (W^o,t_u,E)\)</span> indicate the data. The log-likelihood of a single observation is:</p>
+<p><span class="math display">\[ l(X;\theta) = E \times \int f_{W|W&gt;w^*}(\log(W^{o})-\zeta)\phi(\zeta;\sigma_\zeta)d\zeta + (1-E)\times[\log(h) + t_u\log(1-h)]  \]</span></p>
+<p>where, according to our parametric specifications:</p>
+<p><span class="math display">\[ f_{W|W&gt;w^*}(w) = \frac{\phi(w;\sigma_{W})}{1-\Phi(w^*/\sigma_{W})}.\]</span></p>
+<p><span class="math inline">\(\phi(\cdot;\sigma)\)</span> is the pdf of a normal with standard deviation <span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\Phi\)</span> is the cdf of a standard normal.</p>
+<p>The maximum likelihood estimator is:</p>
+<p><span class="math display">\[ \hat{\theta} = \arg\max_\theta \frac{1}{N}\sum_{n}l(X_n;\theta) \]</span> while the MLE estimates of <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(b\)</span> are:</p>
+<p><span class="math display">\[ \hat{\lambda} = \hat{h} / (1 - \widehat{F}_{W|W&gt;w^*}(\hat{w}^*) \]</span></p>
+<p><span class="math display">\[ \hat{b} = w^* - \frac{\hat{\lambda}}{1 - \beta(1-\hat{\delta})}\int_{\hat{w}^*}(1-\widehat{F}_{W|W&gt;w^*}(w))dw \]</span></p>
+<p>When we get to the theory we will consider the asymptotic properties of not just <span class="math inline">\(\hat{\theta}\)</span> but also the derived estimates <span class="math inline">\(\hat{b}\)</span> and <span class="math inline">\(\hat{\lambda}\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Coding the Log-Likelihood
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exm-search_likelihood" class="theorem example">
+<p><span class="theorem-title"><strong>Example 12.1</strong></span> First, let’s load the routines that we previously wrote to solve the model and take numerical integrals with quadrature. These are identical to what we’ve seen before and are available on the course github.</p>
+<div id="37c2b269" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"../scripts/search_model.jl"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>solve_res_wage (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>Before writing the likelihood, let’s load the data, clean, and create the data frame.</p>
+<div id="bad78a63" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span>, <span class="bu">DataFrames</span>, <span class="bu">DataFramesMeta</span>, <span class="bu">Statistics</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="st">"../data/cps_00019.csv"</span>,DataFrame)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> <span class="pp">@chain</span> data <span class="cf">begin</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="op">:</span>E <span class="op">=</span> <span class="op">:</span>EMPSTAT<span class="op">.&lt;</span><span class="fl">21</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="pp">@byrow</span> <span class="op">:</span>wage <span class="op">=</span> <span class="cf">begin</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">:</span>PAIDHOUR<span class="op">==</span><span class="fl">0</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="cn">missing</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elseif</span> <span class="op">:</span>PAIDHOUR<span class="op">==</span><span class="fl">2</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">:</span>HOURWAGE<span class="op">&lt;</span><span class="fl">99.99</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>HOURWAGE<span class="op">&gt;</span><span class="fl">0</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="op">:</span>HOURWAGE</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="cn">missing</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elseif</span> <span class="op">:</span>PAIDHOUR<span class="op">==</span><span class="fl">1</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">:</span>EARNWEEK<span class="op">&gt;</span><span class="fl">0</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>UHRSWORKT<span class="op">&lt;</span><span class="fl">997</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>UHRSWORKT<span class="op">&gt;</span><span class="fl">0</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="op">:</span>EARNWEEK <span class="op">/</span> <span class="op">:</span>UHRSWORKT</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="cn">missing</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@subset</span> <span class="op">:</span>MONTH<span class="op">.==</span><span class="fl">1</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@select</span> <span class="op">:</span>AGE <span class="op">:</span>SEX <span class="op">:</span>RACE <span class="op">:</span>EDUC <span class="op">:</span>wage <span class="op">:</span>E <span class="op">:</span>DURUNEMP</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="cf">begin</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span>bachelors <span class="op">=</span> <span class="op">:</span>EDUC<span class="op">.&gt;=</span><span class="fl">111</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span>nonwhite <span class="op">=</span> <span class="op">:</span>RACE<span class="op">.!=</span><span class="fl">100</span> </span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span>female <span class="op">=</span> <span class="op">:</span>SEX<span class="op">.==</span><span class="fl">2</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span>DURUNEMP <span class="op">=</span> <span class="fu">round</span>.(<span class="op">:</span>DURUNEMP <span class="op">.*</span> <span class="fl">12</span><span class="op">/</span><span class="fl">52</span>)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co"># the whole dataset in a named tuple</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>wage_missing <span class="op">=</span> <span class="fu">ismissing</span>.(data.wage)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>wage <span class="op">=</span> <span class="fu">coalesce</span>.(data.wage,<span class="fl">1</span>.)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="fu">length</span>(data.AGE)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co"># create a named tuple with all variables to conveniently pass to the log-likelihood:</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>dat <span class="op">=</span> (;logwage <span class="op">=</span> <span class="fu">log</span>.(wage),wage_missing,E <span class="op">=</span> data.E,tU <span class="op">=</span> data.DURUNEMP) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>(logwage = [0.0, 0.0, 0.0, 3.0368742168851663, 2.302585092994046, 3.2188758248682006, 2.2512917986064953, 0.0, 0.0, 0.0  …  0.0, 0.0, 2.4849066497880004, 3.056356895370426, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], wage_missing = Bool[1, 1, 1, 0, 0, 0, 0, 1, 1, 1  …  1, 1, 0, 0, 1, 1, 1, 1, 1, 1], E = Bool[1, 1, 1, 1, 1, 1, 1, 1, 1, 1  …  1, 1, 1, 1, 1, 1, 1, 1, 1, 1], tU = [231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0  …  231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0])</code></pre>
+</div>
+</div>
+<p>Now, let’s write the log-likelihood as above.</p>
+<div id="98201b5e" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span>, <span class="bu">Optim</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ϕ</span>(x,μ,σ) <span class="op">=</span> <span class="fu">pdf</span>(<span class="fu">Normal</span>(μ,σ),x)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Φ</span>(x,μ,σ) <span class="op">=</span> <span class="fu">cdf</span>(<span class="fu">Normal</span>(μ,σ),x)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># a function for the log-likelihood of observed wages (integrating out measurement error)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">logwage_likelihood</span>(logwage,F,σζ,wres)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">pdf</span>(F,x) <span class="op">/</span> (<span class="fl">1</span><span class="fu">-cdf</span>(F,wres)) <span class="op">*</span> <span class="fu">ϕ</span>(logwage,<span class="fu">log</span>(x),σζ)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    ub <span class="op">=</span> <span class="fu">quantile</span>(F,<span class="fl">0.9999</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">integrateGL</span>(f,wres,ub)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># a function to get the log-likelihood of a single observation</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># note this function assumes that data holds vectors </span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># E, tU, and logwage</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">log_likelihood</span>(n,data,pars)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    (;h,δ,wres,F,σζ) <span class="op">=</span> pars</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> <span class="fl">0</span>.</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> data.E[n]</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        ll <span class="op">+=</span> <span class="fu">log</span>(h) <span class="op">-</span> <span class="fu">log</span>(h <span class="op">+</span> δ)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> !data.wage_missing[n]</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>            ll <span class="op">+=</span> <span class="fu">logwage_likelihood</span>(data.logwage[n],F,σζ,wres)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        ll <span class="op">+=</span> <span class="fu">log</span>(δ) <span class="op">-</span> <span class="fu">log</span>(h <span class="op">+</span> δ)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        ll <span class="op">+=</span> <span class="fu">log</span>(h) <span class="op">+</span> data.tU[n] <span class="op">*</span> <span class="fu">log</span>(<span class="fl">1</span><span class="op">-</span>h)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ll</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co"># a function to iterate over all observations</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">log_likelihood_obj</span>(x,pars,data)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    pars <span class="op">=</span> <span class="fu">update</span>(pars,x)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> <span class="fl">0</span>.</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="fu">eachindex</span>(data.E)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        ll <span class="op">+=</span> <span class="fu">log_likelihood</span>(n,data,pars)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ll <span class="op">/</span> <span class="fu">length</span>(data.E)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>log_likelihood_obj (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>Finally, since routines like <code>Optim</code> optimize over vectors, we want to write an update routine that takes a vector <code>x</code> and maps it to new parameters. Here we are going to use transformation functions to ensure that parameters obey their bound constraints. There are other ways to ensure this, but this is one way that works.</p>
+<div id="47f8177d" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">logit</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x) <span class="op">/</span> (<span class="fl">1</span><span class="fu">+exp</span>(x))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">logit_inv</span>(x) <span class="op">=</span> <span class="fu">log</span>(x<span class="op">/</span>(<span class="fl">1</span><span class="op">-</span>x))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">update</span>(pars,x)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    h <span class="op">=</span> <span class="fu">logit</span>(x[<span class="fl">1</span>])</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    δ <span class="op">=</span> <span class="fu">logit</span>(x[<span class="fl">2</span>])</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    μ <span class="op">=</span> x[<span class="fl">3</span>]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    σ <span class="op">=</span> <span class="fu">exp</span>(x[<span class="fl">4</span>])</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    wres <span class="op">=</span> <span class="fu">exp</span>(x[<span class="fl">5</span>])</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    F <span class="op">=</span> <span class="fu">LogNormal</span>(μ,σ)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (;pars<span class="op">...</span>,h,δ,μ,σ,wres,F)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>update (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>Now we can finally test our likelihood to see how it runs:</p>
+<div id="087b96bc" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> [<span class="fu">logit_inv</span>(<span class="fl">0.5</span>),<span class="fu">logit_inv</span>(<span class="fl">0.03</span>),<span class="fl">2</span>.,<span class="fu">log</span>(<span class="fl">1</span>.),<span class="fu">log</span>(<span class="fl">5</span>.)]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> (;σζ <span class="op">=</span> <span class="fl">0.05</span>, β <span class="op">=</span> <span class="fl">0.995</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">log_likelihood_obj</span>(x0,pars,dat) <span class="co">#&lt;- test.</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> <span class="fu">optimize</span>(<span class="fu">x-&gt;-log_likelihood_obj</span>(x,pars,dat),x0,<span class="fu">Newton</span>(),Optim.<span class="fu">Options</span>(show_trace<span class="op">=</span><span class="cn">true</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Iter     Function value   Gradient norm 
+     0     2.428210e-01     2.348428e-01
+ * time: 0.011503934860229492
+     1     2.051862e-01     1.072566e-01
+ * time: 2.0285048484802246
+     2     1.827395e-01     4.626301e-01
+ * time: 3.3154308795928955
+     3     1.758193e-01     4.441528e-01
+ * time: 4.487942934036255
+     4     1.692587e-01     3.168138e-02
+ * time: 5.828249931335449
+     5     1.668869e-01     1.483080e-01
+ * time: 6.988066911697388
+     6     1.647839e-01     2.507384e-01
+ * time: 8.349639892578125
+     7     1.638445e-01     1.648957e-01
+ * time: 9.709852933883667
+     8     1.633820e-01     2.338710e-02
+ * time: 10.884522914886475
+     9     1.633356e-01     2.095668e-02
+ * time: 12.224071979522705
+    10     1.633224e-01     1.774668e-03
+ * time: 13.551061868667603
+    11     1.633213e-01     3.628638e-03
+ * time: 14.911957025527954
+    12     1.633211e-01     1.280346e-04
+ * time: 16.260320901870728
+    13     1.633210e-01     3.719531e-04
+ * time: 17.622062921524048
+    14     1.633210e-01     5.299485e-06
+ * time: 18.999624013900757
+    15     1.633210e-01     3.008006e-05
+ * time: 20.55402183532715
+    16     1.633210e-01     8.243085e-08
+ * time: 21.90324902534485
+    17     1.633210e-01     6.359010e-08
+ * time: 23.07305097579956
+    18     1.633210e-01     2.488281e-07
+ * time: 24.421974897384644
+    19     1.633210e-01     2.588340e-08
+ * time: 25.61241579055786
+    20     1.633210e-01     1.472700e-08
+ * time: 26.809528827667236
+    21     1.633210e-01     2.956400e-09
+ * time: 28.253630876541138</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code> * Status: success (objective increased between iterations)
+
+ * Candidate solution
+    Final objective value:     1.633210e-01
+
+ * Found with
+    Algorithm:     Newton's Method
+
+ * Convergence measures
+    |x - x'|               = 6.08e-06 ≰ 0.0e+00
+    |x - x'|/|x'|          = 2.83e-07 ≰ 0.0e+00
+    |f(x) - f(x')|         = 1.60e-13 ≰ 0.0e+00
+    |f(x) - f(x')|/|f(x')| = 9.82e-13 ≰ 0.0e+00
+    |g(x)|                 = 2.96e-09 ≤ 1.0e-08
+
+ * Work counters
+    Seconds run:   28  (vs limit Inf)
+    Iterations:    21
+    f(x) calls:    66
+    ∇f(x) calls:   66
+    ∇²f(x) calls:  21</code></pre>
+</div>
+</div>
+<p>Here we tell <code>Optim</code> to make use of automatic differentiation with <code>ForwardDiff</code>. Let’s take a peek at the parameter estimates:</p>
+<div id="4b10ab24" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(;<span class="fu">update</span>(pars,res.minimizer)<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div><div style="float: left;"><span>1×8 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">σζ</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">β</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">h</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">δ</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">μ</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">σ</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">wres</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">F</th>
+</tr>
+<tr class="subheader headerLastRow even">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="LogNormal{Float64}">LogNorma…</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.995</td>
+<td style="text-align: right;">0.184915</td>
+<td style="text-align: right;">0.00764741</td>
+<td style="text-align: right;">3.47993</td>
+<td style="text-align: right;">1.09258</td>
+<td style="text-align: right;">4.80711e-10</td>
+<td style="text-align: left;">LogNormal{Float64}(μ=3.47993, σ=1.09258)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Performance Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that in <a href="#exm-search_likelihood" class="quarto-xref">Example&nbsp;<span>12.1</span></a> we created a <code>NamedTuple</code> called <code>dat</code> from the data frame, which cements the type of each vector of data into <code>dat</code>.</p>
+<p>This is important for performance! Working with <code>DataFrame</code> types directly can dramatically slow down your code because the columns of these data frames are not typed concretely. See the <a href="../appendices/performance.html">performance tips</a> for more discussion.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-estimation_search" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 12.1</strong></span> Extent the code above to 1. Additionally estimate the parameters <span class="math inline">\(b\)</span> and <span class="math inline">\(\lambda\)</span>. 2. Estimate the search model separately for men with and without a bachelor’s degree. 3. Report and comment on your estimates.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="the-labor-supply-model" class="level2" data-number="12.3">
+<h2 data-number="12.3" class="anchored" data-anchor-id="the-labor-supply-model"><span class="header-section-number">12.3</span> The Labor Supply Model</h2>
+</section>
+<section id="the-savings-model" class="level2" data-number="12.4">
+<h2 data-number="12.4" class="anchored" data-anchor-id="the-savings-model"><span class="header-section-number">12.4</span> The Savings Model</h2>
+</section>
+<section id="the-entry-exit-model" class="level2" data-number="12.5">
+<h2 data-number="12.5" class="anchored" data-anchor-id="the-entry-exit-model"><span class="header-section-number">12.5</span> The Entry-Exit Model</h2>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -707,13 +1137,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../lectures/identification_labor_supply.html" class="pagination-link" aria-label="The Dynamic Labor Supply Model">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span>
+      <a href="../lectures/extremum-estimators.html" class="pagination-link" aria-label="Extremum Estimators">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Extremum Estimators</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../lectures/extremum_theory.html" class="pagination-link" aria-label="Asymptotic Theory">
-        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

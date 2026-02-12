@@ -769,5 +769,81 @@
       "Identification and Credible Inference",
       "<span class='chapter-number'>11</span>  <span class='chapter-title'>The Entry-Exit Model</span>"
     ]
+  },
+  {
+    "objectID": "lectures/extremum_intro_examples.html",
+    "href": "lectures/extremum_intro_examples.html",
+    "title": "12  Introduction and Examples",
+    "section": "",
+    "text": "12.1 The Generalized Roy Model\nBefore diving into the statistical theory of each estimator, we will first propose an estimation method for each of our prototype models. In doing so, we will cover three workhorse techniques:\nJust to clarify where we are going, it helps to reiterate what the key properties are that we would like to establish for each approach.\nOur identification argument suggested a two-step estimator for the Generalized Roy Model:\nThis model will give us a little more to chew on when we think about the properties of two-step estimators.",
+    "crumbs": [
+      "Extremum Estimators",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Introduction and Examples</span>"
+    ]
+  },
+  {
+    "objectID": "lectures/extremum_intro_examples.html#the-generalized-roy-model",
+    "href": "lectures/extremum_intro_examples.html#the-generalized-roy-model",
+    "title": "12  Introduction and Examples",
+    "section": "",
+    "text": "Estimate the selection equation by maximum likelihood.\nEstimate the outcome equations with OLS using a selection correction.",
+    "crumbs": [
+      "Extremum Estimators",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Introduction and Examples</span>"
+    ]
+  },
+  {
+    "objectID": "lectures/extremum_intro_examples.html#the-search-model",
+    "href": "lectures/extremum_intro_examples.html#the-search-model",
+    "title": "12  Introduction and Examples",
+    "section": "12.2 The Search Model",
+    "text": "12.2 The Search Model\nFor this example, let’s assume that we observe wages with some small amount of known measurement error:\n\\[ \\log(W^{o}_{n,t}) = \\log(W_{n,t}) + \\zeta_{n,t}\\]\nwhere \\(\\zeta_{n,t} \\sim \\mathcal{N}(0,\\sigma^2_\\zeta)\\) and \\(\\sigma_\\zeta = 0.05\\).\nRecall that without further variation, we must make a parametric assumption on the wage distribution, and so we assume that \\(W\\) is log-normally distributed with mean \\(\\mu\\) and variance \\(\\sigma^2_{W}\\).\nOur strategy here is to estimate the parameters\n\\[ \\theta = (\\mu,\\sigma^2_{W},h,\\delta,w^*) \\]\nand invert out \\(\\lambda\\) and \\(b\\) (the latter using the reservation wage equation). Let \\(X_{n} = (W^o,t_u,E)\\) indicate the data. The log-likelihood of a single observation is:\n\\[ l(X;\\theta) = E \\times \\int f_{W|W&gt;w^*}(\\log(W^{o})-\\zeta)\\phi(\\zeta;\\sigma_\\zeta)d\\zeta + (1-E)\\times[\\log(h) + t_u\\log(1-h)]  \\]\nwhere, according to our parametric specifications:\n\\[ f_{W|W&gt;w^*}(w) = \\frac{\\phi(w;\\sigma_{W})}{1-\\Phi(w^*/\\sigma_{W})}.\\]\n\\(\\phi(\\cdot;\\sigma)\\) is the pdf of a normal with standard deviation \\(\\sigma\\) and \\(\\Phi\\) is the cdf of a standard normal.\nThe maximum likelihood estimator is:\n\\[ \\hat{\\theta} = \\arg\\max_\\theta \\frac{1}{N}\\sum_{n}l(X_n;\\theta) \\] while the MLE estimates of \\(\\lambda\\) and \\(b\\) are:\n\\[ \\hat{\\lambda} = \\hat{h} / (1 - \\widehat{F}_{W|W&gt;w^*}(\\hat{w}^*) \\]\n\\[ \\hat{b} = w^* - \\frac{\\hat{\\lambda}}{1 - \\beta(1-\\hat{\\delta})}\\int_{\\hat{w}^*}(1-\\widehat{F}_{W|W&gt;w^*}(w))dw \\]\nWhen we get to the theory we will consider the asymptotic properties of not just \\(\\hat{\\theta}\\) but also the derived estimates \\(\\hat{b}\\) and \\(\\hat{\\lambda}\\).\n\n\n\n\n\n\nExample: Coding the Log-Likelihood\n\n\n\n\nExample 12.1 First, let’s load the routines that we previously wrote to solve the model and take numerical integrals with quadrature. These are identical to what we’ve seen before and are available on the course github.\n\ninclude(\"../scripts/search_model.jl\")\n\nsolve_res_wage (generic function with 1 method)\n\n\nBefore writing the likelihood, let’s load the data, clean, and create the data frame.\n\nusing CSV, DataFrames, DataFramesMeta, Statistics\n\ndata = CSV.read(\"../data/cps_00019.csv\",DataFrame)\ndata = @chain data begin\n    @transform :E = :EMPSTAT.&lt;21\n    @transform @byrow :wage = begin\n        if :PAIDHOUR==0\n            return missing\n        elseif :PAIDHOUR==2\n            if :HOURWAGE&lt;99.99 && :HOURWAGE&gt;0\n                return :HOURWAGE\n            else\n                return missing\n            end\n        elseif :PAIDHOUR==1\n            if :EARNWEEK&gt;0 && :UHRSWORKT&lt;997 && :UHRSWORKT&gt;0\n                return :EARNWEEK / :UHRSWORKT\n            else\n                return missing\n            end\n        end\n    end\n    @subset :MONTH.==1\n    @select :AGE :SEX :RACE :EDUC :wage :E :DURUNEMP\n    @transform begin\n        :bachelors = :EDUC.&gt;=111\n        :nonwhite = :RACE.!=100 \n        :female = :SEX.==2\n        :DURUNEMP = round.(:DURUNEMP .* 12/52)\n    end\nend\n\n# the whole dataset in a named tuple\nwage_missing = ismissing.(data.wage)\nwage = coalesce.(data.wage,1.)\nN = length(data.AGE)\n# create a named tuple with all variables to conveniently pass to the log-likelihood:\ndat = (;logwage = log.(wage),wage_missing,E = data.E,tU = data.DURUNEMP) \n\n(logwage = [0.0, 0.0, 0.0, 3.0368742168851663, 2.302585092994046, 3.2188758248682006, 2.2512917986064953, 0.0, 0.0, 0.0  …  0.0, 0.0, 2.4849066497880004, 3.056356895370426, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], wage_missing = Bool[1, 1, 1, 0, 0, 0, 0, 1, 1, 1  …  1, 1, 0, 0, 1, 1, 1, 1, 1, 1], E = Bool[1, 1, 1, 1, 1, 1, 1, 1, 1, 1  …  1, 1, 1, 1, 1, 1, 1, 1, 1, 1], tU = [231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0  …  231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0, 231.0])\n\n\nNow, let’s write the log-likelihood as above.\n\nusing Distributions, Optim\n\nϕ(x,μ,σ) = pdf(Normal(μ,σ),x)\nΦ(x,μ,σ) = cdf(Normal(μ,σ),x)\n\n# a function for the log-likelihood of observed wages (integrating out measurement error)\nfunction logwage_likelihood(logwage,F,σζ,wres)\n    f(x) = pdf(F,x) / (1-cdf(F,wres)) * ϕ(logwage,log(x),σζ)\n    ub = quantile(F,0.9999)\n    return integrateGL(f,wres,ub)\nend\n\n# a function to get the log-likelihood of a single observation\n# note this function assumes that data holds vectors \n# E, tU, and logwage\nfunction log_likelihood(n,data,pars)\n    (;h,δ,wres,F,σζ) = pars\n    ll = 0.\n    if data.E[n]\n        ll += log(h) - log(h + δ)\n        if !data.wage_missing[n]\n            ll += logwage_likelihood(data.logwage[n],F,σζ,wres)\n        end\n    else\n        ll += log(δ) - log(h + δ)\n        ll += log(h) + data.tU[n] * log(1-h)\n    end\n    return ll\nend\n\n# a function to iterate over all observations\nfunction log_likelihood_obj(x,pars,data)\n    pars = update(pars,x)\n    ll = 0.\n    for n in eachindex(data.E)\n        ll += log_likelihood(n,data,pars)\n    end\n    return ll / length(data.E)\nend\n\nlog_likelihood_obj (generic function with 1 method)\n\n\nFinally, since routines like Optim optimize over vectors, we want to write an update routine that takes a vector x and maps it to new parameters. Here we are going to use transformation functions to ensure that parameters obey their bound constraints. There are other ways to ensure this, but this is one way that works.\n\nlogit(x) = exp(x) / (1+exp(x))\nlogit_inv(x) = log(x/(1-x))\n\nfunction update(pars,x)\n    h = logit(x[1])\n    δ = logit(x[2])\n    μ = x[3]\n    σ = exp(x[4])\n    wres = exp(x[5])\n    F = LogNormal(μ,σ)\n    return (;pars...,h,δ,μ,σ,wres,F)\nend\n\nupdate (generic function with 1 method)\n\n\nNow we can finally test our likelihood to see how it runs:\n\nx0 = [logit_inv(0.5),logit_inv(0.03),2.,log(1.),log(5.)]\npars = (;σζ = 0.05, β = 0.995)\nlog_likelihood_obj(x0,pars,dat) #&lt;- test.\nres = optimize(x-&gt;-log_likelihood_obj(x,pars,dat),x0,Newton(),Optim.Options(show_trace=true))\n\nIter     Function value   Gradient norm \n     0     2.428210e-01     2.348428e-01\n * time: 0.011503934860229492\n     1     2.051862e-01     1.072566e-01\n * time: 2.0285048484802246\n     2     1.827395e-01     4.626301e-01\n * time: 3.3154308795928955\n     3     1.758193e-01     4.441528e-01\n * time: 4.487942934036255\n     4     1.692587e-01     3.168138e-02\n * time: 5.828249931335449\n     5     1.668869e-01     1.483080e-01\n * time: 6.988066911697388\n     6     1.647839e-01     2.507384e-01\n * time: 8.349639892578125\n     7     1.638445e-01     1.648957e-01\n * time: 9.709852933883667\n     8     1.633820e-01     2.338710e-02\n * time: 10.884522914886475\n     9     1.633356e-01     2.095668e-02\n * time: 12.224071979522705\n    10     1.633224e-01     1.774668e-03\n * time: 13.551061868667603\n    11     1.633213e-01     3.628638e-03\n * time: 14.911957025527954\n    12     1.633211e-01     1.280346e-04\n * time: 16.260320901870728\n    13     1.633210e-01     3.719531e-04\n * time: 17.622062921524048\n    14     1.633210e-01     5.299485e-06\n * time: 18.999624013900757\n    15     1.633210e-01     3.008006e-05\n * time: 20.55402183532715\n    16     1.633210e-01     8.243085e-08\n * time: 21.90324902534485\n    17     1.633210e-01     6.359010e-08\n * time: 23.07305097579956\n    18     1.633210e-01     2.488281e-07\n * time: 24.421974897384644\n    19     1.633210e-01     2.588340e-08\n * time: 25.61241579055786\n    20     1.633210e-01     1.472700e-08\n * time: 26.809528827667236\n    21     1.633210e-01     2.956400e-09\n * time: 28.253630876541138\n\n\n * Status: success (objective increased between iterations)\n\n * Candidate solution\n    Final objective value:     1.633210e-01\n\n * Found with\n    Algorithm:     Newton's Method\n\n * Convergence measures\n    |x - x'|               = 6.08e-06 ≰ 0.0e+00\n    |x - x'|/|x'|          = 2.83e-07 ≰ 0.0e+00\n    |f(x) - f(x')|         = 1.60e-13 ≰ 0.0e+00\n    |f(x) - f(x')|/|f(x')| = 9.82e-13 ≰ 0.0e+00\n    |g(x)|                 = 2.96e-09 ≤ 1.0e-08\n\n * Work counters\n    Seconds run:   28  (vs limit Inf)\n    Iterations:    21\n    f(x) calls:    66\n    ∇f(x) calls:   66\n    ∇²f(x) calls:  21\n\n\nHere we tell Optim to make use of automatic differentiation with ForwardDiff. Let’s take a peek at the parameter estimates:\n\nDataFrame(;update(pars,res.minimizer)...)\n\n1×8 DataFrame\n\n\n\nRow\nσζ\nβ\nh\nδ\nμ\nσ\nwres\nF\n\n\n\nFloat64\nFloat64\nFloat64\nFloat64\nFloat64\nFloat64\nFloat64\nLogNorma…\n\n\n\n\n1\n0.05\n0.995\n0.184915\n0.00764741\n3.47993\n1.09258\n4.80711e-10\nLogNormal{Float64}(μ=3.47993, σ=1.09258)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPerformance Note\n\n\n\nNote that in Example 12.1 we created a NamedTuple called dat from the data frame, which cements the type of each vector of data into dat.\nThis is important for performance! Working with DataFrame types directly can dramatically slow down your code because the columns of these data frames are not typed concretely. See the performance tips for more discussion.\n\n\n\n\n\n\n\n\nExercise\n\n\n\n\nExercise 12.1 Extent the code above to 1. Additionally estimate the parameters \\(b\\) and \\(\\lambda\\). 2. Estimate the search model separately for men with and without a bachelor’s degree. 3. Report and comment on your estimates.",
+    "crumbs": [
+      "Extremum Estimators",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Introduction and Examples</span>"
+    ]
+  },
+  {
+    "objectID": "lectures/extremum_intro_examples.html#the-labor-supply-model",
+    "href": "lectures/extremum_intro_examples.html#the-labor-supply-model",
+    "title": "12  Introduction and Examples",
+    "section": "12.3 The Labor Supply Model",
+    "text": "12.3 The Labor Supply Model",
+    "crumbs": [
+      "Extremum Estimators",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Introduction and Examples</span>"
+    ]
+  },
+  {
+    "objectID": "lectures/extremum_intro_examples.html#the-savings-model",
+    "href": "lectures/extremum_intro_examples.html#the-savings-model",
+    "title": "12  Introduction and Examples",
+    "section": "12.4 The Savings Model",
+    "text": "12.4 The Savings Model",
+    "crumbs": [
+      "Extremum Estimators",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Introduction and Examples</span>"
+    ]
+  },
+  {
+    "objectID": "lectures/extremum_intro_examples.html#the-entry-exit-model",
+    "href": "lectures/extremum_intro_examples.html#the-entry-exit-model",
+    "title": "12  Introduction and Examples",
+    "section": "12.5 The Entry-Exit Model",
+    "text": "12.5 The Entry-Exit Model",
+    "crumbs": [
+      "Extremum Estimators",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Introduction and Examples</span>"
+    ]
+  },
+  {
+    "objectID": "lectures/extremum-estimators.html",
+    "href": "lectures/extremum-estimators.html",
+    "title": "Extremum Estimators",
+    "section": "",
+    "text": "In the previous section we studied identification: the mapping between population distributions and model parameters. We emphasized that it is not just important to establish whether your model is identified, but also how it is identified, given that many quantitative models are heavily parameterized.\nIdentification can lead — often but not always — directly to an estimation strategy. This is particularly true when, in the course of showing identification, you want to show that the key parameters in your study have a particularly credible source of identification.\nIn this part of the course we will move to estimation, first establishing approaches for each of our prototype models and, at times, discussing how estimation relates to the task of “credible” inference.",
+    "crumbs": [
+      "Extremum Estimators"
+    ]
   }
 ]

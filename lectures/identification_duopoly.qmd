@@ -28,7 +28,7 @@ Each parameter in $\phi$ governs a distinct source of variation in the choice pr
 A simple counting argument provides intuition for identification: the data object $p(x,a,a')$ provides variation along four dimensions---the continuous variable $X$ and the four binary configurations of $(a,a')$. Meanwhile, the model contains five parameters. As long as there is sufficient variation in $X$ and the binary states, we have enough "equations" to solve for the unknowns.
 
 :::{.callout-note}
-While counting arguments is useful for building intuition, they do not constitute a formal proof of identification. Rigorous identification arguments for dynamic discrete choice models require tools that we will introduce later in the text, including results on the invertibility of conditional choice probabilities.
+While counting arguments are useful for building intuition, they do not constitute a formal proof of identification. Rigorous identification arguments for dynamic discrete choice models require tools that we will introduce later in the text, including results on the invertibility of conditional choice probabilities.
 :::
 
 ## Credibility and the Role of Unobservables
@@ -42,7 +42,7 @@ Would you find such a forecast credible? What concerns might you have about usin
 
 A key concern is **market-level unobservables**. In practice, markets differ in ways that are observed by firms but not by the econometrician. If these unobservables are correlated with the observed state variable $X$, then variation in entry with respect to $X$ conflates the causal effect of $X$ with selection on unobservables.
 
-For example, suppose that markets with high values of $X$ also tend to have unobservably favorable demand conditions. Firms observe these conditions and incorporate them into their entry decisions. The econometrician, seeing higher entry in high-$X$ markets, might incorrectly attribute this entirely to the effect of $X$ rather than to the correlated unobservable.
+Not only this, but a market level observable that positive effects the payoff from entry will also be positively associated with $a$ and $a'$, leading to bias in $\phi_2$, $\phi_3$ and $\phi_4$ as well.
 
 This is a familiar endogeneity problem, but note that it is more complicated than in the linear regression setting. In the entry-exit model, the unobservable enters the payoff function nonlinearly and affects not only the firm's own decision but also its beliefs about the competitor's behavior in equilibrium.
 

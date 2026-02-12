@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/discrete-choice.html" rel="next">
-<link href="../lectures/identification_labor_supply.html" rel="prev">
+<link href="../lectures/extremum_intro_examples.html" rel="next">
+<link href="../lectures/identification_duopoly.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -186,11 +186,46 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_savings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Life-Cycle Savings Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_duopoly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Entry-Exit Model</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../lectures/extremum-estimators.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Extremum Estimators</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/extremum_intro_examples.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/extremum_theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <span class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Extremum Estimators</span></span>
+ <span class="menu-text">Simulation Methods</span></span>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <span class="sidebar-item-text sidebar-link text-start">
@@ -204,13 +239,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
  <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../appendices/data.html" class="sidebar-item-text sidebar-link">
@@ -261,6 +296,9 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<p>In the previous section we studied <strong>identification</strong>: the mapping between population distributions and model parameters. We emphasized that it is not just important to establish <em>whether</em> your model is identified, but also <em>how</em> it is identified, given that many quantitative models are heavily parameterized.</p>
+<p>Identification can lead — often but not always — directly to an estimation strategy. This is particularly true when, in the course of showing identification, you want to show that the key parameters in your study have a particularly credible source of identification.</p>
+<p>In this part of the course we will move to estimation, first establishing approaches for each of our prototype models and, at times, discussing how estimation relates to the task of “credible” inference.</p>
 
 
 
@@ -684,13 +722,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../lectures/identification_labor_supply.html" class="pagination-link" aria-label="The Dynamic Labor Supply Model">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span>
+      <a href="../lectures/identification_duopoly.html" class="pagination-link" aria-label="The Entry-Exit Model">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Entry-Exit Model</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/discrete-choice.html" class="pagination-link" aria-label="Discrete Choice">
-        <span class="nav-page-text">Discrete Choice</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/extremum_intro_examples.html" class="pagination-link" aria-label="Introduction and Examples">
+        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

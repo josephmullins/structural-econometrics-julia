@@ -1,1 +1,7 @@
 # Extremum Estimators
+
+In the previous section we studied **identification**: the mapping between population distributions and model parameters. We emphasized that it is not just important to establish *whether* your model is identified, but also *how* it is identified, given that many quantitative models are heavily parameterized.
+
+Identification can lead --- often but not always --- directly to an estimation strategy. This is particularly true when, in the course of showing identification, you want to show that the key parameters in your study have a particularly credible source of identification.
+
+In this part of the course we will move to estimation, first establishing approaches for each of our prototype models and, at times, discussing how estimation relates to the task of "credible" inference.
