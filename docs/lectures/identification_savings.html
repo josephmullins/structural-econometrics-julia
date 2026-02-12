@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.539">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Structural Econometrics with Julia - 10&nbsp; The Life-Cycle Savings Model</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../lectures/identification_duopoly.html" rel="next">
+<link href="../lectures/identification_labor_supply.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/identification.html">Identification and Credible Inference</a></li><li class="breadcrumb-item"><a href="../lectures/identification_savings.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Life-Cycle Savings Model</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Structural Econometrics with Julia</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Five Prototype Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/generalized_roy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Job Search Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/savings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">A Life-Cycle Savings Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/entry-exit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/dynamic-labor-supply.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A Simple Labor Supply Model</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/why_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">How and Why to Use Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../lectures/identification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Identification and Credible Inference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_roy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_labor_supply.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_savings.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Life-Cycle Savings Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_duopoly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Entry-Exit Model</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Extremum Estimators</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/extremum_intro_examples.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/extremum_theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Simulation Methods</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Discrete Choice</span></span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/autodiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Automatic Differentiation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Performance Tips</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#identification-of-the-income-process" id="toc-identification-of-the-income-process" class="nav-link active" data-scroll-target="#identification-of-the-income-process"><span class="header-section-number">10.1</span> Identification of the Income Process</a></li>
+  <li><a href="#identification-of-preference-parameters" id="toc-identification-of-preference-parameters" class="nav-link" data-scroll-target="#identification-of-preference-parameters"><span class="header-section-number">10.2</span> Identification of Preference Parameters</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/identification.html">Identification and Credible Inference</a></li><li class="breadcrumb-item"><a href="../lectures/identification_savings.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Life-Cycle Savings Model</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Life-Cycle Savings Model</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>We’ll consider identification of the <a href="../models/savings.html">savings model</a> with the following income process:</p>
+<p><span class="math display">\[ \log(y_{n,t}) = \mu_{t} + \varepsilon_{n,t}\]</span></p>
+<p>where</p>
+<p><span class="math display">\[ \varepsilon_{n,t+1} = \rho \varepsilon_{n,t} + \eta_{n,t},\qquad \eta_{m,t}\sim\mathcal{N}(0,\sigma^2_\eta) \]</span>.</p>
+<p>Collecting parameters, we want to identify</p>
+<p><span class="math display">\[ (\mu,\rho,\sigma_\eta),\qquad (\beta,\sigma,\psi) \]</span></p>
+<p>where the first block indicates parameters of the income process, and the second block determines preferences.</p>
+<section id="identification-of-the-income-process" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="identification-of-the-income-process"><span class="header-section-number">10.1</span> Identification of the Income Process</h2>
+<p>Assume that our data has a panel dimension, so that we see <span class="math inline">\((y_t,C_t,t)_{t=\tau_0}^{\tau_1}\)</span> for some pair <span class="math inline">\((\tau_0,\tau_1)\)</span>. Remember that <span class="math inline">\(t\)</span> indexes age in the model, so it is quite plausible that <span class="math inline">\(\tau_0\)</span> and <span class="math inline">\(\tau_1\)</span> may themselves be random variables (this will be true in the data… we see panels of individuals at different ages and for different lengths of time).</p>
+<p>First, as long as the support of the random variables (<span class="math inline">\(\tau_0,\tau_1\)</span>) covers <span class="math inline">\(t=1\)</span> through to <span class="math inline">\(T\)</span>, <span class="math inline">\(\mu\)</span> is identified as the mean of log income at each age, <span class="math inline">\(\mu_t = \mathbb{E}[\log(y_{t})]\)</span>. We can then residualize log income to get <span class="math inline">\(\varepsilon_{t} = \log(y_t)-\mu_t\)</span>.</p>
+<p>Second, consider the following variances and covariances (remember that the <span class="math inline">\(\eta\)</span> terms are iid):</p>
+<p><span class="math display">\[\begin{eqnarray}
+\mathbb{V}[\varepsilon_{t+1}] = \rho^2\mathbb{V}[\varepsilon_{t}] + \sigma^2_{\eta} \\
+\mathbb{C}(\varepsilon_{t},\varepsilon_{t+1}) = \rho\mathbb{V}[\varepsilon_{t}] \\
+\mathbb{C}(\varepsilon_{t},\varepsilon_{t+2}) = \rho^2\mathbb{V}[\varepsilon_t]
+\end{eqnarray}\]</span></p>
+<p>meaning that we can identify <span class="math inline">\(\rho\)</span> and <span class="math inline">\(\sigma_\eta\)</span> from this system of simultaneous equations.</p>
+<div class="callout callout-style-default callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note: Whether vs How
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that, since these moments can be calculated at any age <span class="math inline">\(t\)</span> and can extend to arbitrary lags, this model is <strong>over-identified</strong>. Which moments should we use in practice? Thinking <em>inside</em> the model, we will address this topic when we get to discussing <em>minimum distance estimation</em>. You might also like to think outside the model and think about (1) how real income processes might deviate from your stylized model and (2) what features of the data you most want the parameters <span class="math inline">\(\rho\)</span> and <span class="math inline">\(\sigma^2\)</span> to capture.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Data from PSID
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exm-psid" class="theorem example">
+<p><span class="theorem-title"><strong>Example 10.1</strong></span> In this example we’ll load psid data from <span class="citation" data-cites="ABB_2018">Arellano, Blundell, and Bonhomme (<a href="../references.html#ref-ABB_2018" role="doc-biblioref">2018</a>)</span> and show how sample equivalents to the above moments might be calculated.</p>
+<p>To begin, let’s load the data and pull out the variables we are interested in using. These are person identifiers (<code>person</code>), year, total income (<code>y</code>), savings (<code>tot_assets1</code>) and age. You should bear in mind that it is by no means trivial to measure total income and total assets in these data. The variables we are looking at are the product of a lot of data cleaning and careful choices by the authors.</p>
+<div id="228d0797" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span>, <span class="bu">DataFrames</span>, <span class="bu">DataFramesMeta</span>, <span class="bu">Statistics</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> <span class="pp">@chain</span> <span class="cf">begin</span> </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    CSV.<span class="fu">read</span>(<span class="st">"../data/abb_aea_data.csv"</span>,DataFrame,missingstring <span class="op">=</span> <span class="st">"NA"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@select</span> <span class="op">:</span>person <span class="op">:</span>y <span class="op">:</span>tot_assets1 <span class="op">:</span>asset <span class="op">:</span>age <span class="op">:</span>year</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div><div style="float: left;"><span>19317×6 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">19292 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">person</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">y</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">tot_assets1</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">asset</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">age</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">year</th>
+</tr>
+<tr class="odd subheader headerLastRow">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">12061</td>
+<td style="text-align: right;">173100</td>
+<td style="text-align: right;">605000</td>
+<td style="text-align: right;">15500.0</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">17118</td>
+<td style="text-align: right;">54000</td>
+<td style="text-align: right;">60000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">12630</td>
+<td style="text-align: right;">61283</td>
+<td style="text-align: right;">224000</td>
+<td style="text-align: right;">39283.0</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">12647</td>
+<td style="text-align: right;">42300</td>
+<td style="text-align: right;">28240</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">5239</td>
+<td style="text-align: right;">82275</td>
+<td style="text-align: right;">7500</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: right;">2671</td>
+<td style="text-align: right;">69501</td>
+<td style="text-align: right;">48000</td>
+<td style="text-align: right;">3600.0</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: right;">13027</td>
+<td style="text-align: right;">68000</td>
+<td style="text-align: right;">148000</td>
+<td style="text-align: right;">20000.0</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: right;">6791</td>
+<td style="text-align: right;">93758</td>
+<td style="text-align: right;">80000</td>
+<td style="text-align: right;">160.0</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: right;">6475</td>
+<td style="text-align: right;">26581</td>
+<td style="text-align: right;">23300</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: right;">18332</td>
+<td style="text-align: right;">33785</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
+<td style="text-align: right;">3856</td>
+<td style="text-align: right;">55300</td>
+<td style="text-align: right;">311000</td>
+<td style="text-align: right;">5300.0</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
+<td style="text-align: right;">19326</td>
+<td style="text-align: right;">40200</td>
+<td style="text-align: right;">105250</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: right;">21818</td>
+<td style="text-align: right;">42500</td>
+<td style="text-align: right;">13000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19306</td>
+<td style="text-align: right;">6617</td>
+<td style="text-align: right;">115887</td>
+<td style="text-align: right;">241000</td>
+<td style="text-align: right;">21346.0</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19307</td>
+<td style="text-align: right;">626</td>
+<td style="text-align: right;">128600</td>
+<td style="text-align: right;">98000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19308</td>
+<td style="text-align: right;">4795</td>
+<td style="text-align: right;">105000</td>
+<td style="text-align: right;">-68000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19309</td>
+<td style="text-align: right;">3223</td>
+<td style="text-align: right;">120000</td>
+<td style="text-align: right;">132000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19310</td>
+<td style="text-align: right;">8098</td>
+<td style="text-align: right;">26527</td>
+<td style="text-align: right;">4700</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19311</td>
+<td style="text-align: right;">8954</td>
+<td style="text-align: right;">144026</td>
+<td style="text-align: right;">220000</td>
+<td style="text-align: right;">25.0</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19312</td>
+<td style="text-align: right;">12990</td>
+<td style="text-align: right;">122665</td>
+<td style="text-align: right;">220000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19313</td>
+<td style="text-align: right;">8782</td>
+<td style="text-align: right;">55000</td>
+<td style="text-align: right;">69000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19314</td>
+<td style="text-align: right;">13059</td>
+<td style="text-align: right;">42728</td>
+<td style="text-align: right;">-10000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19315</td>
+<td style="text-align: right;">13535</td>
+<td style="text-align: right;">57000</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19316</td>
+<td style="text-align: right;">3806</td>
+<td style="text-align: right;">87000</td>
+<td style="text-align: right;">74200</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">19317</td>
+<td style="text-align: right;">11085</td>
+<td style="text-align: right;">74000</td>
+<td style="text-align: right;">-50000</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">108</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>To map to the model, assume that agents begin (<span class="math inline">\(t=1\)</span>) when aged 25 and live for 40 years (so the “terminal” period is at age 64). Thus, we should filter the data to look at only these ages.</p>
+<div id="6583f587" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@subset</span>!(data,<span class="op">:</span>age<span class="op">.&gt;=</span><span class="fl">25</span>,<span class="op">:</span>age<span class="op">.&lt;=</span><span class="fl">64</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now let’s residualize log wages by age, to get our estimate of <span class="math inline">\(\varepsilon_{n,t}\)</span>:</p>
+<div id="3345181b" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> <span class="pp">@chain</span> data <span class="cf">begin</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">groupby</span>(<span class="op">:</span>age)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="op">:</span>eps <span class="op">=</span> <span class="fu">log</span>.(<span class="op">:</span>y) <span class="op">.-</span> <span class="fu">mean</span>(<span class="fu">log</span>.(<span class="op">:</span>y))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next, here is a simple way of creating lagged variables (by mutating the year, renaming, and merging).</p>
+<div id="724a1efe" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> <span class="pp">@chain</span> data <span class="cf">begin</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@select</span> <span class="op">:</span>year <span class="op">:</span>person <span class="op">:</span>eps</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="op">:</span>year <span class="op">=</span> <span class="op">:</span>year <span class="op">.-</span> <span class="fl">2</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rename</span> <span class="op">:</span>epslag1 <span class="op">=</span> <span class="op">:</span>eps</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>d2 <span class="op">=</span> <span class="pp">@chain</span> data <span class="cf">begin</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@select</span> <span class="op">:</span>year <span class="op">:</span>person <span class="op">:</span>eps</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="op">:</span>year <span class="op">=</span> <span class="op">:</span>year <span class="op">.-</span> <span class="fl">4</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rename</span> <span class="op">:</span>epslag2 <span class="op">=</span> <span class="op">:</span>eps</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> <span class="pp">@chain</span> data <span class="cf">begin</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">innerjoin</span>(d1 , on<span class="op">=</span>[<span class="op">:</span>person,<span class="op">:</span>year])</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">innerjoin</span>(d2 , on<span class="op">=</span>[<span class="op">:</span>person,<span class="op">:</span>year])</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>An example of calculating covariances:</p>
+<div id="fb9208f4" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@chain</span> data <span class="cf">begin</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@combine</span> <span class="cf">begin</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span>c1 <span class="op">=</span> <span class="fu">cov</span>(<span class="op">:</span>eps,<span class="op">:</span>epslag1) </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span>c2 <span class="op">=</span> <span class="fu">cov</span>(<span class="op">:</span>eps,<span class="op">:</span>epslag2)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Since the psid interviews are only every two years, we have to adjust our estimate of <span class="math inline">\(\rho\)</span> slightly by taking the square root of the covariance ratio:</p>
+<div id="737d1e50" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rho_est <span class="op">=</span> <span class="fu">sqrt</span>(<span class="kw">ans</span>.c2[<span class="fl">1</span>] <span class="op">/</span> <span class="kw">ans</span>.c1[<span class="fl">1</span>])</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"The estimate of rho is </span><span class="sc">$</span>(<span class="fu">round</span>(rho_est,digits<span class="op">=</span><span class="fl">2</span>))<span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The estimate of rho is 0.98</code></pre>
+</div>
+</div>
+<p>When it comes to the identification of this income process, let’s consider its ability to fit the life-cycle profile in the variance of income:</p>
+<div id="b5bc5842" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="pp">@chain</span> <span class="cf">begin</span> data</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">groupby</span>(<span class="op">:</span>age)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@combine</span> <span class="op">:</span>var_income <span class="op">=</span> <span class="fu">var</span>(<span class="fu">log</span>.(<span class="op">:</span>y))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter</span>(d.age,d.var_income,smooth <span class="op">=</span> <span class="cn">true</span>,label <span class="op">=</span> <span class="cn">false</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<img src="data:image/png;base64,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">
+</div>
+</div>
+<p>The variance of log income seems to grow linearly with age, so this would be hard for our income process to fit if either</p>
+<ol type="1">
+<li>We assume that <span class="math inline">\(\varepsilon\)</span> is initially in its stationary distribution; or</li>
+<li><span class="math inline">\(\rho\)</span> is far from 1, since it implies a concave path for the variance.</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-income_process" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 10.1</strong></span> Suppose that income processes also feature permanent differences in productivity among individuals, so that:</p>
+<p><span class="math display">\[ \log(y_{n,t}) = \mu_t + \alpha_n + \varepsilon_{n,t} \]</span></p>
+<p>where <span class="math inline">\(\varepsilon_{n,t}\)</span> is defined as before, and <span class="math inline">\(\alpha_n\)</span> is the individual fixed effect in wages. Assume that <span class="math inline">\(\alpha\perp \varepsilon_1\)</span>, <span class="math inline">\(\alpha \perp \eta_t\)</span> for all <span class="math inline">\(t\)</span>, and define <span class="math inline">\(\sigma^2_\alpha = \mathbb{V}[\alpha]\)</span>.</p>
+<ol type="1">
+<li>Show that you can identify this income process using additional covariances.</li>
+<li>Estimate the parameters <span class="math inline">\((\rho,\sigma^2_\alpha,\sigma^2_\eta)\)</span> by following your identification argument using the psid data from <a href="#exm-psid" class="quarto-xref">Example&nbsp;<span>10.1</span></a>.</li>
+<li>How do your estimates compare to <a href="#exm-psid" class="quarto-xref">Example&nbsp;<span>10.1</span></a> where we ignored permanent individual heterogeneity?</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="identification-of-preference-parameters" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="identification-of-preference-parameters"><span class="header-section-number">10.2</span> Identification of Preference Parameters</h2>
+<p>This is an interesting case because the problem will likely more closely reflect how you will approach identification in your own research.</p>
+<p>In previous examples, we typically made use of analytical (i.e.&nbsp;“pencil and paper”) representations of optimal behavior as they relate to deeper parameters, and we used this for identification. That is harder to do here since we know we must solve for savings policies numerically.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Identification of more complicated models
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Here are some steps to help you think through identification of your model.</p>
+<ol type="1">
+<li>Could you obtain identification if you had a “perfect” data set or experiment? Do your data allow a second-best approximation that harnesses the intuition of this perfect alternative? Remember that to show identification you can dispense with the practical considerations of finite samples and zoom in on very specific comparisons within the population distribution.</li>
+<li>What kind of variation is in the data that you <em>do</em> have and how do the parameters determine individuals’ response to that variation? If necessary, you can play with numerical solutions of the model to develop your intuition here.</li>
+<li>Can you simplify your model in a way that highlights some of the key forces of identification?</li>
+</ol>
+</div>
+</div>
+<p>These approaches all differ in their level of precision. Your main goal is to provide your audience and yourself with some credible and sensible intuition. For the savings model, let’s use some combination of strategies (2) and (3). First, note that when <span class="math inline">\(\psi=0\)</span>, individuals would run their assets down to zero in the final period. Thus, <span class="math inline">\(\psi\)</span> is very clearly identified by average bequests at the end of the life-cycle.</p>
+<p>Now, suppose we remove uncertainty from the model and impose the natural borrowing constraint, such that the Euler equation becomes:</p>
+<p><span class="math display">\[ \beta(1+r)\left(\frac{C_{t+1}}{C_{t}}\right)^{-\sigma}=1 \]</span></p>
+<p>Notice that <span class="math inline">\(\sigma\)</span> determines the <em>intertemporal elasticity of substitution</em>: how individuals would substitute consumption across periods when there is variation in the price of doing so (<span class="math inline">\(r\)</span>). What sources of variation do we have in this model? Only the income shocks <span class="math inline">\(\eta\)</span>. Without uncertainty, individuals then choose a consumption profile based on the effect of that shock on the net present value of income. The resultant path depends on <span class="math inline">\(\beta\)</span>, <span class="math inline">\(r\)</span>, and <span class="math inline">\(\sigma\)</span>, but importantly <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\sigma\)</span> are <em>not separately identified</em>. Thus, uncertainty and borrowing constraints hold the key for separately identifying parameters in our setting.</p>
+<p>Now, we know from experimenting with this model that as individuals accumulate assets, the risk of hitting the borrowing constraint diminishes and their behavior begins to more closely reflect the case without uncertainty: consumption responses are very close to linear with respect to cash in hand. Thus, to identify <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\sigma\)</span> separately, we need to focus on potential nonlinearities in consumption behavior closer to the borrowing constraint. One example of a set of identifying moments would be:</p>
+<ol type="1">
+<li>Mean assets at each age; and</li>
+<li>The covariance of changes in log consumption with log income conditional on different asset levels.</li>
+</ol>
+<p>While the first set of moments should pin down <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\psi\)</span> jointly by effectively matching average consumption profiles, the second set attempts to pin down the nonlinear effect that <span class="math inline">\(\sigma\)</span> has on consumption at different wealth levels.</p>
+<p>As you can see, this is a sensible intuitive approach to identification that does not offer an exact mapping between data and parameters.</p>
+<p>Since <span class="math inline">\(\sigma\)</span> determines both risk aversion and the intertemporal elasticity of substitution, some ideal data settings that would identify <span class="math inline">\(\sigma\)</span> would include:</p>
+<ol type="1">
+<li>The risk profile of asset portfolio choices (we don’t have this).</li>
+<li>Variation in the income risk faced by individuals (we don’t have this).</li>
+<li>Variation in the returns to saving either through <span class="math inline">\(r_t\)</span> or through policy intervention (we don’t have this).</li>
+</ol>
+<p>In general then there are many ways to identify <span class="math inline">\(\sigma\)</span>, but most are missing in our simple model, so we will have to be more careful with the moments we choose.</p>
+<div class="callout callout-style-default callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Whether vs How
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Suppose you wanted to use this model to evaluate the effect of a pension program reform on savings behavior. Would you be comfortable forecasting counterfactuals with this kind of identification approach? What kind of variation in the data would help you feel that your identification approach was more credible?</p>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-ABB_2018" class="csl-entry" role="listitem">
+Arellano, Manuel, Richard Blundell, and Stephane Bonhomme. 2018. <span>“Nonlinear Persistence and Partial Insurance: Income and Consumption Dynamics in the PSID.”</span> <em>AEA Papers and Proceedings</em> 108 (May): 281–86. <a href="https://doi.org/10.1257/pandp.20181049">https://doi.org/10.1257/pandp.20181049</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      return note.innerHTML;
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../lectures/identification_labor_supply.html" class="pagination-link  aria-label=" &lt;span="" dynamic="" labor="" supply="" model&lt;="" span&gt;"="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../lectures/identification_duopoly.html" class="pagination-link" aria-label="<span class='chapter-number'>11</span>&nbsp; <span class='chapter-title'>The Entry-Exit Model</span>">
+        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Entry-Exit Model</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

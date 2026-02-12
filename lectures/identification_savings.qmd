@@ -1,0 +1,191 @@
+# The Life-Cycle Savings Model
+
+We'll consider identification of the [savings model](../models/savings.qmd) with the following income process:
+
+$$ \log(y_{n,t}) = \mu_{t} + \varepsilon_{n,t}$$
+
+where
+
+$$ \varepsilon_{n,t+1} = \rho \varepsilon_{n,t} + \eta_{n,t},\qquad \eta_{m,t}\sim\mathcal{N}(0,\sigma^2_\eta) $$.
+
+Collecting parameters, we want to identify
+
+$$ (\mu,\rho,\sigma_\eta),\qquad (\beta,\sigma,\psi) $$
+
+where the first block indicates parameters of the income process, and the second block determines preferences.
+
+## Identification of the Income Process
+
+Assume that our data has a panel dimension, so that we see $(y_t,C_t,t)_{t=\tau_0}^{\tau_1}$ for some pair $(\tau_0,\tau_1)$. Remember that $t$ indexes age in the model, so it is quite plausible that $\tau_0$ and $\tau_1$ may themselves be random variables (this will be true in the data... we see panels of individuals at different ages and for different lengths of time). 
+
+First, as long as the support of the random variables ($\tau_0,\tau_1$) covers $t=1$ through to $T$, $\mu$ is identified as the mean of log income at each age, $\mu_t = \mathbb{E}[\log(y_{t})]$. We can then residualize log income to get $\varepsilon_{t} = \log(y_t)-\mu_t$. 
+
+Second, consider the following variances and covariances (remember that the $\eta$ terms are iid):
+
+\begin{eqnarray}
+\mathbb{V}[\varepsilon_{t+1}] = \rho^2\mathbb{V}[\varepsilon_{t}] + \sigma^2_{\eta} \\
+\mathbb{C}(\varepsilon_{t},\varepsilon_{t+1}) = \rho\mathbb{V}[\varepsilon_{t}] \\
+\mathbb{C}(\varepsilon_{t},\varepsilon_{t+2}) = \rho^2\mathbb{V}[\varepsilon_t]
+\end{eqnarray}
+
+meaning that we can identify $\rho$ and $\sigma_\eta$ from this system of simultaneous equations.
+
+:::{.callout-important icon="false"}
+## Note: Whether vs How
+Note that, since these moments can be calculated at any age $t$ and can extend to arbitrary lags, this model is **over-identified**. Which moments should we use in practice? Thinking *inside* the model, we will address this topic when we get to discussing *minimum distance estimation*. You might also like to think outside the model and think about (1) how real income processes might deviate from your stylized model and (2) what features of the data you most want the parameters $\rho$ and $\sigma^2$ to capture.
+:::
+
+
+:::{.callout-note icon="false"}
+## Example: Data from PSID
+:::{#exm-psid}
+In this example we'll load psid data from @ABB_2018 and show how sample equivalents to the above moments might be calculated.
+
+To begin, let's load the data and pull out the variables we are interested in using. These are person identifiers (`person`), year, total income (`y`), savings (`tot_assets1`) and age. You should bear in mind that it is by no means trivial to measure total income and total assets in these data. The variables we are looking at are the product of a lot of data cleaning and careful choices by the authors.
+
+```{julia}
+
+using CSV, DataFrames, DataFramesMeta, Statistics
+data = @chain begin 
+    CSV.read("../data/abb_aea_data.csv",DataFrame,missingstring = "NA")
+    @select :person :y :tot_assets1 :asset :age :year
+end
+
+```
+
+To map to the model, assume that agents begin ($t=1$) when aged 25 and live for 40 years (so the "terminal" period is at age 64). Thus, we should filter the data to look at only these ages.
+
+```{julia}
+@subset!(data,:age.>=25,:age.<=64);
+```
+
+Now let's residualize log wages by age, to get our estimate of $\varepsilon_{n,t}$:
+
+```{julia}
+data = @chain data begin
+    groupby(:age)
+    @transform :eps = log.(:y) .- mean(log.(:y))
+end;
+```
+Next, here is a simple way of creating lagged variables (by mutating the year, renaming, and merging).
+
+```{julia}
+d1 = @chain data begin
+    @select :year :person :eps
+    @transform :year = :year .- 2
+    @rename :epslag1 = :eps
+end
+
+d2 = @chain data begin
+    @select :year :person :eps
+    @transform :year = :year .- 4
+    @rename :epslag2 = :eps
+end
+
+data = @chain data begin
+    innerjoin(d1 , on=[:person,:year])
+    innerjoin(d2 , on=[:person,:year])
+end;
+
+```
+
+An example of calculating covariances:
+
+```{julia}
+@chain data begin
+    @combine begin 
+        :c1 = cov(:eps,:epslag1) 
+        :c2 = cov(:eps,:epslag2)
+    end
+end;
+
+```
+
+Since the psid interviews are only every two years, we have to adjust our estimate of $\rho$ slightly by taking the square root of the covariance ratio:
+
+```{julia}
+rho_est = sqrt(ans.c2[1] / ans.c1[1])
+println("The estimate of rho is $(round(rho_est,digits=2))")
+```
+
+When it comes to the identification of this income process, let's consider its ability to fit the life-cycle profile in the variance of income:
+
+```{julia}
+using Plots
+d = @chain begin data
+    groupby(:age)
+    @combine :var_income = var(log.(:y))
+end
+scatter(d.age,d.var_income,smooth = true,label = false)
+
+```
+The variance of log income seems to grow linearly with age, so this would be hard for our income process to fit if either
+
+1. We assume that $\varepsilon$ is initially in its stationary distribution; or
+2. $\rho$ is far from 1, since it implies a concave path for the variance.
+
+:::
+:::
+
+:::{.callout-tip icon="false"}
+:::{#exr-income_process}
+Suppose that income processes also feature permanent differences in productivity among individuals, so that:
+
+$$ \log(y_{n,t}) = \mu_t + \alpha_n + \varepsilon_{n,t} $$
+
+where $\varepsilon_{n,t}$ is defined as before, and $\alpha_n$ is the individual fixed effect in wages. Assume that $\alpha\perp \varepsilon_1$, $\alpha \perp \eta_t$ for all $t$, and define $\sigma^2_\alpha = \mathbb{V}[\alpha]$. 
+
+1. Show that you can identify this income process using additional covariances.
+2. Estimate the parameters $(\rho,\sigma^2_\alpha,\sigma^2_\eta)$  by following your identification argument using the psid data from @exm-psid.
+3. How do your estimates compare to @exm-psid where we ignored permanent individual heterogeneity? 
+:::
+:::
+
+## Identification of Preference Parameters
+
+This is an interesting case because the problem will likely more closely reflect how you will approach identification in your own research.
+
+In previous examples, we typically made use of analytical (i.e. "pencil and paper") representations of optimal behavior as they relate to deeper parameters, and we used this for identification. That is harder to do here since we know we must solve for savings policies numerically. 
+
+:::{.callout-note}
+## Identification of more complicated models
+
+Here are some steps to help you think through identification of your model.
+
+1. Could you obtain identification if you had a "perfect" data set or experiment? Do your data allow a second-best approximation that harnesses the intuition of this perfect alternative? Remember that to show identification you can dispense with the practical considerations of finite samples and zoom in on very specific comparisons within the population distribution.
+2. What kind of variation is in the data that you *do* have and how do the parameters determine individuals' response to that variation? If necessary, you can play with numerical solutions of the model to develop your intuition here.
+3. Can you simplify your model in a way that highlights some of the key forces of identification?
+
+:::
+
+These approaches all differ in their level of precision. Your main goal is to provide your audience and yourself with some credible and sensible intuition. For the savings model, let's use some combination of strategies (2) and (3). First, note that when $\psi=0$, individuals would run their assets down to zero in the final period. Thus, $\psi$ is very clearly identified by average bequests at the end of the life-cycle.
+
+Now, suppose we remove uncertainty from the model and impose the natural borrowing constraint, such that the Euler equation becomes:
+
+$$ \beta(1+r)\left(\frac{C_{t+1}}{C_{t}}\right)^{-\sigma}=1 $$
+
+Notice that $\sigma$ determines the *intertemporal elasticity of substitution*: how individuals would substitute consumption across periods when there is variation in the price of doing so ($r$). What sources of variation do we have in this model? Only the income shocks $\eta$. Without uncertainty, individuals then choose a consumption profile based on the effect of that shock on the net present value of income. The resultant path depends on $\beta$, $r$, and $\sigma$, but importantly $\beta$ and $\sigma$ are *not separately identified*. Thus, uncertainty and borrowing constraints hold the key for separately identifying parameters in our setting.
+
+Now, we know from experimenting with this model that as individuals accumulate assets, the risk of hitting the borrowing constraint diminishes and their behavior begins to more closely reflect the case without uncertainty: consumption responses are very close to linear with respect to cash in hand. Thus, to identify $\beta$ and $\sigma$ separately, we need to focus on potential nonlinearities in consumption behavior closer to the borrowing constraint. One example of a set of identifying moments would be:
+
+1. Mean assets at each age; and
+2. The covariance of changes in log consumption with log income conditional on different asset levels.
+
+While the first set of moments should pin down $\beta$ and $\psi$ jointly by effectively matching average consumption profiles, the second set attempts to pin down the nonlinear effect that $\sigma$ has on consumption at different wealth levels.
+
+As you can see, this is a sensible intuitive approach to identification that does not offer an exact mapping between data and parameters.
+
+Since $\sigma$ determines both risk aversion and the intertemporal elasticity of substitution, some ideal data settings that would identify $\sigma$ would include:
+
+1. The risk profile of asset portfolio choices (we don't have this).
+2. Variation in the income risk faced by individuals (we don't have this).
+3. Variation in the returns to saving either through $r_t$ or through policy intervention (we don't have this).
+
+In general then there are many ways to identify $\sigma$, but most are missing in our simple model, so we will have to be more careful with the moments we choose.
+
+:::{.callout-warning icon="false"}
+## Whether vs How
+
+Suppose you wanted to use this model to evaluate the effect of a pension program reform on savings behavior. Would you be comfortable forecasting counterfactuals with this kind of identification approach? What kind of variation in the data would help you feel that your identification approach was more credible?
+
+:::
