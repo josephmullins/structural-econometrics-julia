@@ -1,10 +1,21 @@
-# Introduction and Examples
+# Introducing the Estimators
 
-Before diving into the statistical theory of each estimator, we will first propose an estimation method for each of our prototype models. In doing so, we will cover three workhorse techniques:
+Before diving into statistical theory, we will introduce each estimator and sketch out applications by proposing estimation methods for each of our prototype models. 
+
+The three workhorse methods are:
 
 1. Maximum Likelihood;
 2. The Generalized Method of Moments; and
 3. Minimum Distance.
+
+Each of these approaches is an **extremum estimator**: any estimator that can be characterized as the solution to a maximization or minimization problem.
+
+:::{#def-extremum}
+$\hat{\theta}$ is an extremum estimator if:
+
+$$ \hat{\theta} = \arg\max_{\theta\in\Theta} Q_{N}(\theta) $$
+where $\Theta\subset\mathbb{R}^{p}$.
+:::
 
 Just to clarify where we are going, it helps to reiterate what the key properties are that we would like to establish for each approach.
 

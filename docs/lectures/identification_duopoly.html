@@ -20,7 +20,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -30,7 +50,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/extremum_intro_examples.html" rel="next">
+<link href="../lectures/extremum-estimators.html" rel="next">
 <link href="../lectures/identification_savings.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -231,7 +251,7 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+            <a href="../lectures/extremum-estimators.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Extremum Estimators</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -305,15 +325,8 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#data-and-choice-probabilities" id="toc-data-and-choice-probabilities" class="nav-link active" data-scroll-target="#data-and-choice-probabilities"><span class="header-section-number">11.1</span> Data and Choice Probabilities</a></li>
-  <li><a href="#informal-identification" id="toc-informal-identification" class="nav-link" data-scroll-target="#informal-identification"><span class="header-section-number">11.2</span> Informal Identification</a></li>
-  <li><a href="#credibility-and-the-role-of-unobservables" id="toc-credibility-and-the-role-of-unobservables" class="nav-link" data-scroll-target="#credibility-and-the-role-of-unobservables"><span class="header-section-number">11.3</span> Credibility and the Role of Unobservables</a></li>
-  <li><a href="#two-approaches-to-identification" id="toc-two-approaches-to-identification" class="nav-link" data-scroll-target="#two-approaches-to-identification"><span class="header-section-number">11.4</span> Two Approaches to Identification</a>
-  <ul class="collapse">
-  <li><a href="#instrumental-variables" id="toc-instrumental-variables" class="nav-link" data-scroll-target="#instrumental-variables"><span class="header-section-number">11.4.1</span> Instrumental Variables</a></li>
-  <li><a href="#panel-data" id="toc-panel-data" class="nav-link" data-scroll-target="#panel-data"><span class="header-section-number">11.4.2</span> Panel Data</a></li>
-  </ul></li>
-  <li><a href="#the-whether-vs-how-of-identification" id="toc-the-whether-vs-how-of-identification" class="nav-link" data-scroll-target="#the-whether-vs-how-of-identification"><span class="header-section-number">11.5</span> The Whether vs How of Identification</a></li>
+  <li><a href="#identification-without-unobserved-heterogneity" id="toc-identification-without-unobserved-heterogneity" class="nav-link active" data-scroll-target="#identification-without-unobserved-heterogneity"><span class="header-section-number">11.1</span> Identification without Unobserved Heterogneity</a></li>
+  <li><a href="#identification-with-unobserved-heterogeneity" id="toc-identification-with-unobserved-heterogeneity" class="nav-link" data-scroll-target="#identification-with-unobserved-heterogeneity"><span class="header-section-number">11.2</span> Identification with Unobserved Heterogeneity</a></li>
   </ul>
 </nav>
     </div>
@@ -339,43 +352,17 @@ window.Quarto = {
 </header>
 
 
-<section id="data-and-choice-probabilities" class="level2" data-number="11.1">
-<h2 data-number="11.1" class="anchored" data-anchor-id="data-and-choice-probabilities"><span class="header-section-number">11.1</span> Data and Choice Probabilities</h2>
-<p>Identification arguments begin with a description of the available data. In the entry-exit model, the fundamental object that summarizes the data is the equilibrium probability of entry:</p>
-<p><span class="math display">\[ p(x,a,a')\]</span></p>
-<p>where <span class="math inline">\(a \in \{0,1\}\)</span> is the firm’s own incumbency status, <span class="math inline">\(a' \in \{0,1\}\)</span> is the competitor’s incumbency status, and <span class="math inline">\(x\)</span> represents market-level state variables. This probability captures the likelihood of entry (or continued operation) given the current market conditions.</p>
-<p>With a sufficiently rich cross-section of markets, we can estimate these choice probabilities non-parametrically by simply computing the fraction of firms that enter or remain active conditional on each configuration of state variables. The question of identification then becomes: can we recover the structural parameters from these choice probabilities?</p>
-</section>
-<section id="informal-identification" class="level2" data-number="11.2">
-<h2 data-number="11.2" class="anchored" data-anchor-id="informal-identification"><span class="header-section-number">11.2</span> Informal Identification</h2>
-<p>The parameters of the model are identified by how the choice probability <span class="math inline">\(p(x,a,a')\)</span> varies with the state variables. Recall the specification of payoffs in the model:</p>
-<p><span class="math display">\[ u_{1}(x,a,d^{\prime}) = \phi_{0} + \phi_{1}x - \phi_{2}d^\prime - \phi_{3}(1-a) \]</span> <span class="math display">\[{u}_{0}(x,a) = \phi_{4}a \]</span></p>
-<p>Each parameter in <span class="math inline">\(\phi\)</span> governs a distinct source of variation in the choice probability:</p>
-<ul>
-<li><span class="math inline">\(\phi_0\)</span> determines the <em>average</em> level of entry across all markets</li>
-<li><span class="math inline">\(\phi_1\)</span> determines how entry changes with respect to the market characteristic <span class="math inline">\(x\)</span></li>
-<li><span class="math inline">\(\phi_2\)</span> captures how entry responds to the competitor’s presence</li>
-<li><span class="math inline">\(\phi_3\)</span> determines entry among non-incumbent firms (the entry cost)</li>
-<li><span class="math inline">\(\phi_4\)</span>, by making entry more persistent for incumbents, can fit differential sensitivities to market state variables by incumbency status</li>
-</ul>
-<p>A simple counting argument provides intuition for identification: the data object <span class="math inline">\(p(x,a,a')\)</span> provides variation along four dimensions—the continuous variable <span class="math inline">\(X\)</span> and the four binary configurations of <span class="math inline">\((a,a')\)</span>. Meanwhile, the model contains five parameters. As long as there is sufficient variation in <span class="math inline">\(X\)</span> and the binary states, we have enough “equations” to solve for the unknowns.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>While counting arguments is useful for building intuition, they do not constitute a formal proof of identification. Rigorous identification arguments for dynamic discrete choice models require tools that we will introduce later in the text, including results on the invertibility of conditional choice probabilities.</p>
-</div>
-</div>
-</section>
-<section id="credibility-and-the-role-of-unobservables" class="level2" data-number="11.3">
-<h2 data-number="11.3" class="anchored" data-anchor-id="credibility-and-the-role-of-unobservables"><span class="header-section-number">11.3</span> Credibility and the Role of Unobservables</h2>
-<p>Now suppose that <span class="math inline">\(X\)</span> represents a market characteristic that can be manipulated by policy—perhaps a subsidy for market entry or a regulatory barrier. The model would allow us to forecast how entry patterns change under counterfactual policies by re-computing equilibrium choice probabilities at different values of <span class="math inline">\(X\)</span>.</p>
+<p>There are a number steps we have to cover before we can talk about identification of this dynamic game with any formality. Namely, we need to cover:</p>
+<ol type="1">
+<li>Identification of discrete choice models.</li>
+<li>Identification of dynamic discrete choice moels <span class="citation" data-cites="MagnacThesmar kasahara2009">(<a href="../references.html#ref-MagnacThesmar" role="doc-biblioref">Magnac and Thesmar 2002</a>; <a href="../references.html#ref-kasahara2009" role="doc-biblioref">Kasahara and Shimotsu 2009</a>)</span></li>
+<li>Non-parametric instrumental variables <span class="citation" data-cites="chernozhukov2005 chesher2010">(<a href="../references.html#ref-chernozhukov2005" role="doc-biblioref">Chernozhukov and Hansen 2005</a>; <a href="../references.html#ref-chesher2010" role="doc-biblioref">Chesher 2010</a>)</span></li>
+</ol>
+<p>Instead, the sections below loosely sketch out arguments and complications that arise for this class of models.</p>
+<section id="identification-without-unobserved-heterogneity" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="identification-without-unobserved-heterogneity"><span class="header-section-number">11.1</span> Identification without Unobserved Heterogneity</h2>
+<p>When there is no persistent unobserved heterogeneity, identification revolves around the fact the probability of entry: <span class="math display">\[ p(x,a,a')\]</span> is directly observable and holds the key for identification.</p>
+<p>One can show <span class="citation" data-cites="AgMira2002">Magnac and Thesmar (<a href="../references.html#ref-MagnacThesmar" role="doc-biblioref">2002</a>)</span> that, fixing the discount factor <span class="math inline">\(\beta\)</span>, the transition density, and the distribution of taste shocks, there is a one-to-one mapping between choice probabilities and each <span class="math display">\[\tilde{u}(x,a,a') = u_1(x,a,a') - u_0(x,a,a') \]</span> Recall the specification of payoffs in the model: <span class="math display">\[ u_{1}(x,a,d^{\prime}) = \phi_{0} + \phi_{1}x - \phi_{2}d^\prime - \phi_{3}(1-a) \]</span> <span class="math display">\[{u}_{0}(x,a) = \phi_{4}a \]</span> So fixing <span class="math inline">\(x\)</span>, define: <span class="math display">\[ \tilde{u}(x) = [\tilde{u}(x,0,0),\ \tilde{u}(x,1,0),\ \tilde{u}(x,0,1),\ \tilde{u}(x,1,1)]^\prime \]</span> We know that the four terms <span class="math inline">\((\phi_0+\phi_1x,\phi_2,\phi_3,\phi_4)\)</span> uniquely determine the four-dimensional vector <span class="math inline">\(\tilde{u}(x)\)</span> and are hence identified. By then observing how choice probabilities vary with <span class="math inline">\(x\)</span>, we identiy <span class="math inline">\(\phi_0\)</span> and <span class="math inline">\(\phi_1\)</span> separately.</p>
 <div class="callout callout-style-default callout-warning no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -386,31 +373,25 @@ Discussion
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Would you find such a forecast credible? What concerns might you have about using this model for policy analysis?</p>
+<p>Now suppose that <span class="math inline">\(X\)</span> represents a market characteristic that can be manipulated by policy—perhaps a subsidy for market entry or a regulatory barrier. The model would allow us to forecast how entry patterns change under counterfactual policies by re-computing equilibrium choice probabilities at different values of <span class="math inline">\(X\)</span>.</p>
+<p>What key condition permitted this implicit causal inference? Is that assumption likely to be credible? What concerns might you have about using this model for policy analysis?</p>
 </div>
 </div>
-<p>A key concern is <strong>market-level unobservables</strong>. In practice, markets differ in ways that are observed by firms but not by the econometrician. If these unobservables are correlated with the observed state variable <span class="math inline">\(X\)</span>, then variation in entry with respect to <span class="math inline">\(X\)</span> conflates the causal effect of <span class="math inline">\(X\)</span> with selection on unobservables.</p>
-<p>For example, suppose that markets with high values of <span class="math inline">\(X\)</span> also tend to have unobservably favorable demand conditions. Firms observe these conditions and incorporate them into their entry decisions. The econometrician, seeing higher entry in high-<span class="math inline">\(X\)</span> markets, might incorrectly attribute this entirely to the effect of <span class="math inline">\(X\)</span> rather than to the correlated unobservable.</p>
-<p>This is a familiar endogeneity problem, but note that it is more complicated than in the linear regression setting. In the entry-exit model, the unobservable enters the payoff function nonlinearly and affects not only the firm’s own decision but also its beliefs about the competitor’s behavior in equilibrium.</p>
 </section>
-<section id="two-approaches-to-identification" class="level2" data-number="11.4">
-<h2 data-number="11.4" class="anchored" data-anchor-id="two-approaches-to-identification"><span class="header-section-number">11.4</span> Two Approaches to Identification</h2>
-<p>There are two standard approaches to addressing this endogeneity concern:</p>
-<section id="instrumental-variables" class="level3" data-number="11.4.1">
-<h3 data-number="11.4.1" class="anchored" data-anchor-id="instrumental-variables"><span class="header-section-number">11.4.1</span> Instrumental Variables</h3>
-<p>The first solution is to find an instrument <span class="math inline">\(Z\)</span> that shifts <span class="math inline">\(X\)</span> in ways that are independent of market-level unobservables. The logic is analogous to the linear IV case: we isolate variation in <span class="math inline">\(X\)</span> that is “as good as random” with respect to the unobservable.</p>
-<p>However, implementation is more complex than in the linear case. The nonlinearity of discrete choice models means that standard 2SLS formulas do not directly apply.</p>
-<p>The key to using instruments for identification in this setting is:</p>
+<section id="identification-with-unobserved-heterogeneity" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="identification-with-unobserved-heterogeneity"><span class="header-section-number">11.2</span> Identification with Unobserved Heterogeneity</h2>
+<p>Suppose that there is a persistent unobserved factor that shifts the returns to entry in each market: <span class="math display">\[u_{1,m}(x,a,a') = u_1(x,a,a') + \alpha_{m} \]</span></p>
+<p>Two comments are necessary here:</p>
 <ol type="1">
-<li>First to identify the underlying choice probabilities; then</li>
-<li>Derive moment restrictions using these choice probabilities. This typically involves writing conditions for optimal decisions in terms of parameters and choice probabilities only, then using such derivations to write moment conditions.</li>
+<li>We might be worried that <span class="math inline">\(\alpha\)</span> is correlated with the market characteristic <span class="math inline">\(X\)</span>, which would lead to bias in the estimated parameters if we fail to model and account for this relationship.</li>
+<li>Note that <strong>even if</strong> <span class="math inline">\(\alpha\)</span> is independent of <span class="math inline">\(X\)</span>, there is still a problem for identification because of <strong>dynamic selection</strong>. The incumbency variables <span class="math inline">\((A,A')\)</span> are enodgenous to this factor <span class="math inline">\(\alpha\)</span> and hence are mechanically correlated inside the model. A simple instrument that shifts profits from entry would not solve this problem.</li>
 </ol>
-<p>This involves more advanced tools that will be covered later in the text.</p>
-</section>
-<section id="panel-data" class="level3" data-number="11.4.2">
-<h3 data-number="11.4.2" class="anchored" data-anchor-id="panel-data"><span class="header-section-number">11.4.2</span> Panel Data</h3>
-<p>The second solution exploits <strong>panel data</strong>—repeated observations of the same markets over time. If market-level unobservables are persistent (captured by market fixed effects), then within-market variation in entry over time can identify the parameters of interest.</p>
-<p>The intuition is similar to the fixed effects approach in linear models: by looking at how entry in the <em>same</em> market changes when <span class="math inline">\(X\)</span> changes, we difference out any time-invariant unobservable. However, the nonlinearity of discrete choice models again creates complications. The standard fixed effects estimator is inconsistent due to the incidental parameters problem, and specialized techniques are required.</p>
+<p>In general, three things can assist:</p>
+<ol type="1">
+<li><strong>Panel data</strong>: repeated observations of outcomes in each market gives us a way to invert out unobserved market-level heterogeneity.</li>
+<li><strong>Instruments</strong>: there is still hope for identification in the cross-section but we would need a richer model that allows covariates to enter flow payoffs in a way that moves <span class="math inline">\(a\)</span> and <span class="math inline">\(a'\)</span> independently from each other.</li>
+<li>The <strong>steady state</strong> assumption imposes a relationship between the choice probability <span class="math inline">\(p(x,a,a',\alpha)\)</span> and the joint distribution of <span class="math inline">\((a,a',\alpha)\)</span> that provides additional identifying content that may be employed with either strategy (1) or (2).</li>
+</ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -424,28 +405,28 @@ Note
 <p>Both the IV and panel data approaches for discrete choice models involve technical challenges that go beyond their linear counterparts. We will develop the necessary tools and revisit these identification strategies in later chapters.</p>
 </div>
 </div>
-</section>
-</section>
-<section id="the-whether-vs-how-of-identification" class="level2" data-number="11.5">
-<h2 data-number="11.5" class="anchored" data-anchor-id="the-whether-vs-how-of-identification"><span class="header-section-number">11.5</span> The Whether vs How of Identification</h2>
-<p>The discussion above illustrates a recurring theme in structural econometrics. The <strong>whether</strong> of identification—proving that parameters can in principle be recovered from the data—is often straightforward under the maintained assumptions of the model. The <strong>how</strong> of identification—which sources of variation are used and whether those sources are credible—is typically more important for applied work.</p>
-<p>In the entry-exit model, the basic counting argument suggests that parameters are identified from cross-sectional variation in choice probabilities. But this argument implicitly assumes that all variation in <span class="math inline">\(X\)</span> is valid for identification. Once we acknowledge the possibility of market-level unobservables, we must be more careful about <em>which</em> variation we exploit.</p>
-<div class="callout callout-style-default callout-important no-icon callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-The “how” of identification
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Even when a model is point-identified under its maintained assumptions, the credibility of estimates depends on which features of the data drive identification. Thinking carefully about the sources of variation—and whether they are plausibly exogenous—is essential for convincing empirical work.</p>
-</div>
-</div>
-<p>This perspective connects structural estimation to the broader program of causal inference in econometrics. A structural model provides a framework for interpreting variation in the data, but the quality of that interpretation depends on whether the identifying variation is credible for the research question at hand.</p>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-AgMira2002" class="csl-entry" role="listitem">
+Aguirregabiria, Victor, and Pedro Mira. 2002. <span>“Swapping the Nested Fixed Point Algorithm: A Class of Estimators for Discrete Markov Decision Models.”</span> <em>Econometrica</em> 70 (4): 1519–43.
+</div>
+<div id="ref-chernozhukov2005" class="csl-entry" role="listitem">
+Chernozhukov, Victor, and Christian Hansen. 2005. <span>“An IV Model of Quantile Treatment Effects.”</span> <em>Econometrica</em> 73 (1): 245–61.
+</div>
+<div id="ref-chesher2010" class="csl-entry" role="listitem">
+Chesher, Andrew. 2010. <span>“Instrumental Variable Models for Discrete Outcomes.”</span> <em>Econometrica</em> 78 (2): 575–601.
+</div>
+<div id="ref-Hotz1993" class="csl-entry" role="listitem">
+Hotz, V Joseph, and Robert A Miller. 1993. <span>“Conditional Choice Probabilities and the Estimation of Dynamic Models.”</span> <em>The Review of Economic Studies</em> 60 (3): 497–529.
+</div>
+<div id="ref-kasahara2009" class="csl-entry" role="listitem">
+Kasahara, Hiroyuki, and Katsumi Shimotsu. 2009. <span>“Nonparametric Identification of Finite Mixture Models of Dynamic Discrete Choices.”</span> <em>Econometrica</em> 77 (1): 135–75.
+</div>
+<div id="ref-MagnacThesmar" class="csl-entry" role="listitem">
+Magnac, Thierry, and David Thesmar. 2002. <span>“Identifying Dynamic Discrete Decision Processes.”</span> <em>Econometrica</em> 70 (2): 801–16. https://doi.org/<a href="https://doi.org/10.1111/1468-0262.00306">https://doi.org/10.1111/1468-0262.00306</a>.
+</div>
+</div>
 </section>
 
 </main> <!-- /main -->
@@ -873,8 +854,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/extremum_intro_examples.html" class="pagination-link" aria-label="Introduction and Examples">
-        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/extremum-estimators.html" class="pagination-link" aria-label="Extremum Estimators">
+        <span class="nav-page-text">Extremum Estimators</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

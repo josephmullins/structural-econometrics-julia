@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>12&nbsp; Introduction and Examples – Structural Econometrics with Julia</title>
+<title>12&nbsp; Introducing the Estimators – Structural Econometrics with Julia</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -147,7 +147,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/extremum-estimators.html">Extremum Estimators</a></li><li class="breadcrumb-item"><a href="../lectures/extremum_intro_examples.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/extremum-estimators.html">Extremum Estimators</a></li><li class="breadcrumb-item"><a href="../lectures/extremum_intro_examples.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introducing the Estimators</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -278,7 +278,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/extremum_intro_examples.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introducing the Estimators</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -353,9 +353,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/extremum-estimators.html">Extremum Estimators</a></li><li class="breadcrumb-item"><a href="../lectures/extremum_intro_examples.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/extremum-estimators.html">Extremum Estimators</a></li><li class="breadcrumb-item"><a href="../lectures/extremum_intro_examples.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introducing the Estimators</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></h1>
+<h1 class="title"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introducing the Estimators</span></h1>
 </div>
 
 
@@ -372,12 +372,18 @@ window.Quarto = {
 </header>
 
 
-<p>Before diving into the statistical theory of each estimator, we will first propose an estimation method for each of our prototype models. In doing so, we will cover three workhorse techniques:</p>
+<p>Before diving into statistical theory, we will introduce each estimator and sketch out applications by proposing estimation methods for each of our prototype models.</p>
+<p>The three workhorse methods are:</p>
 <ol type="1">
 <li>Maximum Likelihood;</li>
 <li>The Generalized Method of Moments; and</li>
 <li>Minimum Distance.</li>
 </ol>
+<p>Each of these approaches is an <strong>extremum estimator</strong>: any estimator that can be characterized as the solution to a maximization or minimization problem.</p>
+<div id="def-extremum" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 12.1</strong></span> <span class="math inline">\(\hat{\theta}\)</span> is an extremum estimator if:</p>
+<p><span class="math display">\[ \hat{\theta} = \arg\max_{\theta\in\Theta} Q_{N}(\theta) \]</span> where <span class="math inline">\(\Theta\subset\mathbb{R}^{p}\)</span>.</p>
+</div>
 <p>Just to clarify where we are going, it helps to reiterate what the key properties are that we would like to establish for each approach.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -435,14 +441,14 @@ Example: Coding the Log-Likelihood
 <div class="callout-body-container callout-body">
 <div id="exm-search_likelihood" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.1</strong></span> First, let’s load the routines that we previously wrote to solve the model and take numerical integrals with quadrature. These are identical to what we’ve seen before and are available on the course github.</p>
-<div id="37c2b269" class="cell" data-execution_count="1">
+<div id="3849246e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"../scripts/search_model.jl"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>solve_res_wage (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>Before writing the likelihood, let’s load the data, clean, and create the data frame.</p>
-<div id="bad78a63" class="cell" data-execution_count="2">
+<div id="eaf0e756" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span>, <span class="bu">DataFrames</span>, <span class="bu">DataFramesMeta</span>, <span class="bu">Statistics</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="st">"../data/cps_00019.csv"</span>,DataFrame)</span>
@@ -486,7 +492,7 @@ Example: Coding the Log-Likelihood
 </div>
 </div>
 <p>Now, let’s write the log-likelihood as above.</p>
-<div id="98201b5e" class="cell" data-execution_count="3">
+<div id="284b6d5b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span>, <span class="bu">Optim</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ϕ</span>(x,μ,σ) <span class="op">=</span> <span class="fu">pdf</span>(<span class="fu">Normal</span>(μ,σ),x)</span>
@@ -531,7 +537,7 @@ Example: Coding the Log-Likelihood
 </div>
 </div>
 <p>Finally, since routines like <code>Optim</code> optimize over vectors, we want to write an update routine that takes a vector <code>x</code> and maps it to new parameters. Here we are going to use transformation functions to ensure that parameters obey their bound constraints. There are other ways to ensure this, but this is one way that works.</p>
-<div id="47f8177d" class="cell" data-execution_count="4">
+<div id="4f449535" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">logit</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x) <span class="op">/</span> (<span class="fl">1</span><span class="fu">+exp</span>(x))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">logit_inv</span>(x) <span class="op">=</span> <span class="fu">log</span>(x<span class="op">/</span>(<span class="fl">1</span><span class="op">-</span>x))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -549,7 +555,7 @@ Example: Coding the Log-Likelihood
 </div>
 </div>
 <p>Now we can finally test our likelihood to see how it runs:</p>
-<div id="087b96bc" class="cell" data-execution_count="5">
+<div id="babfdecc" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> [<span class="fu">logit_inv</span>(<span class="fl">0.5</span>),<span class="fu">logit_inv</span>(<span class="fl">0.03</span>),<span class="fl">2</span>.,<span class="fu">log</span>(<span class="fl">1</span>.),<span class="fu">log</span>(<span class="fl">5</span>.)]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> (;σζ <span class="op">=</span> <span class="fl">0.05</span>, β <span class="op">=</span> <span class="fl">0.995</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">log_likelihood_obj</span>(x0,pars,dat) <span class="co">#&lt;- test.</span></span>
@@ -557,49 +563,49 @@ Example: Coding the Log-Likelihood
 <div class="cell-output cell-output-stdout">
 <pre><code>Iter     Function value   Gradient norm 
      0     2.428210e-01     2.348428e-01
- * time: 0.011503934860229492
+ * time: 0.011512041091918945
      1     2.051862e-01     1.072566e-01
- * time: 2.0285048484802246
+ * time: 2.10417103767395
      2     1.827395e-01     4.626301e-01
- * time: 3.3154308795928955
+ * time: 3.4270410537719727
      3     1.758193e-01     4.441528e-01
- * time: 4.487942934036255
+ * time: 4.615013122558594
      4     1.692587e-01     3.168138e-02
- * time: 5.828249931335449
+ * time: 5.978161096572876
      5     1.668869e-01     1.483080e-01
- * time: 6.988066911697388
+ * time: 7.157219171524048
      6     1.647839e-01     2.507384e-01
- * time: 8.349639892578125
+ * time: 8.517966032028198
      7     1.638445e-01     1.648957e-01
- * time: 9.709852933883667
+ * time: 9.883538007736206
      8     1.633820e-01     2.338710e-02
- * time: 10.884522914886475
+ * time: 11.071093082427979
      9     1.633356e-01     2.095668e-02
- * time: 12.224071979522705
+ * time: 12.436002016067505
     10     1.633224e-01     1.774668e-03
- * time: 13.551061868667603
+ * time: 13.805508136749268
     11     1.633213e-01     3.628638e-03
- * time: 14.911957025527954
+ * time: 15.163128137588501
     12     1.633211e-01     1.280346e-04
- * time: 16.260320901870728
+ * time: 16.52274513244629
     13     1.633210e-01     3.719531e-04
- * time: 17.622062921524048
+ * time: 17.880887031555176
     14     1.633210e-01     5.299485e-06
- * time: 18.999624013900757
+ * time: 19.24722909927368
     15     1.633210e-01     3.008006e-05
- * time: 20.55402183532715
+ * time: 20.786643981933594
     16     1.633210e-01     8.243085e-08
- * time: 21.90324902534485
+ * time: 22.155712127685547
     17     1.633210e-01     6.359010e-08
- * time: 23.07305097579956
+ * time: 23.34080410003662
     18     1.633210e-01     2.488281e-07
- * time: 24.421974897384644
+ * time: 24.704849004745483
     19     1.633210e-01     2.588340e-08
- * time: 25.61241579055786
+ * time: 25.889103174209595
     20     1.633210e-01     1.472700e-08
- * time: 26.809528827667236
+ * time: 27.0694420337677
     21     1.633210e-01     2.956400e-09
- * time: 28.253630876541138</code></pre>
+ * time: 28.502158164978027</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code> * Status: success (objective increased between iterations)
@@ -618,7 +624,7 @@ Example: Coding the Log-Likelihood
     |g(x)|                 = 2.96e-09 ≤ 1.0e-08
 
  * Work counters
-    Seconds run:   28  (vs limit Inf)
+    Seconds run:   29  (vs limit Inf)
     Iterations:    21
     f(x) calls:    66
     ∇f(x) calls:   66
@@ -626,7 +632,7 @@ Example: Coding the Log-Likelihood
 </div>
 </div>
 <p>Here we tell <code>Optim</code> to make use of automatic differentiation with <code>ForwardDiff</code>. Let’s take a peek at the parameter estimates:</p>
-<div id="4b10ab24" class="cell" data-execution_count="6">
+<div id="7e63d9c7" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(;<span class="fu">update</span>(pars,res.minimizer)<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div><div style="float: left;"><span>1×8 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">

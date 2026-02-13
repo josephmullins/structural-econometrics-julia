@@ -1,0 +1,268 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# A Life-Cycle Savings Model\n",
+        "\n",
+        "## Overview\n",
+        "\n",
+        "This section presents a stylized life-cycle model of consumption and savings. Households make dynamic decisions about consumption and asset accumulation over their lifetime, facing income uncertainty and borrowing constraints. \n",
+        "\n",
+        "## Economic Environment\n",
+        "\n",
+        "Time is discrete and indexed by $t$. Individuals live for a finite number of periods, $T$. They derive utility from consumption according to a CRRA utility function: \n",
+        "\n",
+        "$$ u(c) = \\frac{c^{1-\\sigma}}{1-\\sigma} $$\n",
+        "\n",
+        "and from \"bequests\", which are modeled here as cash on hand net of consumption in the final period:\n",
+        "\n",
+        "$$ \\nu(a) = \\psi \\frac{a^{1-\\sigma}}{1-\\sigma} $$.\n",
+        "\n",
+        "Consumption can be transferred between periods via a portfolio of one-period bonds (\"savings', $a$) that can be purchased at the price $1 / (1+r)$, with a prdetermined limit, $\\underline{a}$, on borrowing.\n",
+        "\n",
+        "Inviduals receive income $y$ every period that is governed by a deterministic ($\\mu_{t}$) and stochastic component:\n",
+        "\n",
+        "$$ \\log(y_{t}) = \\mu_{t} + \\varepsilon_{it} $$\n",
+        "\n",
+        "where $\\varepsilon_{it}$ is a first-order Markov process. A particular case of interest is the case where $\\varepsilon$ is a stationary AR 1 process:\n",
+        "\n",
+        "$$ \\varepsilon_{it} = \\rho \\varepsilon_{it-1} + \\eta_{it} $$\n",
+        "\n",
+        "where $\\eta_{it} \\sim \\mathcal{N}(0,\\sigma^2_{\\eta})$. The unconditional variance of $\\varepsilon_{it}$ is therefore $\\sigma^2_{\\eta} / (1-\\rho^2)$.\n",
+        "\n",
+        "## Model Solution\n",
+        "\n",
+        "Define\n",
+        "\n",
+        "$$ V_{T}(a,\\varepsilon) = \\max_{c}\\left\\{u(c) + \\nu(y + a - c)\\right\\} $$\n",
+        "\n",
+        "And now define the remaining value functions recursively:\n",
+        "\n",
+        "$$ V_{t}(a,\\varepsilon) = \\max_{c,a'}\\left\\{u(c) + \\beta\\mathbb{E}_{\\varepsilon'|\\varepsilon}V(a',\\varepsilon')\\right\\} $$\n",
+        "\n",
+        "subject to:\n",
+        "\n",
+        "$$ c + \\frac{1}{1+r}a' \\leq y + a $$\n",
+        "\n",
+        "and \n",
+        "\n",
+        "$$ a' \\geq \\underline{a}$$\n",
+        "\n",
+        "where $\\underline{a}$ is the borrowing constraint.\n",
+        "\n",
+        "We're going to write code to solve the model naively using this recursive formulation. You may already be aware that there are more efficient solution methods that exploit the first order conditions of the problem. Not the focus of our class! Please don't use the example below as a demonstration of best practice when it comes to solving savings models.\n",
+        "\n",
+        "We'll start picking some default parameters.\n"
+      ],
+      "id": "ecba4f25"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "pars = (;\n",
+        "    T = 45, β = 0.95, σ = 2,ρ = 0.9,ση = 0.1, μ = fill(2.,45), ψ = 5., r = 0.05\n",
+        ")"
+      ],
+      "id": "0915b711",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Next we'll write a function that uses Tauchen's method to approximate the income process as a discrete markov process.\n"
+      ],
+      "id": "37d2a3bd"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "using Distributions,Random\n",
+        "using LinearAlgebra\n",
+        "Φ(x) = cdf(Normal(),x)\n",
+        "\n",
+        "function tauchen(ρ,ση,Kϵ)\n",
+        "    sd = ση/sqrt(1-ρ^2)\n",
+        "    grid = range(-3sd,stop=3sd,length=Kϵ)\n",
+        "    Π = zeros(Kϵ,Kϵ)\n",
+        "    Δ = grid[2]-grid[1]\n",
+        "    for j=1:Kϵ\n",
+        "        Π[1,j] = Φ((grid[1] + Δ/2 - ρ*grid[j])/ση)\n",
+        "        Π[end,j] = 1 - Φ((grid[end] - Δ/2 - ρ*grid[j])/ση)\n",
+        "        for k=2:(Kϵ-1)\n",
+        "            Π[k,j] = Φ((grid[k] + Δ/2 - ρ*grid[j])/ση) - Φ((grid[k] - Δ/2 - ρ*grid[j])/ση)\n",
+        "        end\n",
+        "    end\n",
+        "    return Π,grid\n",
+        "end"
+      ],
+      "id": "3007917b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Now, let's think about how to solve this model. We have two state variables to track. We have discretized $\\varepsilon$, now let's discretize assets and define a max operator.\n"
+      ],
+      "id": "060add3f"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "Ka = 100\n",
+        "Kϵ = 5\n",
+        "agrid = LinRange(0,pars.μ[1] * pars.T,Ka) #<- is this a reasonable upper bound? We'll find out!\n",
+        "Π,ϵgrid = tauchen(pars.ρ,pars.ση,Kϵ)\n",
+        "pars = (;pars...,Ka,agrid,Π,ϵgrid,Kϵ)\n",
+        "\n",
+        "u(c,σ) = c^(1-σ) / (1-σ)\n",
+        "\n",
+        "function solve_max(V,t,iϵ,ia,pars)\n",
+        "    (;agrid,ϵgrid,Π,σ,Ka,r,β) = pars\n",
+        "    cash = exp(pars.μ[t] + ϵgrid[iϵ]) + agrid[ia]\n",
+        "    amax = 0\n",
+        "    vmax = -Inf\n",
+        "    loop = true\n",
+        "    a = 1\n",
+        "    while loop && a<Ka\n",
+        "        c = cash - agrid[a] / (1+r)\n",
+        "        if c>0\n",
+        "            #@views v = u(c,σ) + β * dot(Π[:,iϵ],V[:,a,t+1])\n",
+        "            v = u(c,σ)\n",
+        "            for iϵ′ in axes(V,1)\n",
+        "                v += β * Π[iϵ′,iϵ] * V[iϵ′,a,t+1]\n",
+        "            end\n",
+        "            if v>vmax\n",
+        "                vmax = v\n",
+        "                amax = a\n",
+        "            end\n",
+        "        else\n",
+        "            loop = false\n",
+        "        end\n",
+        "        a += 1 #<- move one up the grid space\n",
+        "    end\n",
+        "    return amax,vmax\n",
+        "end"
+      ],
+      "id": "5ac6cd12",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Next, a function that uses this max operator to get the value function for all states in a period, $t$, and records the optimal savings policy.\n"
+      ],
+      "id": "e1caa493"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "function iterate!(V,A,t,pars)\n",
+        "    for ia in axes(V,2), iϵ in axes(V,1)\n",
+        "        A[iϵ,ia,t],V[iϵ,ia,t] = solve_max(V,t,iϵ,ia,pars)\n",
+        "    end\n",
+        "end\n",
+        "function terminal_values!(V,pars)\n",
+        "    (;σ,ψ,agrid) = pars\n",
+        "    for ia in axes(V,2), iϵ in axes(V,1)\n",
+        "        V[iϵ,ia] = ψ * u(agrid[ia],σ)\n",
+        "    end\n",
+        "end"
+      ],
+      "id": "fe94f3ac",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "function backward_induction!(V,A,pars)\n",
+        "    (;ψ,σ,T,agrid) = pars\n",
+        "    # set the values at T+1 (bequest motives)\n",
+        "    @views terminal_values!(V[:,:,T+1],pars)\n",
+        "    for t in reverse(1:T)\n",
+        "        iterate!(V,A,t,pars)\n",
+        "    end\n",
+        "end"
+      ],
+      "id": "2937a1f7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Let's check the model solution and time it also.\n"
+      ],
+      "id": "bc50d1a9"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "V = zeros(pars.Kϵ,pars.Ka,pars.T+1)\n",
+        "A = zeros(Int64,pars.Kϵ,pars.Ka,pars.T)\n",
+        "backward_induction!(V,A,pars)\n",
+        "@time backward_induction!(V,A,pars)"
+      ],
+      "id": "3a608481",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Seems ok. We can plot the policy functions as a sanity check. The plot below shows savings policy at the median wage shock over time at different levels of assets.\n"
+      ],
+      "id": "8f742d83"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "using Plots\n",
+        "\n",
+        "plot(1:pars.T,agrid[A[3,1:10:Ka,:]'],legend=false)"
+      ],
+      "id": "0cb0b322",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "You can see that the discreteness creates some jumpiness in the policy functions. As I said, other solution methods that use interpolation can be more efficient and will create smoother pictures, but since that is not the focus of this class we will use this simple solution method.\n",
+        "\n",
+        "## Further Reading\n",
+        "\n",
+        "@GourinchasParker2002 and @DeNardi2004 are two classic examples of quantitative applications of the life-cycle savings model."
+      ],
+      "id": "4572ccfe"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "julia-1.11",
+      "language": "julia",
+      "display_name": "Julia 1.11.3",
+      "path": "/Users/mullinsj/Library/Jupyter/kernels/julia-1.11"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

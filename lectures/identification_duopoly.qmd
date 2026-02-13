@@ -1,87 +1,53 @@
 # The Entry-Exit Model
 
-## Data and Choice Probabilities
+There are a number steps we have to cover before we can talk about identification of this dynamic game with any formality. Namely, we need to cover:
 
-Identification arguments begin with a description of the available data. In the entry-exit model, the fundamental object that summarizes the data is the equilibrium probability of entry:
+1. Identification of discrete choice models.
+2. Identification of dynamic discrete choice moels [@MagnacThesmar;@kasahara2009]
+3. Non-parametric instrumental variables [@chernozhukov2005;@chesher2010]
 
+Instead, the sections below loosely sketch out arguments and complications that arise for this class of models.
+
+## Identification without Unobserved Heterogneity
+
+When there is no persistent unobserved heterogeneity, identification revolves around the fact the probability of entry:
 $$ p(x,a,a')$$
+is directly observable and holds the key for identification.
 
-where $a \in \{0,1\}$ is the firm's own incumbency status, $a' \in \{0,1\}$ is the competitor's incumbency status, and $x$ represents market-level state variables. This probability captures the likelihood of entry (or continued operation) given the current market conditions.
-
-With a sufficiently rich cross-section of markets, we can estimate these choice probabilities non-parametrically by simply computing the fraction of firms that enter or remain active conditional on each configuration of state variables. The question of identification then becomes: can we recover the structural parameters from these choice probabilities?
-
-## Informal Identification
-
-The parameters of the model are identified by how the choice probability $p(x,a,a')$ varies with the state variables. Recall the specification of payoffs in the model:
-
+One can show [@AgMira2002,@Hotz1993,@MagnacThesmar] that, fixing the discount factor $\beta$, the transition density, and the distribution of taste shocks, there is a one-to-one mapping between choice probabilities and each
+$$\tilde{u}(x,a,a') = u_1(x,a,a') - u_0(x,a,a') $$
+Recall the specification of payoffs in the model:
 $$ u_{1}(x,a,d^{\prime}) = \phi_{0} + \phi_{1}x - \phi_{2}d^\prime - \phi_{3}(1-a) $$
 $${u}_{0}(x,a) = \phi_{4}a $$
-
-Each parameter in $\phi$ governs a distinct source of variation in the choice probability:
-
-- $\phi_0$ determines the *average* level of entry across all markets
-- $\phi_1$ determines how entry changes with respect to the market characteristic $x$
-- $\phi_2$ captures how entry responds to the competitor's presence
-- $\phi_3$ determines entry among non-incumbent firms (the entry cost)
-- $\phi_4$, by making entry more persistent for incumbents, can fit differential sensitivities to market state variables by incumbency status
-
-A simple counting argument provides intuition for identification: the data object $p(x,a,a')$ provides variation along four dimensions---the continuous variable $X$ and the four binary configurations of $(a,a')$. Meanwhile, the model contains five parameters. As long as there is sufficient variation in $X$ and the binary states, we have enough "equations" to solve for the unknowns.
-
-:::{.callout-note}
-While counting arguments are useful for building intuition, they do not constitute a formal proof of identification. Rigorous identification arguments for dynamic discrete choice models require tools that we will introduce later in the text, including results on the invertibility of conditional choice probabilities.
-:::
-
-## Credibility and the Role of Unobservables
-
-Now suppose that $X$ represents a market characteristic that can be manipulated by policy---perhaps a subsidy for market entry or a regulatory barrier. The model would allow us to forecast how entry patterns change under counterfactual policies by re-computing equilibrium choice probabilities at different values of $X$.
+So fixing $x$, define:
+$$ \tilde{u}(x) = [\tilde{u}(x,0,0),\ \tilde{u}(x,1,0),\ \tilde{u}(x,0,1),\ \tilde{u}(x,1,1)]^\prime $$
+We know that the four terms $(\phi_0+\phi_1x,\phi_2,\phi_3,\phi_4)$ uniquely determine the four-dimensional vector $\tilde{u}(x)$ and are hence identified. By then observing how choice probabilities vary with $x$, we identiy $\phi_0$ and $\phi_1$ separately.
 
 :::{.callout-warning icon="false"}
 ## Discussion
-Would you find such a forecast credible? What concerns might you have about using this model for policy analysis?
+Now suppose that $X$ represents a market characteristic that can be manipulated by policy---perhaps a subsidy for market entry or a regulatory barrier. The model would allow us to forecast how entry patterns change under counterfactual policies by re-computing equilibrium choice probabilities at different values of $X$.
+
+What key condition permitted this implicit causal inference? Is that assumption likely to be credible?
+What concerns might you have about using this model for policy analysis? 
 :::
 
-A key concern is **market-level unobservables**. In practice, markets differ in ways that are observed by firms but not by the econometrician. If these unobservables are correlated with the observed state variable $X$, then variation in entry with respect to $X$ conflates the causal effect of $X$ with selection on unobservables.
+## Identification with Unobserved Heterogeneity
 
-Not only this, but a market level observable that positive effects the payoff from entry will also be positively associated with $a$ and $a'$, leading to bias in $\phi_2$, $\phi_3$ and $\phi_4$ as well.
+Suppose that there is a persistent unobserved factor that shifts the returns to entry in each market:
+$$u_{1,m}(x,a,a') = u_1(x,a,a') + \alpha_{m} $$
 
-This is a familiar endogeneity problem, but note that it is more complicated than in the linear regression setting. In the entry-exit model, the unobservable enters the payoff function nonlinearly and affects not only the firm's own decision but also its beliefs about the competitor's behavior in equilibrium.
+Two comments are necessary here:
 
-## Two Approaches to Identification
+1. We might be worried that $\alpha$ is correlated with the market characteristic $X$, which would lead to bias in the estimated parameters if we fail to model and account for this relationship.
+2. Note that **even if** $\alpha$ is independent of $X$, there is still a problem for identification because of **dynamic selection**. The incumbency variables $(A,A')$ are enodgenous to this factor $\alpha$ and hence are mechanically correlated inside the model. A simple instrument that shifts profits from entry would not solve this problem.
 
-There are two standard approaches to addressing this endogeneity concern:
+In general, three things can assist:
 
-### Instrumental Variables
-
-The first solution is to find an instrument $Z$ that shifts $X$ in ways that are independent of market-level unobservables. The logic is analogous to the linear IV case: we isolate variation in $X$ that is "as good as random" with respect to the unobservable.
-
-However, implementation is more complex than in the linear case. The nonlinearity of discrete choice models means that standard 2SLS formulas do not directly apply. 
-
-The key to using instruments for identification in this setting is:
-
-1. First to identify the underlying choice probabilities; then
-2. Derive moment restrictions using these choice probabilities. This typically involves writing conditions for optimal decisions in terms of parameters and choice probabilities only, then using such derivations to write moment conditions.
-
-This involves more advanced tools that will be covered later in the text.
-
-### Panel Data
-
-The second solution exploits **panel data**---repeated observations of the same markets over time. If market-level unobservables are persistent (captured by market fixed effects), then within-market variation in entry over time can identify the parameters of interest.
-
-The intuition is similar to the fixed effects approach in linear models: by looking at how entry in the *same* market changes when $X$ changes, we difference out any time-invariant unobservable. However, the nonlinearity of discrete choice models again creates complications. The standard fixed effects estimator is inconsistent due to the incidental parameters problem, and specialized techniques are required.
+1. **Panel data**: repeated observations of outcomes in each market gives us a way to invert out unobserved market-level heterogeneity.
+2. **Instruments**: there is still hope for identification in the cross-section but we would need a richer model that allows covariates to enter flow payoffs in a way that moves $a$ and $a'$ independently from each other.
+3. The **steady state** assumption imposes a relationship between the choice probability $p(x,a,a',\alpha)$ and the joint distribution of $(a,a',\alpha)$ that provides additional identifying content that may be employed with either strategy (1) or (2).
 
 :::{.callout-note}
 Both the IV and panel data approaches for discrete choice models involve technical challenges that go beyond their linear counterparts. We will develop the necessary tools and revisit these identification strategies in later chapters.
 :::
 
-## The Whether vs How of Identification
-
-The discussion above illustrates a recurring theme in structural econometrics. The **whether** of identification---proving that parameters can in principle be recovered from the data---is often straightforward under the maintained assumptions of the model. The **how** of identification---which sources of variation are used and whether those sources are credible---is typically more important for applied work.
-
-In the entry-exit model, the basic counting argument suggests that parameters are identified from cross-sectional variation in choice probabilities. But this argument implicitly assumes that all variation in $X$ is valid for identification. Once we acknowledge the possibility of market-level unobservables, we must be more careful about *which* variation we exploit.
-
-:::{.callout-important icon="false"}
-## The "how" of identification
-Even when a model is point-identified under its maintained assumptions, the credibility of estimates depends on which features of the data drive identification. Thinking carefully about the sources of variation---and whether they are plausibly exogenous---is essential for convincing empirical work.
-:::
-
-This perspective connects structural estimation to the broader program of causal inference in econometrics. A structural model provides a framework for interpreting variation in the data, but the quality of that interpretation depends on whether the identifying variation is credible for the research question at hand.
