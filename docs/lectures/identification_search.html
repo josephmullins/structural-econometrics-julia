@@ -272,11 +272,23 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_savings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Life-Cycle Savings Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_duopoly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Entry-Exit Model</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a href="../lectures/extremum-estimators.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Extremum Estimators</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -286,13 +298,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/extremum_intro_examples.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introducing the Estimators with Examples</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/extremum_theory.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span></a>
   </div>
 </li>
       </ul>
@@ -392,7 +404,7 @@ window.Quarto = {
 
 <section id="identification-of-the-model-without-heterogeneity" class="level2" data-number="8.1">
 <h2 data-number="8.1" class="anchored" data-anchor-id="identification-of-the-model-without-heterogeneity"><span class="header-section-number">8.1</span> Identification of the Model without Heterogeneity</h2>
-<p>The <span class="citation" data-cites="Mccall">McCall (<a href="../references.html#ref-Mccall" role="doc-biblioref">1970</a>)</span> Search Model that we introduced as a <a href="../models/search.html">prototype model</a> is an excellent introduction to the identification of structural models. A classic treatment of identification of this model is provided by <span class="citation" data-cites="flinn1982">Flinn and Heckman (<a href="../references.html#ref-flinn1982" role="doc-biblioref">1982</a>)</span>.</p>
+<p>The <span class="citation" data-cites="Mccall">McCall (<a href="#ref-Mccall" role="doc-biblioref">1970</a>)</span> Search Model that we introduced as a <a href="../models/search.html">prototype model</a> is an excellent introduction to the identification of structural models. A classic treatment of identification of this model is provided by <span class="citation" data-cites="flinn1982">Flinn and Heckman (<a href="#ref-flinn1982" role="doc-biblioref">1982</a>)</span>.</p>
 <section id="data" class="level3" data-number="8.1.1">
 <h3 data-number="8.1.1" class="anchored" data-anchor-id="data"><span class="header-section-number">8.1.1</span> Data</h3>
 <p>Identification arguments <em>always</em> begin with an assumption on available data. Even though the model is dynamic, we will show that all we really need is a single cross-section of data:</p>
@@ -1783,7 +1795,7 @@ Note
 <p>In order to introduce the <strong>whether</strong> versus the <strong>how</strong> of identification, let us begin with the observation that the model is <em>over-identified</em>: we only need a subset of the available data to identify the model. For example, note that hazard rates out of unemployment are:</p>
 <p><span class="math display">\[ h(z_1,z_2) = \lambda (1-F_{\omega}(\omega^*(z_1,z_2))) \]</span></p>
 <p>As we now know, the hazard rate <span class="math inline">\(h(z_1,z_2)\)</span> can be identified directly by the distribution of durations, conditional on <span class="math inline">\(z_1,z_2\)</span>. But notice that <span class="math inline">\(h(z'_1,z'_2)/h(z_1,z_2) = (1-F_\omega(\omega^*(z_1,z_2)))/(1-F_{\omega}(\omega^*(z_1,z_2)))\)</span> where the right hand side consists of objects that are directly identified from wage data.</p>
-<p>Now you can go one of two ways: you can enrich the model based on the observation that you have many “spare” features of the data that could be used to identify this extra richness. <strong>Or</strong> you could decide that your model is sufficiently detailed to answer your question of interest (shout out <span class="citation" data-cites="Marschak1953">Marschak (<a href="../references.html#ref-Marschak1953" role="doc-biblioref">1953</a>)</span>), and choose the estimation approach that makes your answer most credible. Since the model is undoubtedly misspecified, you will have to make peace with the idea that your model will not match every feature of the data simultaneously. This is the <strong>how</strong> of identification: which features of the data will you use to identify and estimate your model to make the answer to your question of interest most credible?</p>
+<p>Now you can go one of two ways: you can enrich the model based on the observation that you have many “spare” features of the data that could be used to identify this extra richness. <strong>Or</strong> you could decide that your model is sufficiently detailed to answer your question of interest (shout out <span class="citation" data-cites="Marschak1953">Marschak (<a href="#ref-Marschak1953" role="doc-biblioref">1953</a>)</span>), and choose the estimation approach that makes your answer most credible. Since the model is undoubtedly misspecified, you will have to make peace with the idea that your model will not match every feature of the data simultaneously. This is the <strong>how</strong> of identification: which features of the data will you use to identify and estimate your model to make the answer to your question of interest most credible?</p>
 <div class="callout callout-style-default callout-important no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1802,7 +1814,7 @@ The “how” of identification
 <li>As we discussed above: the shape of the hazard function is identified directly from wage data. Hazard rates are important because they determine unemployment rates, and their responsiveness to <span class="math inline">\(Z_1\)</span> and <span class="math inline">\(Z_2\)</span> determine the how unemployment rates shift with these variables.</li>
 <li>The reservation wage equation above shows that the model treats changes in <span class="math inline">\(Z_1\)</span> and <span class="math inline">\(Z_2\)</span> through the same mechanism. The model requires that variation in these two variables have an identical effect on reservation wages (and hence hazard rates). This is a strong restriction that would likely not hold in extended versions of the model. Would we want identification to rely on this property if we didn’t have to?</li>
 </ol>
-<p>How should we approach these tensions? Just as <span class="citation" data-cites="Marschak1953">Marschak (<a href="../references.html#ref-Marschak1953" role="doc-biblioref">1953</a>)</span> did, let’s return to the <strong>question of interest</strong>. We want to evaluate a policy counterfactual that varies marginal tax rates. Wouldn’t this be most convincing if we show that the model parameters have been chosen to replicate the effects of pre-existing variation that is functionally identical? Some options along these lines:</p>
+<p>How should we approach these tensions? Just as <span class="citation" data-cites="Marschak1953">Marschak (<a href="#ref-Marschak1953" role="doc-biblioref">1953</a>)</span> did, let’s return to the <strong>question of interest</strong>. We want to evaluate a policy counterfactual that varies marginal tax rates. Wouldn’t this be most convincing if we show that the model parameters have been chosen to replicate the effects of pre-existing variation that is functionally identical? Some options along these lines:</p>
 <ol type="1">
 <li>[Minimum Distance] Choose structural parameters to match — along with more fundamental moments — moments based on the joint distribution of unemployment durations and <span class="math inline">\(z_2\)</span>.</li>
 <li>[Indirect Inference] Compute some quasi-experimental estimates of the effect of <span class="math inline">\(Z_2\)</span> on wages and hazard rates, and</li>
@@ -1837,7 +1849,7 @@ Discussion
 <p><span class="math display">\[ \mathbb{P}(t_U=t|E=0,Z) = \sum_{k}\tilde{\pi}_{k}h_{k}(z)(1-h_{k}(z))^{t} \]</span></p>
 <p>where <span class="math inline">\(\tilde{\pi}_{k}\)</span> denotes the representation of each type among the unemployed:</p>
 <p><span class="math display">\[\tilde{\pi}_{k} = \frac{\pi_{k}\frac{\delta}{\delta+h_{k}(z)}}{U(z)} \]</span></p>
-<p><span class="citation" data-cites="heckman1984">Heckman and Singer (<a href="../references.html#ref-heckman1984" role="doc-biblioref">1984</a>)</span> show that, for a fixed <span class="math inline">\(K\)</span>, the parameters <span class="math inline">\((\tilde{\pi}_{k},h_{k}(z))\)</span> are identified from this distribution of durations.</p>
+<p><span class="citation" data-cites="heckman1984">Heckman and Singer (<a href="#ref-heckman1984" role="doc-biblioref">1984</a>)</span> show that, for a fixed <span class="math inline">\(K\)</span>, the parameters <span class="math inline">\((\tilde{\pi}_{k},h_{k}(z))\)</span> are identified from this distribution of durations.</p>
 <div class="callout callout-style-default callout-tip no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1863,7 +1875,7 @@ Exercise
 <!-- Can we show that the model is not identified and that we need panel data? -->
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-flinn1982" class="csl-entry" role="listitem">
 Flinn, Christopher, and James Heckman. 1982. <span>“New Methods for Analyzing Structural Models of Labor Force Dynamics.”</span> <em>Journal of Econometrics</em> 18 (1): 115–68.
 </div>

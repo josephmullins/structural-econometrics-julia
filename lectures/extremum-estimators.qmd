@@ -4,4 +4,4 @@ In the previous section we studied **identification**: the mapping between popul
 
 Identification can lead --- often but not always --- directly to an estimation strategy. This is particularly true when, in the course of showing identification, you want to show that the key parameters in your study have a particularly credible source of identification.
 
-In this part of the course we will move to estimation, first establishing approaches for each of our prototype models and, at times, discussing how estimation relates to the task of "credible" inference.
+In this part of the course we will move to estimation, first introducing approaches using each of our prototype models and, at times, discussing how estimation relates to the task of "credible" inference.

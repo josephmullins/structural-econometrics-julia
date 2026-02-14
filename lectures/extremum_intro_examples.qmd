@@ -1,6 +1,6 @@
-# Introducing the Estimators
+# Introducing the Estimators with Examples
 
-Before diving into statistical theory, we will introduce each estimator and sketch out applications by proposing estimation methods for each of our prototype models. 
+Before diving into statistical theory, we will introduce the estimators by proposing estimation methods for each of our prototype models. 
 
 The three workhorse methods are:
 
@@ -29,14 +29,23 @@ The key theoretical questions we want to establish for each estimation approach 
 
 :::
 
+
 ## The Generalized Roy Model
 
-Our identification argument suggested a **two-step** estimator for the Generalized Roy Model: 
+To discuss estimation of this model, let's assume a linear form for the selection and outcomes equations:
 
-1. Estimate the selection equation by *maximum likelihood*.
+$$ D = \mathbf{1}\{\gamma_0 + \gamma_1X + \gamma_2Z - V \geq0\} $$
+$$ Y_{D} = \beta_{D,0} + \beta_{D,1}X + U_D $$
+with $V\sim\mathcal{N}(0,1)$.
+
+Our identification argument suggested a **two-step** estimator for the Generalized Roy Model, which we implemented in @exm-roy_estimation:
+
+1. Estimate the selection equation by *maximum likelihood*:
+$$ \hat{\gamma} = \arg\max_{\gamma}\frac{1}{N}\sum_{n=1}^{N}D_{n}\log(\Phi(\mathbf{w}_{n}\gamma)) + (1-D_n)\log(1-\Phi(\mathbf{w}_{n}\gamma)) $$
+where $\mathbf{w}_{n} = [1,\ X_{n},\ Z_{n}]$.
 2. Estimate the outcome equations with *OLS* using a *selection correction*. 
 
-This model will give us a little more to chew on when we think about the properties of two-step estimators.
+Note that this is a **two-step** estimator. The second stage relies on parameters estimated in the first stage. We will need to develop theory for this!
 
 ## The Search Model
 
@@ -222,16 +231,236 @@ This is important for performance! Working with `DataFrame` types directly can d
 ## Exercise
 
 :::{#exr-estimation_search}
-Extent the code above to
+Extend the code above to
+
 1. Additionally estimate the parameters $b$ and $\lambda$.
 2. Estimate the search model separately for men with and without a bachelor's degree. 
 3. Report and comment on your estimates.
+
 :::
 
 :::
 
 ## The Labor Supply Model
+Suppose that we have a vector of instruments $\mathbf{z}_{n}$ that we hope will jointly move consumption and labor supply, with a single cross-section of observations:
+
+$$ (W_{n},H_{n},C_{n},\mathbf{z}_{n}).$$
+
+We write the labor supply equation as
+
+$$ \log(H) = \mu - \psi\log(W) - \psi\sigma\log(C) + \epsilon $$
+
+where we assume that $\mathbb{E}[\epsilon\ |\mathbf{z}] = 0$, implying the moment condition:
+
+$$ \mathbb{E}[\epsilon \mathbf{z}] = 0.$$ 
+
+Let $\theta  = (\mu,\sigma,\psi)$ and define the sample moment:
+
+$$g_{N}(\theta) = \frac{1}{N}\sum_{N}\left(\log(H_{n})-\mu-\psi\log(W)-\psi\sigma\log(C)\right)\mathbf{z}_{n}.$$
+
+The GMM estimator is:
+
+$$ \hat{\theta} = \arg\min_{\theta} g_{N}(\theta)^\prime \mathbf{W}_{N} g_{N}(\theta) $$
+
+where $\mathbf{W}_{N}$ is a symmetric, positive definite weighting matrix. Since we have a linear system, this becomes a quadratic minimization problem with a known solution,[^1] but the theory we develop will be more general. 
+
+[^1]: Specifically, let $\beta = [\mu,\ \psi, \psi\sigma]^\prime$, we know that: $\hat{\beta} = (\mathbf{X}^\prime\mathbf{Z}\mathbf{W}_{N}\mathbf{Z}^\prime\mathbf{X})^{-1}(\mathbf{X}^\prime\mathbf{Z}\mathbf{W}_{N}\mathbf{Z}^\prime\mathbf{Y}$ where $\mathbf{X}$, $\mathbf{Z}$, $\mathbf{Y}$ are appropriately stacked vectors of regressors, instruments, and outcomes (log hours). 
+
+Relevant questions for GMM are:
+
+1. What value of $\mathbf{W}$ will give us the "best" performing estimator in the population? (And yes, we also have to define what "best" means).
+2. Can we implement optimal weighting in finite sample?
 
 ## The Savings Model
 
+Let's consider estimation of the income process for this model and save estimation of the preference parameters for our chapter on simulation. Recall from our discussion of identification and from @exr-income_process that we can identify the parameters of this process by matching implied variances and covariances. Supposing that we have more of these moments than we do parameters (i.e. that the parameters are **over-identified** by the moments), we can estimate the income process by **minimum distance**.
+
+Recall the income process:
+$$ \varepsilon_{n,t+1} = \rho \varepsilon_{n,t} + \eta_{n,t},\qquad \eta_{n,t}\sim\mathcal{N}(0,\sigma^2_\eta) $$
+
+and consider the extended specification with permanent heterogeneity:
+$$ \log(y_{n,t}) = \mu_t + \alpha_n + \varepsilon_{n,t} $$
+
+where $\alpha_n \sim (0,\sigma^2_\alpha)$ is an individual fixed effect. Let us further assume that in the first period, $\varepsilon_{0} = 0$. This gives us that 
+
+$$\varepsilon_{t} = \sum_{s=1}^{t}\rho^{t-s}\eta_{s}.$$
+
+Define $\theta = (\rho, \sigma^2_\alpha, \sigma^2_\eta)$ as the parameters we wish to estimate.
+
+### The Minimum Distance Estimator
+
+In @exm-psid, we considered identification of the income process by examining covariance restrictions in panel data. Here we'll consider this approach as well as an alternative. Define
+
+$$\epsilon = \log(y) - \mu_{t} = \alpha + \varepsilon $$
+
+Let's begin by noting the following generic relationships:
+
+$$ \mathbb{V}[\epsilon_{t}] = \sigma^2_{\alpha} + \frac{(1-\rho^{2(t-1)})}{1-\rho^2}\sigma^2_{\eta}$$
+
+and
+
+$$ \mathbb{V}[\epsilon_{t+1}] = \sigma^2_{\alpha} + \rho^2\mathbb{V}[\varepsilon_{t}] + \sigma^2_{\eta} $$
+
+$$ \mathbb{C}(\epsilon_{t},\epsilon_{t+s}) = \sigma^2_{\alpha} + \rho^{s}\mathbb{V}[\epsilon_{t}] $$
+
+We'll consider two potential vectors of moments to match. The first vector consists of the variance of $\epsilon$ at each $t$:
+
+$$ \mathbf{v} = [\mathbb{V}[\epsilon_{1}],\ \mathbb{V}[\epsilon_{2}],\ ...,\ \mathbb{V}[\epsilon_{T}]]^\prime $$
+
+while the second takes two variances and $K$ covariances:
+
+$$\mathbf{c} = [\mathbb{V}[\epsilon_{t}],\ \mathbb{V}[\epsilon_{t+1}],\ \mathbb{C}(\epsilon_{t},\epsilon_{t+1}),\ ...,\ \mathbb{C}(\epsilon_{t},\epsilon_{t+K})]^\prime $$
+
+Let $\mathbf{v}(\theta)$ and $\mathbf{c}(\theta)$ be the model-implied values of these moments, given by the expressions above. The minimum distance estimator is
+
+$$ \hat{\theta} = \arg\min_\theta \left(\hat{\mathbf{v}} - \mathbf{v}(\theta)\right)^\prime \mathbf{W} \left(\hat{\mathbf{v}} - \mathbf{v}(\theta)\right) $$
+
+where $\mathbf{W}$ is a positive definite weighting matrix. An estimator is equivalently defined for the second set of moments $\mathbf{c}$.
+
+:::{.callout-note}
+## Example: Minimum Distance Estimation of the Income Process
+:::{#exm-md_income}
+
+Building on @exm-psid, let's implement a minimum distance estimator for the income process parameters. First, we compute sample moments from the PSID data.
+
+```{julia}
+using CSV, DataFrames, DataFramesMeta, Statistics, Optim, Plots
+
+# Load and prepare data
+data = @chain begin
+    CSV.read("../data/abb_aea_data.csv",DataFrame,missingstring = "NA")
+    @select :person :y :tot_assets1 :asset :age :year
+    @subset :age.>=25 :age.<=64
+end
+
+# Calculate the variance of log income at each age
+m_hat = @chain data begin
+    groupby(:age)
+    @combine :var_logy = var(log.(:y))
+    @orderby :age
+    _.var_logy
+end
+
+```
+
+Now we define the model-implied moments. Since PSID is biennial, we adjust for two-year gaps:
+
+```{julia}
+function model_moments(θ, T)
+    ρ, σ2_α, σ2_η = θ
+    # Variance of transitory component (assuming stationarity for simplicity)
+    var_eps = σ2_η / (1 - ρ^2)
+    m = [σ2_α + (1-ρ^(2(t-1)))/(1-ρ^2) * σ2_η for t in 1:T]
+    return m
+end
+
+# Minimum distance objective (identity weighting matrix)
+function md_objective(x, m_hat)
+    # Transform to ensure constraints: ρ ∈ (-1,1), σ² > 0
+    ρ = tanh(x[1])
+    σ2_α = exp(x[2])
+    σ2_η = exp(x[3])
+    θ = (ρ, σ2_α, σ2_η)
+    T = length(m_hat)
+    m_model = model_moments(θ, T)
+    diff = m_hat .- m_model
+    return diff' * diff  # Identity weighting
+end
+```
+
+Finally, we estimate the parameters:
+
+```{julia}
+# Initial values
+x0 = [0.5, log(0.1), log(0.05)]
+
+# Optimize
+res = optimize(x -> md_objective(x, m_hat), x0, Newton(),autodiff = :forward)
+
+# Extract estimates
+x_hat = res.minimizer
+ρ_hat = tanh(x_hat[1])
+σ2_α_hat = exp(x_hat[2])
+σ2_η_hat = exp(x_hat[3])
+θ_hat = (ρ_hat, σ2_α_hat, σ2_η_hat)
+println("Minimum Distance Estimates:")
+println("  ρ = $(round(ρ_hat, digits=3))")
+println("  σ²_α = $(round(σ2_α_hat, digits=3))")
+println("  σ²_η = $(round(σ2_η_hat, digits=3))")
+# and finally a plot of model fit
+T = length(m_hat)
+scatter(1:T,m_hat,label = "data",title = "Model Fit of Targeted Moments")
+plot!(1:T,model_moments(θ_hat,length(m_hat)),label = "model fit")
+xlabel!("Model Periods (Age)")
+```
+
+:::
+:::
+
+As with the case of GMM, we would like to know how our choice of $\mathbf{W}$ affects the sampling distribution (i.e. precision) of our estimator and if there is an "optimal" choice.
+
+:::{.callout-warning icon="false"}
+## Discussion: Whether vs How
+
+Let's think about more about how we approached identification here: by matching the growth in the variance of log income with age.
+
+Essentially, we are attributing all of this growth to income risk. Suppose we use the model to evaluate the welfare gains from redistributive taxes and transfers. Are you comfortable with how we've identified the extent of income risk? How important will those parameters be for how agents value social insurance?
+
+:::
 ## The Entry-Exit Model
+
+Consider two alternative estimators of the entry-exit model. The key insight from our identification discussion is that the choice probability $p(x,a,a')$ is directly observable in the data and encodes information about the underlying payoff parameters.
+
+Recall the payoff specification:
+$$ u_{1}(x,a,d^{\prime}) = \phi_{0} + \phi_{1}x - \phi_{2}d^\prime - \phi_{3}(1-a) $$
+$$ u_{0}(x,a) = \phi_{4}a $$
+
+and let $\phi = (\phi_0, \phi_1, \phi_2, \phi_3, \phi_4)$ denote the vector of payoff parameters.
+
+### Estimation by Minimum Distance
+
+The minimum distance approach directly exploits the mapping between parameters and choice probabilities. For each market-state combination $(x,a,a')$, the model implies a choice probability:
+
+$$ p(x,a,a';\phi,\beta) = \frac{\exp(v_1(x,a,a';\phi,\beta))}{\exp(v_0(x,a,a';\phi,\beta)) + \exp(v_1(x,a,a';\phi,\beta))} $$
+
+where $v_0$ and $v_1$ are the choice-specific value functions that depend on the equilibrium solution.
+
+Suppose we have a cross-section of data:
+
+$$ (X_{m},D_{m},A_{m},A'_{m})_{m=1}^{M} $$
+
+for each of $M$ markets. Further assume that $X$ is a variable that takes one of a discrete number of values in the support $\mathcal{X}$.
+
+For each unique state $(x,a,a')$ in the data, we can compute the **empirical choice frequency**:
+
+$$ \hat{p}(x,a,a') = \frac{\sum_{m} D_{m}\mathbf{1}\{X_m = x, A_{m} = a, A'_{m} = a'\}}{\sum_{m} \mathbf{1}\{X_m = x, A_{m} = a, A'_{m} = a'\}} $$
+
+The minimum distance estimator minimizes the weighted sum of squared deviations between observed and predicted choice probabilities. Let $\mathbf{p}(\theta)$ be the vector of choice probabilities across the state space $\mathcal{X}\times\{0,1\}^2$ and let $\widehat{\mathbf{p}}$ be the equivalent frequency estimate. The minimum distance estimator is:
+
+$$ \hat{\theta} = \arg\min_\theta (\widehat{\mathbf{p}}-\mathbf{p}(\theta))^\prime \mathbf{W}_{N}(\widehat{\mathbf{p}}-\mathbf{p}(\theta))$$
+
+where $\mathbf{W}_{N}$ is once again a positive definite weighting matrix.
+
+
+### Estimation by GMM
+
+An alternative approach uses the **Generalized Method of Moments**. The key insight is that choice probabilities satisfy certain orthogonality conditions that can be expressed as moment restrictions.
+
+Given the discrete choice structure, the residual:
+$$ \xi_{m} = D_{m} - p(X_m, A_{m}, A'_{m}; \phi, \beta) $$
+
+has the property that $\mathbb{E}[\xi_{m} | X_m, A_{m}, A'_{m}] = 0$ when evaluated at the true parameters. This suggests the moment conditions:
+
+$$ \mathbb{E}\left[(D_{m} - p(X_m, A_{m}, A'_{m}; \phi, \beta)) \cdot \mathbf{z}_{m}\right] = 0 $$
+
+where $\mathbf{z}_{m}$ is a vector of instruments. Natural choices include functions of $(X_m, A_{m}, A'_{m})$ themselves, such as:
+
+$$ \mathbf{z}_{m} = [1,\ X_m,\ A_{m},\ A'_{m},\ X_m \cdot A_{m}]^\prime $$
+
+The GMM estimator minimizes:
+
+$$ \hat{\phi} = \arg\min_\phi g_M(\phi)^\prime \mathbf{W}_M g_M(\phi) $$
+
+where the sample moment is:
+
+$$ g_M(\phi) = \frac{1}{M}\sum_{m}\left(D_{m} - p(X_m, A_{m}, A'_{m}; \phi, \beta)\right) \mathbf{z}_{m} $$

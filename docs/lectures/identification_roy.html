@@ -272,11 +272,23 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_savings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Life-Cycle Savings Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_duopoly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Entry-Exit Model</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a href="../lectures/extremum-estimators.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Extremum Estimators</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -286,13 +298,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/extremum_intro_examples.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction and Examples</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introducing the Estimators with Examples</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/extremum_theory.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span></a>
   </div>
 </li>
       </ul>
@@ -418,7 +430,7 @@ V \\ U_0 \\ U_1
 \]</span> Under the same rank conditions for <span class="math inline">\(X\)</span>, both <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are identified due to. This also means that <span class="math inline">\(ATE(X) = X(\beta_1 - \beta_0)\)</span> is identified for all <span class="math inline">\(X\)</span>.</p>
 <p>Although we cannot identify the full distribution of treatment effects, this also gives us the average treatment effect among individuals with treatment propensity <span class="math inline">\(V\)</span>: <span class="math display">\[\mathbb{E}[Y_0-Y_0|X,V] = X(\beta_1-\beta_0) + \underbrace{(\sigma_{V1}-\sigma_{V0})V}_{\mathbb{E}[U_1-U_0|V]}\]</span> We’ll come back to this object in the next section.</p>
 <p>Notice that identification holds here even <em>without</em> an excluded variable <span class="math inline">\(Z\)</span>. It follows from the assumption of linearity and normality of the error terms, which yield a particular parametric decomposition of the conditional expectation that can be identified.</p>
-<p>This is an example of <strong>identification by functional form</strong>: identification depends crucially on these particular functional form assumptions. Notice that without linearity in <span class="math inline">\(\mu_{d}\)</span>, it is not possible to separately identify <span class="math inline">\(\mu_{d}\)</span> from the selection correction. Would you say that this is a very credible approach to identifying the key causal parameters in the model? <span class="citation" data-cites="Lewbel">Lewbel (<a href="../references.html#ref-Lewbel" role="doc-biblioref">2019</a>)</span> provides a broad and satisfying discussion of these issues.</p>
+<p>This is an example of <strong>identification by functional form</strong>: identification depends crucially on these particular functional form assumptions. Notice that without linearity in <span class="math inline">\(\mu_{d}\)</span>, it is not possible to separately identify <span class="math inline">\(\mu_{d}\)</span> from the selection correction. Would you say that this is a very credible approach to identifying the key causal parameters in the model? <span class="citation" data-cites="Lewbel">Lewbel (<a href="#ref-Lewbel" role="doc-biblioref">2019</a>)</span> provides a broad and satisfying discussion of these issues.</p>
 </section>
 <section id="identification-with-exclusion-restrictions" class="level2" data-number="7.3">
 <h2 data-number="7.3" class="anchored" data-anchor-id="identification-with-exclusion-restrictions"><span class="header-section-number">7.3</span> Identification with Exclusion Restrictions</h2>
@@ -436,10 +448,10 @@ V \\ U_0 \\ U_1
 &amp; \mathbb{E}[Y_1 - Y_0 | V = p] \\
 &amp; MTE(p)
 \end{align}\]</span></p>
-<p><span class="citation" data-cites="HeckmanVytlacil2005">Heckman and Vytlacil (<a href="../references.html#ref-HeckmanVytlacil2005" role="doc-biblioref">2005</a>)</span> call this derivative <em>local instrumental variables</em> approach and define the estimand, <span class="math inline">\(MTE(p)\)</span> as the <strong>marginal treatment effect</strong>. It is the average treatment effect among individuals with a propensity <span class="math inline">\(1-p\)</span> to take the treatment. They show that, commonly used estimators (instrumental variables, difference-in-differences) are often weighted averages of this marginal treatment effect, and that the marginal treatment effect is a useful building block for.</p>
+<p><span class="citation" data-cites="HeckmanVytlacil2005">Heckman and Vytlacil (<a href="#ref-HeckmanVytlacil2005" role="doc-biblioref">2005</a>)</span> call this derivative <em>local instrumental variables</em> approach and define the estimand, <span class="math inline">\(MTE(p)\)</span> as the <strong>marginal treatment effect</strong>. It is the average treatment effect among individuals with a propensity <span class="math inline">\(1-p\)</span> to take the treatment. They show that, commonly used estimators (instrumental variables, difference-in-differences) are often weighted averages of this marginal treatment effect, and that the marginal treatment effect is a useful building block for.</p>
 <p>Note that under support conditions on <span class="math inline">\(Z\)</span>, as the support of <span class="math inline">\(P(X,Z)\)</span> approaches the unit interval <span class="math inline">\([0,1]\)</span>, the average treatment effect <span class="math inline">\(ATE(X) = \mu_{1}(X)-\mu_{0}(X)\)</span> is also identified.</p>
 <p><strong>Credibility</strong> Whether or not you think that this approach to identifying treatment effects is more or less credible than using functional form restrictions may depend on how valid you think the exclusion and independence restrictions are. However, assuming that we have access to a “good” instrument, it should be clear that this approach is preferable.</p>
-<p>In practice, even when we have access to an instrument, the data requirements for fully non-parametric estimation can be overly demanding. A reasonable compromise is to illustrate the conditions under which your instrument provides nonparametric identification, then introduce parametric assumptions that can interpolate this plausible variation. This is a way to establish that identification of your parameters of interest in not purely driven by functional form restrictions. See <span class="citation" data-cites="Cunha2010">Cunha, Heckman, and Schennach (<a href="../references.html#ref-Cunha2010" role="doc-biblioref">2010</a>)</span> and <span class="citation" data-cites="Carneiro2011">Carneiro, Heckman, and Vytlacil (<a href="../references.html#ref-Carneiro2011" role="doc-biblioref">2011</a>)</span> for two examples of this kind of approach.</p>
+<p>In practice, even when we have access to an instrument, the data requirements for fully non-parametric estimation can be overly demanding. A reasonable compromise is to illustrate the conditions under which your instrument provides nonparametric identification, then introduce parametric assumptions that can interpolate this plausible variation. This is a way to establish that identification of your parameters of interest in not purely driven by functional form restrictions. See <span class="citation" data-cites="Cunha2010">Cunha, Heckman, and Schennach (<a href="#ref-Cunha2010" role="doc-biblioref">2010</a>)</span> and <span class="citation" data-cites="Carneiro2011">Carneiro, Heckman, and Vytlacil (<a href="#ref-Carneiro2011" role="doc-biblioref">2011</a>)</span> for two examples of this kind of approach.</p>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -581,7 +593,7 @@ Exercise
 </div>
 <div class="callout-body-container callout-body">
 <div id="exr-id_functional_form" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercise 7.1</strong></span> Using Example <a href="#exm-roy_estimation" class="quarto-xref">Example&nbsp;<span>7.1</span></a>, try setting <span class="math inline">\(\gamma_{3} = 0\)</span> and verify that identification by functional form works in practice: the model can still be estimated using the parametric selection correction.</p>
+<p><span class="theorem-title"><strong>Exercise 7.1</strong></span> Using Example <a href="#exm-roy_estimation" class="quarto-xref">Example&nbsp;<span class="quarto-unresolved-ref">exm-roy_estimation</span></a>, try setting <span class="math inline">\(\gamma_{3} = 0\)</span> and verify that identification by functional form works in practice: the model can still be estimated using the parametric selection correction.</p>
 </div>
 </div>
 </div>
@@ -660,7 +672,7 @@ H = \mathbf{1}\{\beta_0 + \beta_1\log(W) + \zeta &gt;0\}
 </section>
 <section id="monotonicity-and-potential-outcomes" class="level2" data-number="7.4">
 <h2 data-number="7.4" class="anchored" data-anchor-id="monotonicity-and-potential-outcomes"><span class="header-section-number">7.4</span> Monotonicity and Potential Outcomes</h2>
-<p>Recall that the generalized roy model embeds the <strong>potential outcomes framework</strong> (this is the model you get if you throw away the selection equation). <span class="citation" data-cites="ImbensAngrist">Imbens and Angrist (<a href="../references.html#ref-ImbensAngrist" role="doc-biblioref">1994</a>)</span> consider what can be estimated from two stage least squares when you have access to an instrument <span class="math inline">\(Z\)</span> and heterogeneous potential outcomes. To formalize their setup, assume that individuals can be indexed in some measurable space <span class="math inline">\(\omega\in\Omega\)</span>, so that we write the model as a triple: <span class="math inline">\((Y_1(\omega),Y_0(\omega),D_{Z}(\omega))\)</span> where <span class="math inline">\(D_{Z}(\omega)\in\{0,1\}\)</span> indicates the choice of an individual of type <span class="math inline">\(\omega\)</span> when the instrument takes a value <span class="math inline">\(Z\)</span>.</p>
+<p>Recall that the generalized roy model embeds the <strong>potential outcomes framework</strong> (this is the model you get if you throw away the selection equation). <span class="citation" data-cites="ImbensAngrist">Imbens and Angrist (<a href="#ref-ImbensAngrist" role="doc-biblioref">1994</a>)</span> consider what can be estimated from two stage least squares when you have access to an instrument <span class="math inline">\(Z\)</span> and heterogeneous potential outcomes. To formalize their setup, assume that individuals can be indexed in some measurable space <span class="math inline">\(\omega\in\Omega\)</span>, so that we write the model as a triple: <span class="math inline">\((Y_1(\omega),Y_0(\omega),D_{Z}(\omega))\)</span> where <span class="math inline">\(D_{Z}(\omega)\in\{0,1\}\)</span> indicates the choice of an individual of type <span class="math inline">\(\omega\)</span> when the instrument takes a value <span class="math inline">\(Z\)</span>.</p>
 <p>They combine four assumptions:</p>
 <ol type="1">
 <li>Exclusion: <span class="math inline">\(Y_{D}(\omega,Z) = Y_{D}(\omega)\)</span> for <span class="math inline">\(D\in\{0,1\}\)</span></li>
@@ -693,11 +705,11 @@ Exercise
 </div>
 </div>
 </div>
-<p><span class="citation" data-cites="ImbensAngrist">Imbens and Angrist (<a href="../references.html#ref-ImbensAngrist" role="doc-biblioref">1994</a>)</span> call this object the <em>Local Average Treatment Effect</em>. They show that for multi-valued instruments, 2SLS produces a weighted average of these LATES for difference complier groups.</p>
+<p><span class="citation" data-cites="ImbensAngrist">Imbens and Angrist (<a href="#ref-ImbensAngrist" role="doc-biblioref">1994</a>)</span> call this object the <em>Local Average Treatment Effect</em>. They show that for multi-valued instruments, 2SLS produces a weighted average of these LATES for difference complier groups.</p>
 <p>This interpretation of IV estimators is immensely widely used, so you should know the definition and the assumptions under which it works.</p>
 <section id="relationship-to-the-generalized-roy-model" class="level3" data-number="7.4.1">
 <h3 data-number="7.4.1" class="anchored" data-anchor-id="relationship-to-the-generalized-roy-model"><span class="header-section-number">7.4.1</span> Relationship to the Generalized Roy Model</h3>
-<p>There is a deeper relationship between the monotonicity assumption and the Generalized Roy Model. <span class="citation" data-cites="Vytlacil2002">Vytlacil (<a href="../references.html#ref-Vytlacil2002" role="doc-biblioref">2002</a>)</span> shows that the monotonicity assumption is <strong>equivalent</strong> to a latent index model representation. One direction of this proof is easy, since it is simple to verify that the latent index model: <span class="math display">\[D = \mathbf{1}\{P(Z)-V \geq 0\}\]</span> obeys monotonicity. Going the other way, it is relatively intuitive to see that one can construct a mapping from <span class="math inline">\(\Omega\)</span> to <span class="math inline">\([0,1]\)</span> such that: <span class="math display">\[ D_{Z}(\omega) = \mathbf{1}\{P(Z)-V(\omega) \geq 0\}. \]</span></p>
+<p>There is a deeper relationship between the monotonicity assumption and the Generalized Roy Model. <span class="citation" data-cites="Vytlacil2002">Vytlacil (<a href="#ref-Vytlacil2002" role="doc-biblioref">2002</a>)</span> shows that the monotonicity assumption is <strong>equivalent</strong> to a latent index model representation. One direction of this proof is easy, since it is simple to verify that the latent index model: <span class="math display">\[D = \mathbf{1}\{P(Z)-V \geq 0\}\]</span> obeys monotonicity. Going the other way, it is relatively intuitive to see that one can construct a mapping from <span class="math inline">\(\Omega\)</span> to <span class="math inline">\([0,1]\)</span> such that: <span class="math display">\[ D_{Z}(\omega) = \mathbf{1}\{P(Z)-V(\omega) \geq 0\}. \]</span></p>
 <div class="callout callout-style-default callout-tip no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -715,7 +727,7 @@ Exercise
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-Carneiro2011" class="csl-entry" role="listitem">
 Carneiro, P., J. J. Heckman, and E. J. Vytlacil. 2011. <span>“Estimating Marginal Returns to Education.”</span> <em>American Economic Review</em> 101 (October): 2754–81. <a href="http://www.nber.org/papers/w16474">http://www.nber.org/papers/w16474</a>.
 </div>
