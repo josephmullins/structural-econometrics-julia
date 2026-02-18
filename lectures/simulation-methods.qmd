@@ -1,1 +1,649 @@
 # Simulation Methods
+
+In many structural models, the likelihood or moment conditions cannot be computed in closed form because they involve high-dimensional integrals over unobserved heterogeneity, latent states, or expectations over future shocks. The savings model is a good example: even if we knew the true parameters, computing the likelihood of an observed consumption path requires integrating over sequences of income shocks. In these settings, **simulation** provides a way forward.
+
+This chapter covers three topics. First, we discuss **simulation-based estimators** --- the method of simulated moments (MSM) and indirect inference --- which replace intractable analytical objects with simulation approximations. Second, we introduce the **bootstrap**, a general resampling-based approach to inference that is particularly useful when analytical standard errors are difficult to derive. Third, we bring these tools together with our prototype models.
+
+## Integration by Simulation
+
+At the heart of simulation-based estimation is the problem of computing integrals. Suppose we need to evaluate:
+
+$$f(y|\mathbf{x},\theta) = \int h(y|\mathbf{x},\theta,\mathbf{u})g(\mathbf{u})d\mathbf{u}$$
+
+where $\mathbf{u}$ is a vector of unobservables with density $g$. If the dimension of $\mathbf{u}$ is large or $h$ does not admit a closed-form integral, we can approximate by **Monte Carlo integration**: draw $\mathbf{u}^{1},\ldots,\mathbf{u}^{R}$ from $g$ and compute:
+
+$$\hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_{r=1}^{R}h(y|\mathbf{x},\theta,\mathbf{u}^{r})$$
+
+By the law of large numbers, $\hat{f}\rightarrow_{p} f$ as $R\rightarrow\infty$. This is unbiased by construction: $\mathbb{E}_{\mathbf{u}}[\hat{f}]=f$.
+
+### Importance Sampling
+
+Sometimes we want to draw from an alternative density $w(\mathbf{u})$ instead of $g(\mathbf{u})$ --- for instance because $g$ is hard to sample from, or because draws from $w$ reduce the variance of the estimator. In this case:
+
+$$\hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_{r=1}^{R}h(y|\mathbf{x},\theta,\mathbf{u}^{r})\frac{g(\mathbf{u}^{r})}{w(\mathbf{u}^{r})},\qquad \mathbf{u}^{r}\sim w$$
+
+This is still unbiased and consistent, and the choice of $w$ can substantially reduce variance. The ratio $g/w$ is called the **importance weight**.
+
+## Maximum Simulated Likelihood
+
+A natural first idea is to replace the likelihood with its simulated analogue. The **maximum simulated likelihood (MSL)** estimator is:
+
+$$\hat{\theta}_{MSL} = \arg\max_{\theta}\sum_{n=1}^{N}\log\hat{f}(y_{n}|\mathbf{x}_{n},\theta)$$
+
+where $\hat{f}$ is the simulated probability from above.
+
+:::{.callout-important}
+## A Subtlety with MSL
+
+There is an important issue with MSL: because $\log$ is concave, Jensen's inequality gives $\mathbb{E}[\log\hat{f}]\leq \log\mathbb{E}[\hat{f}]=\log f$. This means the simulated log-likelihood is *biased downward*, and the MSL estimator is inconsistent for fixed $R$. Consistency requires that the number of simulation draws grows with the sample: both $N,R\rightarrow\infty$ with $\sqrt{N}/R\rightarrow 0$.
+
+This is in contrast to the method of simulated moments, which we discuss next, where a fixed number of simulation draws is sufficient for consistency.
+:::
+
+Under standard regularity conditions and $\sqrt{N}/R\rightarrow 0$, the MSL estimator has the same asymptotic distribution as the (infeasible) MLE:
+
+$$\sqrt{N}(\hat{\theta}_{MSL}-\theta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\ \mathcal{I}(\theta_{0})^{-1})$$
+
+In practice, one should use enough draws that the simulation error is small relative to the sampling variability. A common rule of thumb is to set $R$ large enough that results are insensitive to further increases.
+
+## Method of Simulated Moments
+
+The **method of simulated moments (MSM)** is the simulation analogue of GMM. Suppose that the moment conditions take the form:
+
+$$\mathbb{E}[g(\mathbf{w},\theta_{0})] = \mathbb{E}\left[\int h(\mathbf{w},\theta_{0},\mathbf{u})f(\mathbf{u}|\theta_{0})d\mathbf{u}\right] = \mathbf{0}$$
+
+If we cannot evaluate $g$ analytically, we can replace it with a simulated version:
+$$\hat{g}(\mathbf{w}_{n},\theta) = \frac{1}{R}\sum_{r=1}^{R}\tilde{g}(\mathbf{w}_{n},\mathbf{u}^{r},\theta)$$
+
+where $\mathbb{E}_{\mathbf{u}}[\tilde{g}(\mathbf{w},\mathbf{u},\theta)]=g(\mathbf{w},\theta)$. The MSM estimator is:
+
+$$\hat{\theta}_{MSM} = \arg\min_{\theta}\ \hat{\mathbf{g}}_{N}(\theta)'\mathbf{W}\hat{\mathbf{g}}_{N}(\theta),\qquad\hat{\mathbf{g}}_{N}(\theta) = \frac{1}{N}\sum_{n=1}^{N}\hat{g}(\mathbf{w}_{n},\theta)$$
+
+### A Common Special Case
+
+In many structural applications, the moment conditions do not involve observation-level simulation. Instead, we match *aggregate* statistics from the data to their model-implied counterparts computed by simulating the model. The moments take the form:
+
+$$\hat{\mathbf{g}}_{N}(\theta) = \hat{\mathbf{m}} - \tilde{\mathbf{m}}(\theta)$$
+
+where $\hat{\mathbf{m}}$ is a vector of sample statistics (means, variances, covariances, etc.) and $\tilde{\mathbf{m}}(\theta)$ is the corresponding vector computed from simulated data. This is the structure we will use for the savings model below.
+
+### Asymptotic Distribution
+
+:::{#thm-msm-asymptotics}
+## Asymptotic Distribution of MSM
+Suppose the standard regularity conditions for GMM hold and $\mathbb{E}_{\mathbf{u}}[\tilde{g}(\mathbf{w},\mathbf{u},\theta)]=g(\mathbf{w},\theta)$. Then with $R$ fixed:
+
+$$\sqrt{N}(\hat{\theta}_{MSM}-\theta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\Sigma_{MSM})$$
+
+where:
+$$\Sigma_{MSM} = (\nabla_{\theta}g_{0}\mathbf{W}\nabla_{\theta}g_{0}')^{-1}\nabla_{\theta}g_{0}\mathbf{W}\mathbb{E}[\hat{g}_{0}\hat{g}_{0}']\mathbf{W}\nabla_{\theta}g_{0}'(\nabla_{\theta}g_{0}\mathbf{W}\nabla_{\theta}g_{0}')^{-1}$$
+
+with $\nabla_{\theta}g_{0}=\mathbb{E}[\nabla_{\theta}g(\mathbf{w},\theta_{0})']$.
+:::
+
+Several features are worth highlighting:
+
+1. **Consistency does not require $R\rightarrow\infty$.** Because $\hat{g}$ is an unbiased estimator of $g$, the simulated sample moments converge to zero at $\theta_{0}$ by the law of large numbers. This is in contrast to MSL.
+2. **Simulation adds variance.** Because $\mathbb{V}[\hat{g}]\geq\mathbb{V}[g]$, the MSM estimator is less efficient than the infeasible GMM estimator that uses the true $g$. For the common case of a **frequency simulator** (where $\tilde{g}$ is a binary indicator), the variance inflates by a factor of $(1+1/R)$.
+3. **If $\sqrt{N}/R\rightarrow 0$**, the efficiency loss from simulation disappears and the MSM achieves the same asymptotic variance as GMM.
+
+See @newey1994large for a comprehensive treatment.
+
+
+:::{.callout-note icon="false" collapse="true"}
+## Example: Simulating the Savings Model
+:::{#exm-simulate_savings}
+
+To estimate the savings model by MSM, we first need to be able to **simulate** data from it. Given a solution (the policy function $A$), we can forward-simulate a panel of individuals by drawing income shocks and applying the optimal savings rule.
+
+```{julia}
+using Distributions, Random, LinearAlgebra, Statistics
+
+# === Model setup (from savings model chapter) ===
+Φ_cdf(x) = cdf(Normal(),x)
+
+function tauchen(ρ,ση,Kϵ)
+    sd = ση/sqrt(1-ρ^2)
+    grid = range(-3sd,stop=3sd,length=Kϵ)
+    Π = zeros(Kϵ,Kϵ)
+    Δ = grid[2]-grid[1]
+    for j=1:Kϵ
+        Π[1,j] = Φ_cdf((grid[1] + Δ/2 - ρ*grid[j])/ση)
+        Π[end,j] = 1 - Φ_cdf((grid[end] - Δ/2 - ρ*grid[j])/ση)
+        for k=2:(Kϵ-1)
+            Π[k,j] = Φ_cdf((grid[k] + Δ/2 - ρ*grid[j])/ση) - Φ_cdf((grid[k] - Δ/2 - ρ*grid[j])/ση)
+        end
+    end
+    return Π,collect(grid)
+end
+
+u(c,σ) = c^(1-σ) / (1-σ)
+
+function solve_max(V,t,iϵ,ia,pars)
+    (;agrid,ϵgrid,Π,σ,Ka,r,β) = pars
+    cash = exp(pars.μ[t] + ϵgrid[iϵ]) + agrid[ia]
+    amax = 1
+    vmax = -Inf
+    loop = true
+    a = 1
+    while loop && a<Ka
+        c = cash - agrid[a] / (1+r)
+        if c>0
+            v = u(c,σ)
+            for iϵ′ in axes(V,1)
+                v += β * Π[iϵ′,iϵ] * V[iϵ′,a,t+1]
+            end
+            if v>vmax
+                vmax = v
+                amax = a
+            end
+        else
+            loop = false
+        end
+        a += 1
+    end
+    return amax,vmax
+end
+
+function iterate!(V,A,t,pars)
+    for ia in axes(V,2), iϵ in axes(V,1)
+        A[iϵ,ia,t],V[iϵ,ia,t] = solve_max(V,t,iϵ,ia,pars)
+    end
+end
+
+function terminal_values!(V,pars)
+    (;σ,ψ,agrid) = pars
+    for ia in axes(V,2), iϵ in axes(V,1)
+        V[iϵ,ia] = ψ * u(agrid[ia],σ)
+    end
+end
+
+function backward_induction!(V,A,pars)
+    (;T) = pars
+    @views terminal_values!(V[:,:,T+1],pars)
+    for t in reverse(1:T)
+        iterate!(V,A,t,pars)
+    end
+end
+
+function setup_and_solve(θ)
+    β, σ, ψ = θ
+    T = 45
+    Ka = 100
+    Kϵ = 5
+    ρ = 0.9
+    ση = 0.1
+    r = 0.05
+    μ = fill(2., T)
+    agrid = collect(LinRange(0, μ[1] * T, Ka))
+    Π, ϵgrid = tauchen(ρ, ση, Kϵ)
+    pars = (;T, β, σ, ρ, ση, μ, ψ, r, Ka, Kϵ, agrid, Π, ϵgrid)
+    V = zeros(Kϵ, Ka, T+1)
+    A = zeros(Int64, Kϵ, Ka, T)
+    backward_induction!(V, A, pars)
+    return A, pars
+end
+```
+
+Now we write a simulation function. Given the policy function, we draw income shocks and track each individual's asset and income path.
+
+```{julia}
+function simulate_panel(A, pars, N_sim; seed=nothing)
+    (;T, Kϵ, Ka, agrid, ϵgrid, Π, μ, r) = pars
+    if !isnothing(seed)
+        Random.seed!(seed)
+    end
+
+    # Pre-compute CDF for sampling from Markov chain
+    cumΠ = cumsum(Π, dims=1)
+
+    # Storage
+    assets = zeros(N_sim, T+1)   # assets at start of each period
+    income = zeros(N_sim, T)
+    consumption = zeros(N_sim, T)
+    iϵ_sim = zeros(Int, N_sim, T)
+
+    # Initial conditions: start with zero assets, draw initial ϵ from stationary dist
+    # Use middle state as starting point for simplicity
+    iϵ_sim[:, 1] .= (Kϵ + 1) ÷ 2
+
+    for n in 1:N_sim
+        ia = 1  # start with zero assets
+        for t in 1:T
+            iϵ = iϵ_sim[n, t]
+            y = exp(μ[t] + ϵgrid[iϵ])
+            income[n, t] = y
+            cash = y + agrid[ia]
+
+            # Look up optimal savings
+            ia_next = A[iϵ, ia, t]
+            c = cash - agrid[ia_next] / (1 + r)
+            consumption[n, t] = c
+            assets[n, t+1] = agrid[ia_next]
+            ia = ia_next
+
+            # Draw next period's ϵ
+            if t < T
+                u_draw = rand()
+                iϵ_next = findfirst(cumΠ[:, iϵ] .>= u_draw)
+                iϵ_sim[n, t+1] = iϵ_next
+            end
+        end
+    end
+    return (;assets, income, consumption)
+end
+
+# Solve and simulate
+A, pars = setup_and_solve((0.95, 2.0, 5.0))
+sim = simulate_panel(A, pars, 1000; seed=123)
+```
+
+Let's check the simulation by plotting average assets and consumption over the life cycle.
+
+```{julia}
+using Plots
+p1 = plot(1:pars.T, mean(sim.assets[:,1:pars.T], dims=1)', label="Mean Assets",
+          xlabel="Age", title="Life-Cycle Profiles")
+plot!(p1, 1:pars.T, mean(sim.consumption, dims=1)', label="Mean Consumption")
+plot!(p1, 1:pars.T, mean(sim.income, dims=1)', label="Mean Income")
+```
+
+The hump-shaped asset profile and the smooth consumption path are consistent with the model's predictions: individuals accumulate assets during working years and draw them down toward the end of life, with the bequest motive preventing full decumulation.
+
+:::
+:::
+
+:::{.callout-note icon="false" collapse="true"}
+## Example: Simulated Moments for the Savings Model
+:::{#exm-bootstrap_savings}
+
+Now let's use the simulation machinery to define a set of moments and construct an MSM estimator for the preference parameters $(\beta,\sigma,\psi)$. We take the income process parameters $(\rho,\sigma_{\eta})$ as given (estimated in @exm-md_income).
+
+Our target moments will be:
+
+1. Mean assets at ages 30, 40, 50, 60 (to pin down the savings profile)
+2. Variance of log consumption at ages 30, 40, 50, 60 (to pin down risk aversion)
+
+```{julia}
+# Compute moments from simulated data
+function simulated_moments(θ; N_sim=2000, seed=42)
+    A, pars = setup_and_solve(θ)
+    sim = simulate_panel(A, pars, N_sim; seed=seed)
+    target_ages = [6, 16, 26, 36]  # ages 30, 40, 50, 60 (relative to t=1 at age 25)
+    m_assets = [mean(sim.assets[:, t]) for t in target_ages]
+    m_var_logc = [var(log.(sim.consumption[:, t])) for t in target_ages]
+    return vcat(m_assets, m_var_logc)
+end
+
+# "True" parameters and data moments
+θ_true = (0.95, 2.0, 5.0)
+m_data = simulated_moments(θ_true; N_sim=10_000, seed=1)
+
+# MSM objective
+function msm_objective(x, m_data)
+    β = 0.8 + 0.19 * (1 / (1 + exp(-x[1])))  # map to (0.8, 0.99)
+    σ = exp(x[2])
+    ψ = exp(x[3])
+    θ = (β, σ, ψ)
+    m_sim = simulated_moments(θ)
+    diff = m_data .- m_sim
+    return diff' * diff
+end
+```
+
+This estimator is computationally intensive --- each evaluation of the objective requires solving the dynamic programming problem and simulating the model. In practice, derivative-free optimization methods or finite-difference gradients are often used.
+
+```{julia}
+#| eval: false
+using Optim
+x0 = [0.0, log(2.0), log(5.0)]
+res = optimize(x -> msm_objective(x, m_data), x0, NelderMead(),
+               Optim.Options(iterations=200, show_trace=true))
+```
+
+:::
+:::
+
+
+## Indirect Inference
+
+**Indirect inference** is a simulation-based estimator that works by fitting an *auxiliary model* to both the real data and to data simulated from the structural model, and then finding the structural parameters that make the two sets of auxiliary estimates as close as possible.
+
+### Setup
+
+Let $\hat{\beta}_{N}$ be a vector of statistics estimated from the data (the "auxiliary parameters"). For example, $\hat{\beta}$ might be OLS coefficients from a wage regression, or the parameters of a reduced-form probit. The key requirement is that $\hat{\beta}$ is asymptotically normal:
+
+$$\sqrt{N}(\hat{\beta}_{N}-\beta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\Omega)$$
+
+Now, for each candidate $\theta$, simulate data from the structural model and compute the same statistic on the simulated data, yielding $\hat{\beta}^{R}(\theta)$. Let $\beta(\theta)=\text{plim}\ \hat{\beta}^{R}(\theta)$ denote the "pseudo-true" value of the auxiliary parameter implied by $\theta$. The **indirect inference estimator** is:
+
+$$\hat{\theta}_{II} = \arg\min_{\theta}\ (\hat{\beta}_{N}-\hat{\beta}^{R}(\theta))'\mathbf{W}(\hat{\beta}_{N}-\hat{\beta}^{R}(\theta))$$
+
+### Asymptotic Distribution
+
+:::{#thm-ii-asymptotics}
+## Asymptotic Distribution of Indirect Inference
+Suppose:
+
+1. $\sqrt{N}(\hat{\beta}_{N}-\beta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\Omega)$
+2. $R,N\rightarrow\infty$ with $\sqrt{N}/R\rightarrow 0$
+3. $\theta_{0}$ is the unique solution to $\beta(\theta)=\beta_{0}$ (**identification**)
+
+Then:
+$$\sqrt{N}(\hat{\theta}_{II}-\theta_{0})\rightarrow_{d}\mathcal{N}\left(\mathbf{0},\ (\nabla_{\theta}\beta_{0}\mathbf{W}\nabla_{\theta}\beta_{0}')^{-1}\nabla_{\theta}\beta_{0}\mathbf{W}\Omega\mathbf{W}\nabla_{\theta}\beta_{0}'(\nabla_{\theta}\beta_{0}\mathbf{W}\nabla_{\theta}\beta_{0}')^{-1}\right)$$
+
+where $\nabla_{\theta}\beta_{0}=\frac{\partial\beta(\theta_{0})'}{\partial\theta}$.
+:::
+
+The variance formula has the same sandwich structure as minimum distance estimation (@thm-md-asymptotics), which makes sense: indirect inference *is* a simulated minimum distance estimator where the reduced-form statistics play the role of $\pi$.
+
+### Relationship to MSM
+
+Indirect inference nests MSM as a special case. If the auxiliary model consists of sample moments $\hat{\beta}=\frac{1}{N}\sum_{n}g(\mathbf{w}_{n})$ and the simulated counterpart is $\hat{\beta}^{R}(\theta)=\frac{1}{NR}\sum_{r}\sum_{n}g(\mathbf{w}_{n}^{r}(\theta))$, then the indirect inference estimator reduces to MSM. The appeal of indirect inference is that it allows the use of *richer* auxiliary models --- like regressions or multinomial choice models --- that can capture complex features of the data.
+
+:::{.callout-warning icon="false"}
+## Discussion: Choosing Auxiliary Statistics
+
+The choice of auxiliary model is both an art and a science. A good auxiliary model should:
+
+1. Be sensitive to the structural parameters of interest (for efficiency).
+2. Capture the key features of the data that the structural model is designed to explain.
+3. Be computationally cheap to estimate (since it must be re-estimated on each simulated dataset).
+
+In practice, it is useful to think of the auxiliary model as a *diagnostic*: if the structural model cannot match the auxiliary estimates, it suggests the model is missing something important. This perspective connects indirect inference to the broader goal of model evaluation.
+:::
+
+
+## The Bootstrap
+
+We now turn to a fundamentally different use of simulation: not for evaluating the objective function, but for **inference**. The **bootstrap** uses resampling to approximate the sampling distribution of an estimator, providing standard errors and confidence intervals without requiring analytical derivations.
+
+### Motivation
+
+In many settings we face one or more of the following challenges:
+
+1. The variance formula is difficult to derive (e.g. for multi-step estimators).
+2. The derivatives of the criterion function are hard or costly to compute.
+3. The estimation criterion is non-smooth in finite samples.
+4. The sample size is too small for the CLT to provide a good approximation.
+
+The bootstrap addresses all of these by directly approximating the finite-sample distribution.
+
+### Framework
+
+Let $T_{N} = T_{N}(X_{1},\ldots,X_{N})$ be a statistic --- for instance, $T_{N}=\hat{\theta}$ or $T_{N}=\sqrt{N}(\hat{\theta}-\theta_{0})$. The finite-sample distribution $G_{N}(\cdot,F_{0})$ is typically unknown. The bootstrap idea is to replace $F_{0}$ with an estimate $\hat{F}_{N}$ and use $G_{N}(\cdot,\hat{F}_{N})$ to approximate $G_{N}(\cdot,F_{0})$.
+
+There are two main approaches to constructing $\hat{F}_{N}$:
+
+:::{#def-nonparametric-bootstrap}
+## Nonparametric Bootstrap
+Replace $F_{0}$ with the **empirical distribution function**:
+$$\hat{F}_{N}(x) = \frac{1}{N}\sum_{n=1}^{N}\mathbf{1}\{X_{n}\leq x\}$$
+Bootstrap samples are obtained by sampling $N$ observations **with replacement** from the original data.
+:::
+
+:::{#def-parametric-bootstrap}
+## Parametric Bootstrap
+Replace $F_{0}$ with $F(\cdot,\hat{\theta}_{N})$, the model-implied distribution evaluated at the estimated parameters. Bootstrap samples are obtained by **simulating** from the estimated model.
+:::
+
+The nonparametric bootstrap is more general and requires fewer assumptions, while the parametric bootstrap can be more efficient when the model is correctly specified. For structural models, the parametric bootstrap is natural since we already have the machinery to simulate from the model.
+
+### Procedure
+
+Given an estimator $\hat{\theta}_{N}$:
+
+1. Draw a bootstrap sample of size $N$: $\mathbf{X}^{b}=\{X_{1}^{b},\ldots,X_{N}^{b}\}$
+    - **Nonparametric**: sample with replacement from $\{X_{1},\ldots,X_{N}\}$
+    - **Parametric**: simulate from $F(\cdot,\hat{\theta}_{N})$
+2. Compute the bootstrap estimate: $\hat{\theta}^{b}_{N}=T_{N}(\mathbf{X}^{b})$
+3. Repeat steps 1-2 for $b=1,\ldots,B$ to obtain the bootstrap distribution $\{\hat{\theta}^{1}_{N},\ldots,\hat{\theta}^{B}_{N}\}$
+
+From this distribution we can compute:
+
+- **Bootstrap standard errors**: $\text{se}^{*}(\hat{\theta}) = \text{sd}(\hat{\theta}^{1},\ldots,\hat{\theta}^{B})$
+- **Percentile confidence intervals**: $[q_{\alpha/2},\ q_{1-\alpha/2}]$ where $q_{\alpha}$ is the $\alpha$-quantile of the bootstrap distribution
+- **Bootstrap-$t$ confidence intervals**: based on the distribution of the pivotal statistic $t^{b}=(\hat{\theta}^{b}-\hat{\theta})/\text{se}(\hat{\theta}^{b})$
+
+### When Does the Bootstrap Work?
+
+The bootstrap is **consistent** when the statistic $T_{N}$ is asymptotically normal. In this case, $G_{N}(\cdot,\hat{F}_{N})\rightarrow_{p}G_{\infty}(\cdot,F_{0})$, so the bootstrap distribution converges to the true asymptotic distribution.
+
+The bootstrap can actually do *better* than the asymptotic normal approximation when the statistic is **asymptotically pivotal** --- that is, when its asymptotic distribution does not depend on unknown parameters. The $t$-statistic $\sqrt{N}(\hat{\theta}-\theta_{0})/\text{se}(\hat{\theta})$ is a canonical example. In this case, the bootstrap provides a higher-order refinement over the normal approximation. See @horowitz2001bootstrap for a detailed discussion.
+
+:::{.callout-important}
+## Replicating the Dependence Structure
+
+The bootstrap requires that the resampling scheme correctly replicates the dependence structure in the data. For iid data, sampling with replacement is sufficient. For **panel data**, one should resample entire individuals (not individual observations) to preserve the within-person correlation structure. For time series data, block bootstrap methods are needed.
+:::
+
+:::{.callout-note icon="false" collapse="true"}
+## Example: Bootstrap Confidence Intervals for the Income Process
+:::{#exm-bootstrap_income}
+
+Let's apply the bootstrap to construct confidence intervals for the income process parameters estimated by minimum distance in @exm-md_income. Rather than relying on the analytical standard errors from @exm-md_income_se, we resample individuals from the PSID panel and re-estimate the parameters on each bootstrap sample.
+
+Since the PSID is panel data, we resample **entire individuals** (all observations for a given person) to preserve the within-person correlation.
+
+```{julia}
+using CSV, DataFrames, DataFramesMeta, Statistics, Optim, Plots, Random
+
+# Load and prepare data
+data_psid = @chain begin
+    CSV.read("../data/abb_aea_data.csv",DataFrame,missingstring = "NA")
+    @select :person :y :tot_assets1 :asset :age :year
+    @subset :age.>=25 :age.<=64
+end
+
+# Model moments and estimation functions (from @exm-md_income)
+function model_moments(θ, T)
+    ρ, σ2_α, σ2_η = θ
+    m = [σ2_α + (1-ρ^(2(t-1)))/(1-ρ^2) * σ2_η for t in 1:T]
+    return m
+end
+
+function md_estimate(data)
+    m_hat = @chain data begin
+        groupby(:age)
+        @combine :var_logy = var(log.(:y))
+        @orderby :age
+        _.var_logy
+    end
+    T = length(m_hat)
+
+    function md_objective(x)
+        ρ = tanh(x[1])
+        σ2_α = exp(x[2])
+        σ2_η = exp(x[3])
+        θ = (ρ, σ2_α, σ2_η)
+        m_model = model_moments(θ, T)
+        diff = m_hat .- m_model
+        return diff' * diff
+    end
+
+    x0 = [0.5, log(0.1), log(0.05)]
+    res = optimize(md_objective, x0, Newton(), autodiff=:forward)
+    x = res.minimizer
+    return [tanh(x[1]), exp(x[2]), exp(x[3])]
+end
+
+# Point estimate
+θ_hat = md_estimate(data_psid)
+println("Point estimates: ρ=$(round(θ_hat[1],digits=3)), σ²_α=$(round(θ_hat[2],digits=3)), σ²_η=$(round(θ_hat[3],digits=3))")
+```
+
+Now the bootstrap. We resample persons with replacement and re-estimate on each bootstrap sample.
+
+```{julia}
+Random.seed!(42)
+persons = unique(data_psid.person)
+N_persons = length(persons)
+B = 200
+
+θ_boot = mapreduce(vcat, 1:B) do b
+    # Resample persons with replacement
+    boot_persons = persons[rand(1:N_persons, N_persons)]
+    # Build bootstrap dataset (preserving panel structure)
+    boot_data = mapreduce(vcat, boot_persons) do p
+        @subset(data_psid, :person .== p)
+    end
+    try
+        return md_estimate(boot_data)'
+    catch
+        return [NaN NaN NaN]
+    end
+end
+
+# Remove any failed bootstrap replications
+θ_boot = θ_boot[.!any(isnan.(θ_boot), dims=2)[:], :]
+
+# Bootstrap standard errors
+se_boot = std.(eachcol(θ_boot))
+println("\nBootstrap standard errors (B=$B):")
+println("  se(ρ)    = $(round(se_boot[1], digits=4))")
+println("  se(σ²_α) = $(round(se_boot[2], digits=4))")
+println("  se(σ²_η) = $(round(se_boot[3], digits=4))")
+
+# 95% percentile confidence intervals
+ci_lower = [quantile(θ_boot[:,j], 0.025) for j in 1:3]
+ci_upper = [quantile(θ_boot[:,j], 0.975) for j in 1:3]
+println("\n95% Confidence Intervals:")
+println("  ρ:    [$(round(ci_lower[1],digits=3)), $(round(ci_upper[1],digits=3))]")
+println("  σ²_α: [$(round(ci_lower[2],digits=3)), $(round(ci_upper[2],digits=3))]")
+println("  σ²_η: [$(round(ci_lower[3],digits=3)), $(round(ci_upper[3],digits=3))]")
+```
+
+Let's visualize the bootstrap distributions.
+
+```{julia}
+labels = ["ρ", "σ²_α", "σ²_η"]
+pl = [begin
+    histogram(θ_boot[:,j], normalize=:pdf, label=false, alpha=0.5)
+    plot!([θ_hat[j], θ_hat[j]], [0, ylims()[2]*0.9], color="red",
+          linewidth=2, label="Point Estimate")
+    plot!(title=labels[j])
+end for j in 1:3]
+plot(pl..., layout=(1,3), size=(900,300))
+```
+
+Notice that bootstrapping panel data by resampling individuals is straightforward to implement and automatically accounts for within-person dependence, arbitrary heteroskedasticity, and the full complexity of the minimum distance estimator. Compare these to the analytical standard errors from @exm-md_income_se.
+
+:::
+:::
+
+
+:::{.callout-note icon="false" collapse="true"}
+## Example: Bootstrap for the Savings Model
+:::{#exm-bootstrap_savings_model}
+
+For the savings model, we use the **parametric bootstrap**. Since we are estimating by MSM using simulated data, the natural bootstrap procedure is:
+
+1. Estimate $\hat{\theta}$ by MSM.
+2. Simulate a "new" dataset from the model at $\hat{\theta}$ (this is the bootstrap sample).
+3. Re-estimate $\hat{\theta}^{b}$ from the bootstrap sample (using the same MSM procedure).
+4. Repeat to build the bootstrap distribution.
+
+Here is a sketch of the procedure. The key idea is that the "data moments" in each bootstrap replication come from a fresh simulation at the estimated $\hat{\theta}$, mimicking the sampling variability in the real data.
+
+```{julia}
+#| eval: false
+function parametric_bootstrap(θ_hat, B; N_data=1000, N_sim=2000)
+    θ_boot = zeros(B, 3)
+    for b in 1:B
+        # Step 1: Simulate "data" from model at θ̂ (with new random seed)
+        A, pars = setup_and_solve(θ_hat)
+        sim_data = simulate_panel(A, pars, N_data; seed=b)
+
+        # Step 2: Compute "data" moments from simulated data
+        target_ages = [6, 16, 26, 36]
+        m_boot = vcat(
+            [mean(sim_data.assets[:, t]) for t in target_ages],
+            [var(log.(sim_data.consumption[:, t])) for t in target_ages]
+        )
+
+        # Step 3: Re-estimate by MSM (matching m_boot instead of m_data)
+        x0 = [0.0, log(θ_hat[2]), log(θ_hat[3])]
+        res = optimize(x -> msm_objective(x, m_boot), x0, NelderMead(),
+                       Optim.Options(iterations=200))
+        x = res.minimizer
+        θ_boot[b,:] = [0.8 + 0.19/(1+exp(-x[1])), exp(x[2]), exp(x[3])]
+    end
+    return θ_boot
+end
+
+# Run bootstrap (computationally intensive!)
+# θ_boot = parametric_bootstrap(θ_hat, 100)
+# se_boot = std.(eachcol(θ_boot))
+```
+
+Each bootstrap replication requires solving the dynamic programming problem twice (once for the data simulation, once for each objective function evaluation during optimization). This makes the parametric bootstrap for structural models computationally expensive, but it is conceptually simple and automatically accounts for all sources of estimation uncertainty.
+
+:::
+:::
+
+
+## Practical Considerations
+
+### Simulation Noise and Smoothing
+
+When simulation draws are held fixed across evaluations of the objective function, the simulated objective is a smooth function of $\theta$ (assuming the model itself is smooth in $\theta$). This means standard gradient-based optimizers can be used. If simulation draws are re-drawn at each evaluation, the objective becomes noisy and optimization may fail or converge to the wrong point. **Always fix the random seed** when evaluating the simulated objective across different $\theta$ values.
+
+### How Many Draws?
+
+For MSM, consistency holds for any fixed $R$, but efficiency improves with $R$. A practical approach is to start with a moderate $R$ for exploration, then increase $R$ and check that the estimates are stable. If the estimates change substantially, $R$ is too small.
+
+For MSL, the bias from taking logarithms of simulated probabilities is of order $1/R$. In practice, $R$ should be large enough that this bias is negligible relative to the standard error.
+
+### Choosing Moments for MSM
+
+In @exm-bootstrap_savings, we chose a small set of moments. In practice, the choice of moments should be guided by:
+
+1. **Identification**: the moments should be informative about the parameters. Moments that are insensitive to a parameter will not help estimate it.
+2. **Parsimony**: more moments improve efficiency (in principle) but increase computational cost and can lead to poorly conditioned weighting matrices.
+3. **Model fit**: if the model cannot match a particular moment, including it will distort the estimates of other parameters. Start with moments the model should be able to match.
+
+The discussion in the [identification chapter](identification_savings.qmd) on which moments pin down which preference parameters is directly relevant here.
+
+### Diagonal Weighting Matrices
+
+When using MSM or minimum distance with many moments, the optimal weighting matrix $\mathbf{W}^{*}=\hat{S}^{-1}$ can be poorly estimated and lead to erratic results in finite samples. A common and practical alternative is to use a **diagonal** weighting matrix, where each moment is weighted by the inverse of its variance but cross-moment covariances are ignored. This sacrifices some efficiency but tends to be much more stable in practice.
+
+
+## Exercises
+
+:::{.callout-tip icon="false"}
+## Exercise
+:::{#exr-savings_estimation}
+Estimate the preference parameters $(\beta,\sigma,\psi)$ of the [savings model](../models/savings.qmd) using the method of simulated moments. Take the income process parameters as given from @exm-md_income.
+
+1. Choose a set of target moments from the PSID data (@exm-psid) that are informative about $(\beta,\sigma,\psi)$. Justify your choice based on the identification discussion in the [savings identification chapter](identification_savings.qmd).
+2. Implement the MSM estimator using the simulation code from @exm-simulate_savings.
+3. Report your estimates and plot the model fit for your chosen moments.
+4. Assess sensitivity: how do the estimates change when you use a different set of moments?
+:::
+:::
+
+
+:::{.callout-tip icon="false"}
+## Exercise
+:::{#exr-savings_bootstrap}
+Continuing from @exr-savings_estimation:
+
+1. Implement a parametric bootstrap to compute standard errors for $(\hat{\beta},\hat{\sigma},\hat{\psi})$ following the approach in @exm-bootstrap_savings_model. Use $B=100$ bootstrap replications.
+2. Construct 95% confidence intervals for each parameter.
+3. Which parameter is most precisely estimated? Which is least? Does this match your intuition from the identification discussion?
+:::
+:::
+
+
+:::{.callout-tip icon="false"}
+## Exercise
+:::{#exr-income_diagonal}
+Return to the minimum distance estimation of the income process from @exm-md_income. Instead of using the identity weighting matrix, implement estimation with:
+
+1. The **diagonal** weighting matrix, where each moment is weighted by the inverse of the variance of the corresponding sample moment.
+2. The **optimal** weighting matrix from @exm-md_income_se.
+
+Compare the estimates and standard errors across all three weighting schemes. How much does the choice of weighting matrix matter in practice?
+:::
+:::

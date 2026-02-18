@@ -1,0 +1,950 @@
+\documentclass[xcolor=dvipsnames,handout,c]{beamer}
+%\documentclass[xcolor=dvipsnames]{beamer}
+\usepackage{amssymb}
+\usepackage{amsmath}
+%\usepackage{mathpazo}
+\usepackage{multimedia}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{pgfpages}
+
+\usetheme{default}
+\usepackage{graphicx}
+\usepackage{amsthm}
+\usepackage{bm}
+\newcommand\ov{\overline}
+\newcommand\un{\underline}
+\newcommand\BB{\mathbb}
+\newcommand\EE{\mathbb{E}}
+\newcommand\mc{\mathcal}
+\newcommand\ti{\tilde}
+\newcommand\h{\hat}
+\newcommand\beq{\begin{equation}}
+\newcommand\eeq{\end{equation}}
+\newcommand\barr{\begin{array}}
+\newcommand\earr{\end{array}}
+\newcommand\bfp{\mathbf{p}}
+\newcommand\pder[2]{\frac{\partial #1}{\partial #2}}
+%\DeclareMathOperator*{\plim}{plim}
+\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand\eps{\epsilon}
+\newcommand\veps{\varepsilon}
+
+
+\setcounter{MaxMatrixCols}{10}
+\mode<presentation>
+\newtheorem{acknowledgement}[theorem]{Acknowledgement}
+\newtheorem{algorithm}[theorem]{Algorithm}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{case}[theorem]{Case}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{conclusion}[theorem]{Conclusion}
+\newtheorem{condition}[theorem]{Condition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{criterion}[theorem]{Criterion}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{summary}[theorem]{Summary}
+%\newenvironment{stepenumerate}{\begin{enumerate}[<+->]}{\end{enumerate}}
+%\newenvironment{stepitemize}{\begin{itemize}[<+->]}{\end{itemize} }
+%\newenvironment{enumerate}{\begin{enumerate}[<+-| alert@+>]}{\end{enumerate}}
+%\newenvironment{stepitemizewithalert}{\begin{itemize}[<+-| alert@+>]}{\end{itemize} }
+\beamertemplatetransparentcoveredhigh
+\usefonttheme[onlymath]{serif}
+%\usetheme[height=7mm]{Boadilla}
+\setbeamercovered{dynamic}
+\usecolortheme[named=Blue]{structure}
+\def\hilite<#1>{\temporal<#1>{\color{black!50}}{\color{blue}}{\color{black}}}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\begin{document}
+
+\title[Applied Econometrics]{Applied Econometrics: Extremum Estimators}
+\author[Mullins]{Joseph Mullins \\
+\bigskip \bigskip Econ 8208}
+\institute{University of Minnesota}
+\date{Spring 2020}
+\maketitle
+
+\begin{frame}\frametitle{Introduction}
+  \begin{itemize}
+  \item In the Fall you extensively studied GMM.
+  \item Now look at how GMM falls within broad class of estimators.
+  \item Goal: give you the tools to choose the right estimation method for your research.
+  \item Understand tradeoffs for different methods.
+  \item Apply these to different settings:
+    \begin{itemize}
+    \item[-] Discrete choice.
+    \item[-] Search models.
+    \item[-] Dynamic models and panel data.
+    \item[-] ``Causal inference''.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+
+\frametitle{Example: Maximum Likelihood Estimator}
+
+\begin{itemize}
+
+\item Example: $y_{i}\in \{0,1\}$: employment status.
+
+\item We are interested in understanding the importance of factors $x_{i}$
+(e.g., wage offers, skills, family characteristics) affecting the
+probability $\Pr (y_{i}=1|x_{i})$, which is nonlinear function of $x_{i}.$
+
+\item One popular approach: maximum likelihood.
+
+\begin{itemize}
+\item maximum likelihood is an approach to estimate the model fully
+exploiting individual level data.
+\end{itemize}
+\end{itemize}
+
+\end{frame}%
+
+\begin{frame}%
+
+\frametitle{Maximum Likelihood Estimator}
+
+\begin{itemize}
+\item Specifically, let $f(y_{i}|\mathbf{x}_{i},\theta )$ be the likelihood
+of $y_{i}$ conditional on $\mathbf{x}_{i}$ under parameter $\theta .$
+
+\begin{itemize}
+\item (example) suppose that $\Pr (y_{i}=1|x_{i})=\Phi (\mathbf{x}_{i}\beta
+) $ and $\Pr (y_{i}=0|x_{i})=1-\Phi (\mathbf{x}_{i}\beta ).$ Then, the
+likelihood is
+\begin{equation*}
+f(y_{i}|\mathbf{x}_{i},\theta )=\Phi (\mathbf{x}_{i}\beta )^{y_{i}}\left(
+1-\Phi (\mathbf{x}_{i}\beta )\right) ^{1-y_{i}}.
+\end{equation*}
+\end{itemize}
+
+\item Maximum likelihood estimator is the solution to
+\begin{equation*}
+\hat{\theta}_{ML}=\arg\max_{\theta }\prod_{i=1}^{n}f(y_{i}|\mathbf{x}_{i},\theta ).
+\end{equation*}
+
+\item This is equivalent to maximize the log likelihood:%
+\begin{equation*}
+\hat{\theta}_{ML}=\arg\max_{\theta }\sum_{i=1}^{n}\log (f(y_{i}|\mathbf{x}_{i},\theta )).
+\end{equation*}
+
+\item \textbf{Crucial}: what are the asymptotic properties of $\hat{\theta}_{ML}$?
+\end{itemize}
+
+\end{frame}%
+
+\begin{frame}%
+
+\frametitle{Our Plan}
+
+\begin{itemize}
+\item We first define two general classes of estimator called (1) {\color{blue}extremum
+estimator} and (2) {\color{blue}M-estimator} (an important subclass).
+
+\item Then, study asymptotic properties:
+
+\begin{itemize}
+\item[-] consistency
+
+\item[-] asymptotic normality
+\end{itemize}
+
+\item Then study asymptotic properties of {\color{blue}ML}.
+\item Then we introduce other techniques, often well-suited to complicated models:
+  \begin{itemize}
+  \item[-] {\color{blue}Minimum Distance}
+  \item[-] {\color{blue} Simulated Method of Moments/Indirect Inference/Simulated ML}
+  \end{itemize}
+\item We discuss the {\color{blue}Bootstrap}, a convenient method for inference.
+\end{itemize}
+
+\end{frame}%
+
+\begin{frame}%
+
+\frametitle{Extremum Estimator}
+
+\begin{itemize}
+\item Extremum estimators comprises a wide class of estimation strategies.
+They are defined as follows:
+
+\begin{definition}
+Extremum Estimators
+
+$\hat{\theta}$ is an extremum estimator iff
+\begin{equation*}
+\hat{\theta}=\arg \max_{\theta }Q_{n}(\theta )\text{ }\theta \in \Theta
+\subset R^{p}.
+\end{equation*}%
+for some $Q_{n}(\cdot ).$
+\end{definition}
+\end{itemize}
+
+\end{frame}%
+
+% \begin{frame}%
+
+% \frametitle{Extremum Estimator: Existence}
+
+% \begin{itemize}
+% \item The following are sufficient conditions for the existence of extremum
+% estimators:
+
+% \begin{enumerate}
+% \item $\Theta $ is compact;
+
+% \item $Q_{n}(\cdot )$ is continuous in $\theta ;$
+
+% \item $Q_{n}(\theta )$ is a measurable function of the data for any fixed $%
+% \theta .$
+% \end{enumerate}
+% \end{itemize}
+% \end{frame}%
+\begin{frame}%
+
+\frametitle{Extremum Estimator: Examples}
+
+\begin{itemize}
+\item (M-estimator)%
+\begin{equation*}
+Q_{n}(\theta )=\frac{1}{n}\sum_{i=1}^{n}m(\mathbf{w}_{i},\theta )
+\end{equation*}
+
+\item (GMM estimator)%
+\begin{equation*}
+Q_{n}(\theta )=-\frac{1}{2}\mathbf{g}_{n}^{\prime }(\theta )\mathbf{\hat{W}g}%
+_{n}(\theta )
+\end{equation*}%
+where%
+\begin{equation*}
+\mathbf{g}_{n}(\theta )=\frac{1}{n}\sum g(\mathbf{w}_{i},\theta )
+\end{equation*}
+\item (Minimum Distance Estimator)
+  \[
+    Q_{n}(\theta,\hat{\pi}_n)=-\frac{1}{2}\psi^{\prime}(\theta,\hat{\pi}_n)\mathbf{\hat{W}}\psi(\theta,\hat{\pi}_n)
+\]
+where
+\[ \sqrt{n}\hat{\pi}_n\rightarrow_d\mathcal{N}(\pi_0,\Sigma)\qquad \psi(\theta_0,\pi_0)=0
+\]
+\end{itemize}
+
+\end{frame}%
+
+\begin{frame}%
+
+\frametitle{Examples of M-estimator}
+
+\begin{itemize}
+\item Maximum Likelihood:
+\begin{equation*}
+m(\mathbf{w}_{i},\theta )=\log (f(y_{i}|\mathbf{x}_{i},\theta ))
+\end{equation*}
+
+\item Nonlinear least squares%
+\begin{equation*}
+m(\mathbf{w}_{i},\theta )=\left( y_{i}-\varphi (\mathbf{x}_{i},\theta
+)\right) ^{2}.
+\end{equation*}
+\item Exercise: M-estimator is a special case of GMM.
+\end{itemize}
+\end{frame}%
+
+\begin{frame}%
+
+\frametitle{Consistency}
+
+\begin{itemize}
+\item Suppose that
+
+\begin{enumerate}
+\item $Q_{n}(\theta )\rightarrow _{p}Q_{0}(\theta ),$ $\forall \theta .$
+
+\item $\theta _{0}\,$\ is the maximizer of $Q_{0}(\theta )\,.$
+\end{enumerate}
+
+\item One could be tempted to infer that $\hat{\theta}\rightarrow _{p}\theta
+_{0}...$
+
+\item But these are not sufficient conditions.
+\end{itemize}
+
+\end{frame}%
+
+\begin{frame}%
+
+\frametitle{Identification}
+
+\begin{itemize}
+\item If the solution of $\max Q_{0}(\theta )$ is not unique, then it may
+not converge to $\theta _{0}!$
+
+\item We need to impose that $\theta _{0}\,$\ is the unique maximizer of $%
+Q_{0}(\theta ).$
+\item Alternative: \emph{partial identification}.
+\end{itemize}
+
+\end{frame}%
+
+\begin{frame}%
+
+\frametitle{Uniform Convergence}
+
+\begin{itemize}
+\item It maye be that $Q_{n}(\theta )\rightarrow
+_{p}Q_{0}(\theta )$ but NOT $\hat{\theta}\rightarrow _{p}\theta _{0}.$
+
+\item To guarantee this, we need to impose the stronger notion of
+convergence:%
+\begin{equation*}
+\sup_{\theta \in \Theta }\left\vert Q_{n}(\theta )-Q_{0}(\theta )\right\vert
+\rightarrow _{p}0.
+\end{equation*}
+\item Exercise: think of an example to show necessity ($Q_n(\theta) = \mathbf{1}\{\theta=\frac{n}{1+n}\} + 1-\theta^2$)
+\end{itemize}
+
+\end{frame}%
+
+\begin{frame}%
+\frametitle{Consistency with compactness}
+
+\begin{theorem}
+Suppose that
+
+(1) $\Theta $ is a compact subset $R^{p}.$
+
+(2) $Q_{n}(\theta )$ is continuous in $\theta ,\forall (\mathbf{w}%
+_{i})_{i=1}^{n}$
+
+(3) $Q_{n}(\theta )$ is a measurable function of the data, $\forall \theta
+\in \Theta .$
+
+If there is $Q_{0}(\cdot )$ such that
+
+(a) (identification) $Q_{0}(\cdot )$ is uniquely maximized on $\Theta $ at $%
+\theta _{0}\in \Theta .$
+
+(b) (uniform convergence) $Q_{n}(\cdot )$ converges uniformly in probability
+to $Q_{0}(\cdot )$ (in other words, assume that $\sup_{\theta \in \Theta
+}\left\vert Q_{n}(\theta )-Q_{0}(\theta )\right\vert \rightarrow _{p}0.)$
+
+then%
+\begin{equation*}
+\hat{\theta}\rightarrow _{p}\theta _{0}.
+\end{equation*}
+\end{theorem}
+
+\end{frame}%
+
+\begin{frame}\frametitle{Proof Sketch}
+\begin{enumerate}
+\item Show that $Q_0(\hat{\theta}) > Q_0(\theta_0) - \epsilon$ for any $\epsilon$ with prob approaching 1 (need uniform convergence)
+\item For any small neighborhood around $\theta_0$, $\mathcal{N}$, compactness + continuity gives $\sup_{\theta\in\Theta\cap\mathcal{N}^c}Q_0(\theta)<Q_0(\theta_0)$
+\item Choose $\epsilon = Q_0(\theta_0)-\sup_{\theta\in\Theta\cap\mathcal{N}^c}Q_0(\theta)$
+\item This implies $\hat{\theta}\in\mathcal{N}$.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Consistency (w/o compactness)}
+
+\begin{theorem}
+Suppose that
+
+(1) $\theta _{0}\in int(\Theta )$
+
+(2)$\ Q_{n}(\theta )$ is concave in $\theta ,\forall (\mathbf{w}%
+_{i})_{i=1}^{n}$
+
+(3) $Q_{n}(\theta )$ is a measurable function of the data, $\forall \theta
+\in \Theta .$
+
+If there is $Q_{0}(\cdot )$ such that
+
+(a) (identification) $Q_{0}(\cdot )$ is uniquely maximized on $\Theta $ at $%
+\theta _{0}\in \Theta .$
+
+(b) (pointwise convergence) $Q_{n}(\cdot )\rightarrow _{p}Q_{0}(\cdot
+),\forall \theta $
+
+then%
+\begin{equation*}
+\hat{\theta}\rightarrow _{p}\theta _{0}.
+\end{equation*}
+\end{theorem}
+
+%Concave+pointwise convergence $\rightarrow $ uniform convergence <- this is false
+
+\end{frame}%
+\begin{frame}\frametitle{Proof Sketch}
+    \begin{enumerate}
+    \item Theorem: concavity implies uniform convergence on any compact subset of $\Theta$ (e.g. Rockafellar (1970))
+    \item By $\theta_0\in int(\Theta)$ + continuity + concavity, $\exists$ $\epsilon$ s.t. $C = \{\theta: Q_0(\theta)\geq Q_0(\theta_0)-\epsilon\}$ is closed and bounded.
+    \item $\tilde{\theta}_n=\arg\max_{\theta\in C} Q_n(\theta)$ is consistent by previous theorem.
+    \item For any $\theta\notin C$, $Q_n(\theta_0) > Q_n(\theta)$ w.p.a. 1 by pointwise convergence.
+    \item So $\tilde{\theta}_n=\hat{\theta}_n$ w.p.a. 1.
+    \end{enumerate}
+  \end{frame}
+
+\begin{frame}
+\frametitle{More on Uniform Convergence}
+For $M$-estimators, $Q_n(\theta) = \frac{1}{n}\sum m(\mathbf{w}_i,\theta)$:
+\begin{itemize}
+\item Note that if we can use the Ergodic theorem, one can have
+\begin{equation*}
+Q_{n}(\theta )\rightarrow _{p}Q_{0}(\theta )\equiv E[m(\mathbf{w}_{i},\theta
+)].
+\end{equation*}
+
+\item With compactness, how can we show that the convergence is uniform?
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}%
+
+\frametitle{Uniform LLN}
+
+\begin{theorem}
+Assume that $\left\{ \mathbf{w}_{i}\right\} _{i=1}^{n}$ is ergodic
+stationary. Furthermore,
+
+(1) $\Theta $ is compact
+
+(2) $m(\mathbf{w}_{i},\theta )$ is continuous in $\theta ,\forall \mathbf{w}%
+_{i}$
+
+(3) $m(\mathbf{w}_{i},\theta )$ is a measurable function of the data, $%
+\forall \theta \in \Theta .$
+
+(4) $\exists d(\mathbf{w}_{i})$ such that $\left\vert m(\mathbf{w}%
+_{i},\theta )\right\vert \leq d(\mathbf{w}_{i}),$ $\forall \theta \in \Theta
+$ and $E[d(\mathbf{w}_{i})]<\infty $
+
+then
+
+(a) convergence is uniform;
+
+(b) $E[m(\mathbf{w}_{i},\theta )]$ is continuous in $\theta .$
+\end{theorem}
+
+Use $d(\mathbf{w}_{i})=\sup_{\theta }\left\vert m(\mathbf{w}_{i},\theta
+)\right\vert $ and the condition to be verified is $E[\sup_{\theta
+}\left\vert m(\mathbf{w}_{i},\theta )\right\vert ]<\infty .$
+
+\end{frame}%
+\begin{frame}%
+
+\frametitle{Identification Condition}
+
+\begin{itemize}
+\item How about identification condition?
+
+\item For the nonlinear least squares,
+\begin{equation*}
+m(\mathbf{w}_{i},\theta )=-\left( y_{i}-\varphi (\mathbf{x}_{i},\theta
+)\right) ^{2}
+\end{equation*}%
+and%
+\begin{equation*}
+E[y_{i}|\mathbf{x}_{i}]=\varphi (\mathbf{x}_{i},\theta ).
+\end{equation*}
+
+\item The identification condition holds if
+\begin{equation*}
+\varphi (\mathbf{x}_{i},\theta _{0})\neq \varphi (\mathbf{x}_{i},\theta
+),\forall \theta \neq \theta _{0}.
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}%
+
+\frametitle{Identification Condition for ML}
+
+\begin{itemize}
+\item The Kullback-Leibler information inequality states that
+\begin{eqnarray*}
+E\left[ \ln \left( \frac{f(\mathbf{w}_{i},\theta )}{f(\mathbf{w}_{i},\theta
+_{0})}\right) \right] &\leq &\ln E\left[ \frac{f(\mathbf{w}_{i},\theta )}{f(%
+\mathbf{w}_{i},\theta _{0})}\right] \\
+&=&0.
+\end{eqnarray*}%
+\begin{equation*}
+\Longleftrightarrow
+\end{equation*}%
+\begin{equation*}
+E[\ln \left( f(\mathbf{w}_{i},\theta )\right) ]\leq E[\ln \left( f(\mathbf{w}%
+_{i},\theta _{0})\right) ]
+\end{equation*}%
+with equality if $\theta =\theta _{0}$ and with strict inequality if $\theta
+\neq \theta _{0}$
+
+\item So $E[m(\mathbf{w}_{i},\theta _{0})]$ is uniquely maximized at $\theta
+_{0}$ if $f(\mathbf{w}_{i},\theta )\neq f(\mathbf{w}_{i},\theta _{0})$ $%
+\forall \theta \neq \theta _{0}.$
+\end{itemize}
+
+\end{frame}%
+\begin{frame}%
+
+\frametitle{Consistency for ML with compactness}
+
+\begin{theorem}
+Suppose that $\left\{ y_{i},\mathbf{x}_{i}\right\} $ is ergodic stationary
+with density $f(y_{i}|\mathbf{x}_{i},\theta _{0})$ and $\hat{\theta}$ be the
+conditional MLE. The model is assumed to be correctly specified so that $%
+\theta _{0}\in \Theta $ and
+
+(1) $\Theta $ is a compact subset $R^{p}.$
+
+(2) $f(y_{i}|\mathbf{x}_{i},\theta )$ is continuous in $\theta ,\forall (%
+\mathbf{w}_{i})_{i=1}^{n}$
+
+(3) $f(y_{i}|\mathbf{x}_{i},\theta )$ is a measurable function of the data, $%
+\forall \theta \in \Theta .$
+
+(4) (identification) $\Pr \left( f(y_{i}|\mathbf{x}_{i},\theta _{0})\neq
+f(y_{i}|\mathbf{x}_{i},\theta )\right) >0,$ $\forall \theta \neq \theta _{0}.
+$
+
+(5) (dominance condition) $E_{y_{i},\mathbf{x}_{i}}[\sup_{\theta \in \Theta
+}\ln \left\vert \left( f(y_{i}|\mathbf{x}_{i},\theta )\right) \right\vert
+]<\infty $
+
+then%
+\begin{equation*}
+\hat{\theta}\rightarrow _{p}\theta _{0}.
+\end{equation*}
+\end{theorem}
+
+\end{frame}%
+
+\begin{frame}%
+
+\frametitle{Consistency for ML w/o compactness}
+
+\begin{theorem}
+Suppose that $\left\{ y_{i},\mathbf{x}_{i}\right\} $ is ergodic stationary
+with density $f(y_{i}|\mathbf{x}_{i},\theta _{0})$ and $\hat{\theta}$ be the
+conditional MLE. The model is assumed to be correctly specified so that $%
+\theta _{0}\in \Theta $ and
+
+(1) $\theta _{0}\in int\left( \Theta \right) $
+
+(2) $f(y_{i}|\mathbf{x}_{i},\theta )$ is concave in $\theta ,\forall (%
+\mathbf{w}_{i})_{i=1}^{n}$
+
+(3) $f(y_{i}|\mathbf{x}_{i},\theta )$ is a measurable function of the data, $%
+\forall \theta \in \Theta .$
+
+(4) (identification) $\Pr \left( f(y_{i}|\mathbf{x}_{i},\theta _{0})\neq
+f(y_{i}|\mathbf{x}_{i},\theta )\right) >0,$ $\forall \theta \neq \theta _{0}.
+$
+
+(5) $E_{y_{i},\mathbf{x}_{i}}[\ln \left\vert \left( f(y_{i}|\mathbf{x}%
+_{i},\theta )\right) \right\vert ]<\infty ,$ $\forall \theta $
+
+then%
+\begin{equation*}
+\hat{\theta}\rightarrow _{p}\theta _{0}.
+\end{equation*}
+\end{theorem}
+
+\end{frame}%
+
+\begin{frame}%
+
+\frametitle{Asymptotic Normality}
+
+\begin{itemize}
+\item Assume that $m(\mathbf{w}_{i},\theta )$ is twice differentiable.
+
+\item Define
+\begin{equation*}
+\mathbf{s(w}_{i},\theta )_{p\times 1}=\frac{\partial m(\mathbf{w}_{i},\theta
+)}{\partial \theta }
+\end{equation*}
+\end{itemize}
+
+\begin{equation*}
+\mathbf{H(w}_{i},\theta )_{p\times p}=\frac{\partial ^{2}m(\mathbf{w}%
+_{i},\theta )}{\partial \theta \partial \theta ^{\prime }}
+\end{equation*}
+
+\end{frame}%
+
+\begin{frame}%
+
+\frametitle{Asymptotic Normality}
+
+\begin{itemize}
+\item Under the assumption that $\hat{\theta}$, $\hat{\theta}$ will be the
+solution of FOC:%
+\begin{equation*}
+0=\frac{\partial Q_{n}(\hat{\theta})}{\partial \theta }=\frac{1}{n}%
+\sum_{n=1}^{n}\mathbf{s(w}_{i},\theta ).
+\end{equation*} \pause
+
+\item By applying the mean value theorem ($h(x)=h(x_{0})+\frac{\partial h(%
+\bar{x})}{\partial x}(x-x_{0}),$ $\bar{x}\in \lbrack x,x_{0}]$),
+\begin{eqnarray*}
+\frac{\partial Q_{n}(\hat{\theta})}{\partial \theta } &=&\frac{\partial
+Q_{n}(\theta _{0})}{\partial \theta }+\frac{\partial ^{2}Q_{n}(\bar{\theta}))%
+}{\partial \theta \partial \theta ^{\prime }}(\hat{\theta}-\theta ) \\ \pause
+&=&\frac{1}{n}\sum_{i=1}^{n}\mathbf{s(w}_{i},\theta _{0})+\sum_{i=1}^{n}%
+\mathbf{H(w}_{i},\bar{\theta})(\hat{\theta}-\theta _{0}) \\
+&=&0. \pause
+\end{eqnarray*}
+\item Notice that $E[\bm{s}(\bm{w}_i,\theta_0)]=0$ so by CLT:
+  \[\frac{1}{n}\sum_{i=1}^{n}\mathbf{s(w}_{i},\theta _{0}) \rightarrow_d \mc{N}(0,\Sigma)\]
+  with $\Sigma = E[\bm{s}(\bm{w}_i,\theta_0)\bm{s}(\bm{w}_i,\theta_0)']$.
+\end{itemize}
+
+\end{frame}%
+\begin{frame}%
+
+\frametitle{Asymptotic Normality}
+
+\begin{itemize}
+\item Assuming that $\frac{1}{n}\sum_{i=1}^{n}\mathbf{H(w}_{i},\bar{\theta})$
+is nonsingular,
+\begin{equation*}
+\sqrt{n}(\hat{\theta}-\theta _{0})=-\left[ \frac{1}{n}\sum_{i=1}^{n}\mathbf{H(w}_{i},\bar{\theta})\right] ^{-1}\frac{1}{\sqrt{n}}\sum_{i=1}^{n}\mathbf{s(w}_{i},\theta _{0}).
+\end{equation*} \pause
+
+\item If
+\begin{equation*}
+\frac{1}{n}\sum_{i=1}^{n}\mathbf{H(w}_{i},\bar{\theta})\rightarrow _{p}E[\mathbf{H(w}_{i},\theta _{0})]
+\end{equation*}%
+and
+\begin{equation*}
+\frac{1}{\sqrt{n}}\sum_{i=1}^{n}\mathbf{s(w}_{i},\theta _{0})\rightarrow
+_{d}N(\mathbf{0,}\Sigma )
+\end{equation*}% \pause
+then by Slutzky theorem%
+\begin{equation*}
+\sqrt{n}(\hat{\theta}-\theta _{0})\rightarrow _{d}N(\mathbf{0,}E[\mathbf{H(w}%
+_{i},\theta _{0})]^{-1}\Sigma E[\mathbf{H(w}_{i},\theta _{0})]^{-1})
+\end{equation*}
+\end{itemize}
+
+\end{frame}%
+\begin{frame}%
+
+\frametitle{Asymptotic Normality for M-estimator}
+
+\begin{theorem}
+Assume that conditions for consistency hold. Also,
+
+\begin{enumerate}
+\item  $\theta _{0}\in int\left( \Theta \right) $ \pause
+
+\item  $m(\mathbf{w}_{i},\theta )\in C^{2}$ in $\theta ,\forall \mathbf{w}_{i}$ \pause
+
+\item  $\sqrt{n}\frac{1}{n}\sum_{i=1}^{n}\mathbf{s(w}_{i},\theta )\rightarrow
+_{d}N(\mathbf{0},\Sigma )$ where $\Sigma $ is positive def. \pause
+
+\item  (local dominance for the Hessian)%
+\begin{equation*}
+E\left( \sup_{\theta \in N(\theta _{0})}\left\Vert \mathbf{H(w}_{i},\theta
+)\right\Vert \right) <\infty .
+\end{equation*} \pause
+
+\item  $E\left( \mathbf{H(w}_{i},\theta _{0})\right) $ is nonsingular. \pause
+\end{enumerate} \pause
+
+then%
+\begin{equation*}
+\sqrt{n}\left( \theta -\theta _{0}\right) \rightarrow _{d}N(\mathbf{0}%
+,E\left( \mathbf{H(w}_{i},\theta _{0})\right) ^{-1}\Sigma E\left( \mathbf{H(w%
+}_{i},\theta _{0})\right) ^{-1})
+\end{equation*}
+\end{theorem}
+
+\end{frame}%
+
+\begin{frame}\frametitle{Fisher Information Matrix}
+  We can show that when $m(\textbf{w}_i,\theta)=\log(f(y_i|\textbf{x}_i,\theta)$:
+  \[\Sigma = E[\mathbf{s}(\mathbf{w}_i,\theta_0)\mathbf{s}(\mathbf{w}_i,\theta_0)^\prime] = -E[\mathbf{H}(\mathbf{w}_i,\theta_0)]\]
+  So asympotic variance is:
+\begin{equation*}
+Avar(\hat{\theta})=-E\left( \mathbf{H(w}_{i},\theta _{0})\right) ^{-1}=E[\mathbf{s(w}_{i},\theta_0)\mathbf{s(w}_{i},\theta )^{\prime }]^{-1}=\mathcal{I}(\theta)^{-1}.
+\end{equation*}
+Sometimes call $\mathcal{I}(\theta)$ the \emph{Fisher} information matrix. It's the covariance of the score, $\mathbf{s}_i$.
+\end{frame}
+
+\begin{frame}\frametitle{Efficiency}
+\begin{itemize}
+\item ML can be thought of as efficient among a number of important classes of estimators. \pause
+\item Efficient among GMM estimators. \pause
+\item $\mathcal{I}(\theta)^{-1}$ is the \emph{Cramer-Rao lower bound} for all unbiased estimators of $\theta_0$ \pause
+\item One reason MLE is efficient: it makes use of every available piece of information. \pause
+\item This means it takes every feature of the model \emph{very} seriously. \pause
+\item Statistical information $\neq$ theoretical or conceptual importance. \pause
+\item Leans heavily on specification of parametric distributions.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}\frametitle{Efficiency relative to GMM}
+  Recall $\hat{\theta}_{GMM}=\arg\min g_n(\theta)'Wg_n(\theta)$ where
+  \[g_n = \frac{1}{n}\sum g(z_i,\theta)\]
+  You know that
+  \[V[\hat{\theta}_{GMM}] = E[m_\theta]^{-1}E[mm']E[m_\theta]^{-1} \]
+  where $m_\theta=E[\nabla_\theta g]^\prime W\nabla_\theta g(z,\theta_0)'$ and $m=E[\nabla_\theta g]^\prime W g(z,\theta_0)$.
+\end{frame}
+
+\begin{frame}\frametitle{Efficiency relative to GMM}
+  Now use the identity:
+    \begin{align*}
+      0 &= \int g(z,\theta)f(z|\theta)dz\ (\text{identity for all $\theta$}) \\ \pause
+      \Rightarrow      0 &= \int \nabla_\theta g(z,\theta)f(z|\theta)dz + \int g(z,\theta) \nabla_\theta\log(f(z|\theta))f(z|\theta) dz \\ \pause
+      0 &=  E[\nabla_\theta g(z,\theta)] - E[g(z,\theta)\mathbf{s}(z,\theta)^\prime] \\
+   \Leftrightarrow   0 &= E[m_\theta] - E[m\mathbf{s}(z,\theta)^\prime]
+    \end{align*} \pause
+    This gives:
+    {\footnotesize
+\begin{align*}
+  V[\hat{\theta}_{GMM}]-V[\hat{\theta}_{MLE}] &= E[m_\theta]^{-1}E[mm^\prime]E[m_\theta]^{-1} - E[ss^\prime]^{-1} \\ \pause
+                                              &= E[ms^\prime]^{-1}E[mm^\prime]E[ms^\prime]^{-1} - E[ss^\prime]^{-1} \\ \pause
+                                              &= E[ms']^{-1}(E[mm^\prime] - E[ms^\prime]E[ss^\prime]^{-1}E[ms^\prime])E[ms^\prime]^{-1} \\ \pause
+                                                &= E[ms']^{-1}E[UU']E[ms']^{-1} \geq 0
+\end{align*}}
+where $U=m-E[ms']E[ss']^{-1}s$.
+\end{frame}
+
+%% HERE: put in application to a simple search model!!
+\begin{frame}\frametitle{Two Applications}
+\begin{enumerate}
+\item Stationary search model.
+\begin{itemize}
+\item Parameters $b$, $F_w$, $\delta$, $\lambda$.
+\item Single cross-section on wages and unemployment durations.
+\item Review case on board. We'll return to this example in future sections.
+\item With and without observable heterogeneity, $\mathbf{x}_i$.
+\end{itemize} \pause
+\item Life-cycle savings model.
+  \begin{itemize}
+  \item Preferences: $(\beta,\sigma)$
+  \item Income process: \[y_{t} = \mu_{t} + \varepsilon_{t}+v_{t},\ \varepsilon_{t+1}=\rho\varepsilon_{t}+\xi_{t+1},\ v_t\sim\mc{N}(0,\sigma^2_{v}),\ \xi_t\sim\mc{N}(0,\sigma^2_{\xi})\]
+  \item Initial conditions: $\varepsilon_0\sim\mc{N}(0,\sigma^2_{\xi}/(1-\rho^2))$, $a_0=0$.
+  \item With short panels, full likelihood here is tricky!
+  \end{itemize}
+  % \item Generic model of choice.
+% \begin{itemize}
+% \item ${\Psi}(\pi,\theta)=0$ where $\pi$ are choice probabilities, $\dim(\pi)=D$.
+% \item $\Psi$ are optimality conditions (e.g. dynamic program).
+% \item Data on choices, $d_i\in\{0,...,D-1\}$.
+% \item Model produces mapping $\pi = \pi(\theta)$.
+% \end{itemize}
+\end{enumerate}
+Let's write the likelihood for both cases.
+\end{frame}
+
+
+\begin{frame}\frametitle{Minimum Distance Estimator}
+\begin{definition}[Minimum Distance Estimator]
+  Suppose:
+  \begin{itemize}
+  \item $\hat{\pi}_n$ is a statistic from the data, and
+  \item $\psi(\pi,\theta)$ is a vector of model restrictions.
+  \item Idea: $\psi(\pi_0,\theta_0)=0$ and $\pi_n\rightarrow_p\pi_0$. \pause
+  \end{itemize}
+  $\hat{\theta}_n$ is a \textbf{minimum distance estimator} if:
+  \[\hat{\theta}_n=\arg\min_{\theta} \psi(\hat{\pi}_n,\theta)'\mathbf{W}_n\psi(\hat{\pi}_n,\theta)\]
+\end{definition} \pause
+Note:
+\begin{itemize}
+\item There is more general definition that nests GMM as special case. \pause
+\item For consistency, apply theorem of choice for extremum estimators.
+\item   Let $\nabla_\theta \psi_0 = \frac{\partial \psi(\theta_0,\pi_0)'}{\partial \theta}$ and $\nabla_\theta \psi_n =  \frac{\partial \psi(\hat{\theta}_n,\hat{\pi}_n)'}{\partial \theta}$
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}\frametitle{Asymptotics for MD}
+  \begin{theorem}[Asymptotics for MD]
+    Suppose:
+    \begin{enumerate}
+    \item $\psi(\pi_0,\theta_0) = 0$, $\psi(\pi_0,\theta)\neq 0\ \forall\theta\neq\theta_0$. \pause
+    \item $\sqrt{n}(\hat{\pi}_n-\pi_0)\rightarrow_d\mathcal{N}(0,\bm{\Omega})$ \pause
+    \item $\mathbf{W}_n\rightarrow_p \mathbf{W}$, each symmetric, nonsingular. \pause
+    \item $\psi$ differentiable, $\text{rank}(\nabla_\theta \psi)= p$. \pause
+    \end{enumerate}
+    then:
+    $\sqrt{n}(\hat{\theta}_n-\theta_0)\rightarrow_d\mathcal{N}(0,\Sigma)$ with
+    \[\Sigma = (\nabla_\theta\psi_0 \mathbf{W} \nabla_\theta\psi_0')^{-1}\nabla_\theta\psi_0 \mathbf{W}\nabla_\pi\psi_0'\bm{\Omega}\nabla_\pi\psi_0 \mathbf{W} \nabla_\theta \psi_0'(\nabla_\theta\psi_0 \mathbf{W} \nabla_\theta\psi_0')^{-1}\] \pause
+  \end{theorem}
+Efficient weighting: $\mathbf{W}=(\nabla_\pi\psi_0'\bm{\Omega}\nabla_\pi\psi_0)^{-1}$, gives:
+\[\Sigma^* = (\nabla_\theta\psi_0 (\nabla_\pi\psi_0'\bm{\Omega}\nabla_\pi\psi_0)^{-1} \nabla_\theta\psi_0')^{-1} \]
+\end{frame}
+
+\begin{frame}\frametitle{Asymptotics for MD}
+  Delta Method:
+  \begin{align*}
+    \psi(\hat{\pi}_n,\hat{\theta}_n) &\approx \psi(\pi_0,\theta_0) + \nabla_\pi\psi'_0(\hat{\pi}_n-\pi_0) + \nabla_{\theta}\psi'_0(\hat{\theta}_n-\theta_0) \\\pause
+    \underbrace{\nabla_\theta\psi_n\mathbf{W}_n\psi(\hat{\pi}_n,\hat{\theta}_n)}_{=0} &\approx \nabla_\theta\psi_n\mathbf{W}_n(\nabla_\pi\psi_0'(\hat{\pi}_n-\pi_0) + \nabla_{\theta}\psi_0(\hat{\theta}_n-\theta_0))  \\ \pause
+   \hat{\theta}_n-\theta_0 &\approx (\nabla_\theta\psi_n \mathbf{W}_n\nabla_\theta\psi_0')^{-1}\nabla_\theta\psi_n \mathbf{W}_n\nabla_\pi\psi_0'(\hat{\pi}_n-\pi)
+  \end{align*}
+  \begin{itemize}
+  \item Applying Slutsky gives the result.
+  \item Could have also used MVT. In this case, $\approx$ used because of second order terms that disappear.
+  \item Note the special case: $\pi - \psi(\theta)=0$. A bit simpler.
+  \item Often, $\psi(\pi,\theta)$ defines such an \emph{implicit function}.
+  \end{itemize}
+\end{frame}
+
+% get CPS data, and have them estimate two ways!
+% this would be a nice application
+
+% \begin{frame}\frametitle{Applications of Minimum Distance}
+% \begin{enumerate}
+% \item Search Model
+% \begin{itemize}
+% \item Previous case: solve reservation wage for each choice of $\theta$. \pause
+% \item But we \emph{could} estimate reservation wages directly (turns out that $w^*=\min_i w_i$ ) \pause
+% \item No weighting necessary here. \pause
+% \end{itemize}
+% \item Choice Model
+% \begin{itemize}
+% \item Recall that $\Psi$ is vector of optimality conditions. \pause
+% \item Suppose that $\Psi$ is easy to compute (i.e. check) but not easy to solve. \pause
+% \item Solution: estimate $\pi$ directly and do minimum distance!! \pause
+% \item $\hat{\pi}_{n,d} = \frac{1}{n}\sum_{i=1}^n\mathbf{1}\{d_i=d\}$ (frequency estimator) \pause
+% \item Just as efficient as MLE when optimally weighted. \pause
+% \end{itemize}
+% \end{enumerate}
+% \end{frame}
+
+\begin{frame}\frametitle{Efficiency of Optimal Minimum Distance}
+  Let $\dim(\psi)=\dim(\pi)$, IFT says:
+  \[\nabla_\theta \pi = -\nabla_\theta\psi (\nabla_\pi\psi')^{-1} \]
+  So:
+  \begin{align*}
+    \Sigma^* &= (\nabla_\theta\psi_0(\nabla_\pi\psi_0' E[s_\pi s_\pi']^{-1} \nabla_\pi \psi_0)^{-1}\nabla_\theta \psi_0')^{-1} \\
+            &= (\nabla_\theta \psi_0\nabla_\pi\psi_0'^{-1}E[s_\pi s_\pi'] \nabla_\pi \psi_0^{-1}\nabla_\theta \psi_0')^{-1} \\
+            &= (\nabla_\theta \pi E[s_\pi s_\pi']\nabla_\theta \pi')^{-1} \\
+            &= E[s_\theta s_\theta']^{-1} = \mathcal{I}_\theta
+  \end{align*}
+  If $\dim(\psi)>\dim(\pi)$, use \emph{pseudo-inverse} of $\nabla_\pi\psi_0$.
+\end{frame}
+
+\begin{frame}\frametitle{Two Step Estimators}
+  Setup, two parameter sets: $\gamma$, $\beta$. $\gamma$ estimated by:
+  \[\frac{1}{n}\sum g_1(\mathbf{w}_i,\h{\gamma}) = \mathbf{0}\] \pause
+  And then $\beta$ estimated by:
+  \[\frac{1}{n}\sum g_2(\mathbf{w}_i,\h{\gamma},\h{\beta}) = \mathbf{0}\] \pause
+  Note:
+  \begin{itemize}
+  \item This is GMM (MLE nested).
+  \item $g_1$ and $g_2$ incorporate weighting, so apply wlog.
+  \item $\dim(g_1)=\dim(\gamma)$, $\dim(g_2)=\dim(\beta)$.
+  \end{itemize}
+  \pause Questions:
+  \begin{enumerate}
+  \item Is $\h{\beta}$ consistent?
+  \item How does variance of $\h{\gamma}$ contribute to variance of $\h{\beta}$?
+  \end{enumerate}
+
+\end{frame}
+
+\begin{frame}\frametitle{Two Step Estimators: Asymptotics}
+  Define $\theta = [\gamma',\ \beta']'$, and
+  \begin{align*}
+    g(\mathbf{w}_i,\theta) &= \left[\barr{c}g_1(\mathbf{w}_i,\gamma) \\ g_2(\mathbf{w}_i,\gamma,\beta) \earr\right]  \\
+    \bm{\Omega} &= E[g(\mathbf{w}_i,\theta_0)g(\mathbf{w}_i,\theta_0)'] \\
+    E[\nabla_\theta g'] = \bm{\Gamma} &= \left[\barr{cc} \Gamma_{1\gamma} & \mathbf{0} \\\Gamma_{2\gamma} & \Gamma_{2\beta}\earr\right]
+  \end{align*}  \pause
+  Under regularity conditions:
+  \[\sqrt{n}(\hat{\theta}-\theta_0) \rightarrow_d \mc{N}(0,\bm{\Gamma}'^{-1}\bm{\Omega}\bm{\Gamma}^{-1})\] \pause
+    which means:
+    \[\sqrt{n}(\h{\beta}-\beta_0) \rightarrow_d \mc{N}(0,(\bm{\Gamma}'^{-1}\bm{\Omega}\bm{\Gamma}^{-1})_{22})\]
+\end{frame}
+
+\begin{frame}\frametitle{Two Step Estimators: Asymptotics}
+  Partitioned inverse formula gives:
+  \[\bm{\Gamma}^{-1} = \left[\barr{cc} \Gamma_{1\gamma}^{-1} & \mathbf{0} \\ -\Gamma^{-1}_{2\beta}\Gamma_{2\gamma}\Gamma^{-1}_{1\gamma} & \Gamma^{-1}_{2\beta}\earr\right]\] \pause
+  ...Algebra... \pause
+  \begin{align*}
+    \BB{V}[\sqrt{n}\h{\beta}] =& \Gamma_{2\beta}^{-1}{\color{blue}[\Omega_{22}  - \Gamma_{2\gamma}\Gamma_{1\gamma}^{-1}\Omega_{12} - \Omega_{12}'\Gamma_{1\gamma}'\Gamma_{2\gamma}'^{-1}} \\ &{\color{blue}+ \Gamma_{2\gamma}\Gamma_{1\gamma}^{-1}\Omega_{11}\Gamma_{1\gamma}'^{-1}\Gamma_{2\gamma}']}\Gamma_{2\beta}'^{-1} \\
+    =& \Gamma_{2\beta}^{-1}{\color{blue}\BB{V}[g_2(\mathbf{w}_i,\theta_0) - \Gamma_{2\gamma}\Gamma^{-1}_{1\gamma}g_1(\mathbf{w}_i,\gamma_0)]}\Gamma_{2\beta}'^{-1}
+  \end{align*} \pause
+So, no contribution if $\Gamma_{2\gamma}=E[\nabla_\gamma g_2(\mathbf{w}_i,\theta_0)']=\mathbf{0}$
+\end{frame}
+
+\begin{frame}\frametitle{Application: Two-stage IV}
+\begin{eqnarray}
+  y_i = \alpha_0 + D_i\beta_0 + u_i \\ \pause
+  P[D_i=1|\mathbf{x}_i] = \Phi(\mathbf{x}_i'\gamma_0) \\ \pause
+  E[u_i|\mathbf{x}_i]=0 \pause
+\end{eqnarray}
+So $X_i$ are instruments for $D_i$. \pause Estimate by:
+\begin{enumerate}
+\item Get $\h{\gamma}$ by MLE.
+\item Do GMM using:
+  \[E\left[\left(\barr{c}1 \\ \Phi(\mathbf{x}_i'\gamma_0)\earr\right)u_i\right] = \mathbf{0}\]
+\end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Application: Two-stage IV}
+  Here:
+  \begin{eqnarray}
+    g_1(\mathbf{w}_i,\gamma) = \frac{(D_i-\Phi(\mathbf{x}_i'\gamma))\phi(\mathbf{x}_i'\gamma)}{\Phi(\mathbf{x}'_i\gamma)(1-\Phi(\mathbf{x}'_i\gamma))}\mathbf{x}_i \nonumber \\
+    g_2(\mathbf{w}_i,\theta) = \left(\barr{c}1 \\ \Phi(\mathbf{x}_i'\gamma)\earr\right)(y_i-\alpha-D_i\beta) \nonumber \pause
+  \end{eqnarray}
+  Since $E[\nabla_\gamma g_2(\mathbf{w}_i,\theta_0)']=0$, we can ignore contribution of $\h{\gamma}$ to variance. (Exercise on board).
+\end{frame}
+
+\begin{frame}\frametitle{Auxiliary Information}
+  Assume:
+  \begin{eqnarray}
+    E[g_1(\mathbf{w}_i)] = 0 \nonumber\\
+    E[g_2(\mathbf{w}_i,\theta)] = 0 \nonumber
+  \end{eqnarray}
+  Just identified, wlog.
+  Cases:
+  \begin{enumerate}
+  \item Estimate $\theta$ using $g_2$ and ignoring $g_1$.
+  \item Estimate $\theta$ using $g=[g_1',\ g_2']'$, with optimal weighting.
+  \end{enumerate}
+  Notation:
+  \begin{eqnarray}
+    \Gamma_0 = E[\nabla_\theta g_2(\mathbf{w}_i,\theta_0)'],\qquad \Gamma_* = \left[\barr{c}\mathbf{0} \\ \Gamma_0\earr\right]\nonumber \\
+    E[g(\mathbf{w}_i,\theta_0)g(\mathbf{w}_i,\theta_0)'] = \Omega_* = \left[\barr{cc}\Sigma & C' \\ C & \Omega\earr\right] \nonumber
+  \end{eqnarray}
+\end{frame}
+
+\begin{frame}\frametitle{Efficiency under Auxiliary Information}
+Asymptotic variances are:
+\begin{eqnarray}
+  Avar_1 = (\Gamma_0\Omega^{-1}\Gamma_0')^{-1} \nonumber \\
+  Avar_2 = (\Gamma_*\Omega_*^{-1}\Gamma_*')^{-1} \nonumber
+\end{eqnarray}
+Paritioned inverse formula + algebra:
+\[\Gamma_*\Omega_*^{-1}\Gamma'_* = \Gamma_0(\Omega \underbrace{- C\Sigma^{-1}C'}_{\color{blue} \text{Gain in precision from }g_1 })^{-1}\Gamma'_0 \]
+Use this to show that $Avar_1 - Avar_2 \geq 0$. Notes:
+\begin{itemize}
+\item Punchline: auxiliary information on data (even without parameter restrictions) can lead to increases in efficiency.
+\item Example: estimating a regression model on micro data, when macro data tells you \emph{almost} exactly the value of some marginal distributions.
+\item Logic extends to adding moment restrictions.
+\item Lancaster \& Imbens (1994)
+\end{itemize}
+\end{frame}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

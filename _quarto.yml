@@ -29,7 +29,9 @@ book:
       chapters:
       - lectures/extremum_intro_examples.qmd
       - lectures/extremum_theory.qmd
-    - part: Simulation Methods
+    - part: Simulation Methods 
+      chapters:
+        - lectures/simulation-methods.qmd
     - part: lectures/discrete-choice.qmd
     #- summary.qmd
     - references.qmd

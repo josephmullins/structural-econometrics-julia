@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>14&nbsp; Simulation Methods – Structural Econometrics with Julia</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../lectures/discrete-choice.html" rel="next">
+<link href="../lectures/extremum_theory.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-626149efe8f5d16e1d391ba177679bf0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/simulation-methods.html">Simulation Methods</a></li><li class="breadcrumb-item"><a href="../lectures/simulation-methods.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Simulation Methods</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Structural Econometrics with Julia</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Five Prototype Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/generalized_roy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Job Search Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/savings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">A Life-Cycle Savings Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/entry-exit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Firm Entry-Exit Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/dynamic-labor-supply.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A Simple Labor Supply Model</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/why_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">How and Why to Use Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../lectures/identification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Identification and Credible Inference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_roy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_labor_supply.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Dynamic Labor Supply Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_savings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Life-Cycle Savings Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/identification_duopoly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Entry-Exit Model</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../lectures/extremum-estimators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extremum Estimators</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/extremum_intro_examples.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Introducing the Estimators with Examples</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/extremum_theory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Simulation Methods</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/simulation-methods.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Simulation Methods</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Discrete Choice</span></span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/autodiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Automatic Differentiation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Performance Tips</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#integration-by-simulation" id="toc-integration-by-simulation" class="nav-link active" data-scroll-target="#integration-by-simulation"><span class="header-section-number">14.1</span> Integration by Simulation</a>
+  <ul class="collapse">
+  <li><a href="#importance-sampling" id="toc-importance-sampling" class="nav-link" data-scroll-target="#importance-sampling"><span class="header-section-number">14.1.1</span> Importance Sampling</a></li>
+  </ul></li>
+  <li><a href="#maximum-simulated-likelihood" id="toc-maximum-simulated-likelihood" class="nav-link" data-scroll-target="#maximum-simulated-likelihood"><span class="header-section-number">14.2</span> Maximum Simulated Likelihood</a></li>
+  <li><a href="#method-of-simulated-moments" id="toc-method-of-simulated-moments" class="nav-link" data-scroll-target="#method-of-simulated-moments"><span class="header-section-number">14.3</span> Method of Simulated Moments</a>
+  <ul class="collapse">
+  <li><a href="#a-common-special-case" id="toc-a-common-special-case" class="nav-link" data-scroll-target="#a-common-special-case"><span class="header-section-number">14.3.1</span> A Common Special Case</a></li>
+  <li><a href="#asymptotic-distribution" id="toc-asymptotic-distribution" class="nav-link" data-scroll-target="#asymptotic-distribution"><span class="header-section-number">14.3.2</span> Asymptotic Distribution</a></li>
+  </ul></li>
+  <li><a href="#indirect-inference" id="toc-indirect-inference" class="nav-link" data-scroll-target="#indirect-inference"><span class="header-section-number">14.4</span> Indirect Inference</a>
+  <ul class="collapse">
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">14.4.1</span> Setup</a></li>
+  <li><a href="#asymptotic-distribution-1" id="toc-asymptotic-distribution-1" class="nav-link" data-scroll-target="#asymptotic-distribution-1"><span class="header-section-number">14.4.2</span> Asymptotic Distribution</a></li>
+  <li><a href="#relationship-to-msm" id="toc-relationship-to-msm" class="nav-link" data-scroll-target="#relationship-to-msm"><span class="header-section-number">14.4.3</span> Relationship to MSM</a></li>
+  </ul></li>
+  <li><a href="#the-bootstrap" id="toc-the-bootstrap" class="nav-link" data-scroll-target="#the-bootstrap"><span class="header-section-number">14.5</span> The Bootstrap</a>
+  <ul class="collapse">
+  <li><a href="#motivation" id="toc-motivation" class="nav-link" data-scroll-target="#motivation"><span class="header-section-number">14.5.1</span> Motivation</a></li>
+  <li><a href="#framework" id="toc-framework" class="nav-link" data-scroll-target="#framework"><span class="header-section-number">14.5.2</span> Framework</a></li>
+  <li><a href="#procedure" id="toc-procedure" class="nav-link" data-scroll-target="#procedure"><span class="header-section-number">14.5.3</span> Procedure</a></li>
+  <li><a href="#when-does-the-bootstrap-work" id="toc-when-does-the-bootstrap-work" class="nav-link" data-scroll-target="#when-does-the-bootstrap-work"><span class="header-section-number">14.5.4</span> When Does the Bootstrap Work?</a></li>
+  </ul></li>
+  <li><a href="#practical-considerations" id="toc-practical-considerations" class="nav-link" data-scroll-target="#practical-considerations"><span class="header-section-number">14.6</span> Practical Considerations</a>
+  <ul class="collapse">
+  <li><a href="#simulation-noise-and-smoothing" id="toc-simulation-noise-and-smoothing" class="nav-link" data-scroll-target="#simulation-noise-and-smoothing"><span class="header-section-number">14.6.1</span> Simulation Noise and Smoothing</a></li>
+  <li><a href="#how-many-draws" id="toc-how-many-draws" class="nav-link" data-scroll-target="#how-many-draws"><span class="header-section-number">14.6.2</span> How Many Draws?</a></li>
+  <li><a href="#choosing-moments-for-msm" id="toc-choosing-moments-for-msm" class="nav-link" data-scroll-target="#choosing-moments-for-msm"><span class="header-section-number">14.6.3</span> Choosing Moments for MSM</a></li>
+  <li><a href="#diagonal-weighting-matrices" id="toc-diagonal-weighting-matrices" class="nav-link" data-scroll-target="#diagonal-weighting-matrices"><span class="header-section-number">14.6.4</span> Diagonal Weighting Matrices</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">14.7</span> Exercises</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/simulation-methods.html">Simulation Methods</a></li><li class="breadcrumb-item"><a href="../lectures/simulation-methods.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Simulation Methods</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Simulation Methods</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In many structural models, the likelihood or moment conditions cannot be computed in closed form because they involve high-dimensional integrals over unobserved heterogeneity, latent states, or expectations over future shocks. The savings model is a good example: even if we knew the true parameters, computing the likelihood of an observed consumption path requires integrating over sequences of income shocks. In these settings, <strong>simulation</strong> provides a way forward.</p>
+<p>This chapter covers three topics. First, we discuss <strong>simulation-based estimators</strong> — the method of simulated moments (MSM) and indirect inference — which replace intractable analytical objects with simulation approximations. Second, we introduce the <strong>bootstrap</strong>, a general resampling-based approach to inference that is particularly useful when analytical standard errors are difficult to derive. Third, we bring these tools together with our prototype models.</p>
+<section id="integration-by-simulation" class="level2" data-number="14.1">
+<h2 data-number="14.1" class="anchored" data-anchor-id="integration-by-simulation"><span class="header-section-number">14.1</span> Integration by Simulation</h2>
+<p>At the heart of simulation-based estimation is the problem of computing integrals. Suppose we need to evaluate:</p>
+<p><span class="math display">\[f(y|\mathbf{x},\theta) = \int h(y|\mathbf{x},\theta,\mathbf{u})g(\mathbf{u})d\mathbf{u}\]</span></p>
+<p>where <span class="math inline">\(\mathbf{u}\)</span> is a vector of unobservables with density <span class="math inline">\(g\)</span>. If the dimension of <span class="math inline">\(\mathbf{u}\)</span> is large or <span class="math inline">\(h\)</span> does not admit a closed-form integral, we can approximate by <strong>Monte Carlo integration</strong>: draw <span class="math inline">\(\mathbf{u}^{1},\ldots,\mathbf{u}^{R}\)</span> from <span class="math inline">\(g\)</span> and compute:</p>
+<p><span class="math display">\[\hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_{r=1}^{R}h(y|\mathbf{x},\theta,\mathbf{u}^{r})\]</span></p>
+<p>By the law of large numbers, <span class="math inline">\(\hat{f}\rightarrow_{p} f\)</span> as <span class="math inline">\(R\rightarrow\infty\)</span>. This is unbiased by construction: <span class="math inline">\(\mathbb{E}_{\mathbf{u}}[\hat{f}]=f\)</span>.</p>
+<section id="importance-sampling" class="level3" data-number="14.1.1">
+<h3 data-number="14.1.1" class="anchored" data-anchor-id="importance-sampling"><span class="header-section-number">14.1.1</span> Importance Sampling</h3>
+<p>Sometimes we want to draw from an alternative density <span class="math inline">\(w(\mathbf{u})\)</span> instead of <span class="math inline">\(g(\mathbf{u})\)</span> — for instance because <span class="math inline">\(g\)</span> is hard to sample from, or because draws from <span class="math inline">\(w\)</span> reduce the variance of the estimator. In this case:</p>
+<p><span class="math display">\[\hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_{r=1}^{R}h(y|\mathbf{x},\theta,\mathbf{u}^{r})\frac{g(\mathbf{u}^{r})}{w(\mathbf{u}^{r})},\qquad \mathbf{u}^{r}\sim w\]</span></p>
+<p>This is still unbiased and consistent, and the choice of <span class="math inline">\(w\)</span> can substantially reduce variance. The ratio <span class="math inline">\(g/w\)</span> is called the <strong>importance weight</strong>.</p>
+</section>
+</section>
+<section id="maximum-simulated-likelihood" class="level2" data-number="14.2">
+<h2 data-number="14.2" class="anchored" data-anchor-id="maximum-simulated-likelihood"><span class="header-section-number">14.2</span> Maximum Simulated Likelihood</h2>
+<p>A natural first idea is to replace the likelihood with its simulated analogue. The <strong>maximum simulated likelihood (MSL)</strong> estimator is:</p>
+<p><span class="math display">\[\hat{\theta}_{MSL} = \arg\max_{\theta}\sum_{n=1}^{N}\log\hat{f}(y_{n}|\mathbf{x}_{n},\theta)\]</span></p>
+<p>where <span class="math inline">\(\hat{f}\)</span> is the simulated probability from above.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+A Subtlety with MSL
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>There is an important issue with MSL: because <span class="math inline">\(\log\)</span> is concave, Jensen’s inequality gives <span class="math inline">\(\mathbb{E}[\log\hat{f}]\leq \log\mathbb{E}[\hat{f}]=\log f\)</span>. This means the simulated log-likelihood is <em>biased downward</em>, and the MSL estimator is inconsistent for fixed <span class="math inline">\(R\)</span>. Consistency requires that the number of simulation draws grows with the sample: both <span class="math inline">\(N,R\rightarrow\infty\)</span> with <span class="math inline">\(\sqrt{N}/R\rightarrow 0\)</span>.</p>
+<p>This is in contrast to the method of simulated moments, which we discuss next, where a fixed number of simulation draws is sufficient for consistency.</p>
+</div>
+</div>
+<p>Under standard regularity conditions and <span class="math inline">\(\sqrt{N}/R\rightarrow 0\)</span>, the MSL estimator has the same asymptotic distribution as the (infeasible) MLE:</p>
+<p><span class="math display">\[\sqrt{N}(\hat{\theta}_{MSL}-\theta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\ \mathcal{I}(\theta_{0})^{-1})\]</span></p>
+<p>In practice, one should use enough draws that the simulation error is small relative to the sampling variability. A common rule of thumb is to set <span class="math inline">\(R\)</span> large enough that results are insensitive to further increases.</p>
+</section>
+<section id="method-of-simulated-moments" class="level2" data-number="14.3">
+<h2 data-number="14.3" class="anchored" data-anchor-id="method-of-simulated-moments"><span class="header-section-number">14.3</span> Method of Simulated Moments</h2>
+<p>The <strong>method of simulated moments (MSM)</strong> is the simulation analogue of GMM. Suppose that the moment conditions take the form:</p>
+<p><span class="math display">\[\mathbb{E}[g(\mathbf{w},\theta_{0})] = \mathbb{E}\left[\int h(\mathbf{w},\theta_{0},\mathbf{u})f(\mathbf{u}|\theta_{0})d\mathbf{u}\right] = \mathbf{0}\]</span></p>
+<p>If we cannot evaluate <span class="math inline">\(g\)</span> analytically, we can replace it with a simulated version: <span class="math display">\[\hat{g}(\mathbf{w}_{n},\theta) = \frac{1}{R}\sum_{r=1}^{R}\tilde{g}(\mathbf{w}_{n},\mathbf{u}^{r},\theta)\]</span></p>
+<p>where <span class="math inline">\(\mathbb{E}_{\mathbf{u}}[\tilde{g}(\mathbf{w},\mathbf{u},\theta)]=g(\mathbf{w},\theta)\)</span>. The MSM estimator is:</p>
+<p><span class="math display">\[\hat{\theta}_{MSM} = \arg\min_{\theta}\ \hat{\mathbf{g}}_{N}(\theta)'\mathbf{W}\hat{\mathbf{g}}_{N}(\theta),\qquad\hat{\mathbf{g}}_{N}(\theta) = \frac{1}{N}\sum_{n=1}^{N}\hat{g}(\mathbf{w}_{n},\theta)\]</span></p>
+<section id="a-common-special-case" class="level3" data-number="14.3.1">
+<h3 data-number="14.3.1" class="anchored" data-anchor-id="a-common-special-case"><span class="header-section-number">14.3.1</span> A Common Special Case</h3>
+<p>In many structural applications, the moment conditions do not involve observation-level simulation. Instead, we match <em>aggregate</em> statistics from the data to their model-implied counterparts computed by simulating the model. The moments take the form:</p>
+<p><span class="math display">\[\hat{\mathbf{g}}_{N}(\theta) = \hat{\mathbf{m}} - \tilde{\mathbf{m}}(\theta)\]</span></p>
+<p>where <span class="math inline">\(\hat{\mathbf{m}}\)</span> is a vector of sample statistics (means, variances, covariances, etc.) and <span class="math inline">\(\tilde{\mathbf{m}}(\theta)\)</span> is the corresponding vector computed from simulated data. This is the structure we will use for the savings model below.</p>
+</section>
+<section id="asymptotic-distribution" class="level3" data-number="14.3.2">
+<h3 data-number="14.3.2" class="anchored" data-anchor-id="asymptotic-distribution"><span class="header-section-number">14.3.2</span> Asymptotic Distribution</h3>
+<div id="thm-msm-asymptotics" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 14.1 (Asymptotic Distribution of MSM)</strong></span> Suppose the standard regularity conditions for GMM hold and <span class="math inline">\(\mathbb{E}_{\mathbf{u}}[\tilde{g}(\mathbf{w},\mathbf{u},\theta)]=g(\mathbf{w},\theta)\)</span>. Then with <span class="math inline">\(R\)</span> fixed:</p>
+<p><span class="math display">\[\sqrt{N}(\hat{\theta}_{MSM}-\theta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\Sigma_{MSM})\]</span></p>
+<p>where: <span class="math display">\[\Sigma_{MSM} = (\nabla_{\theta}g_{0}\mathbf{W}\nabla_{\theta}g_{0}')^{-1}\nabla_{\theta}g_{0}\mathbf{W}\mathbb{E}[\hat{g}_{0}\hat{g}_{0}']\mathbf{W}\nabla_{\theta}g_{0}'(\nabla_{\theta}g_{0}\mathbf{W}\nabla_{\theta}g_{0}')^{-1}\]</span></p>
+<p>with <span class="math inline">\(\nabla_{\theta}g_{0}=\mathbb{E}[\nabla_{\theta}g(\mathbf{w},\theta_{0})']\)</span>.</p>
+</div>
+<p>Several features are worth highlighting:</p>
+<ol type="1">
+<li><strong>Consistency does not require <span class="math inline">\(R\rightarrow\infty\)</span>.</strong> Because <span class="math inline">\(\hat{g}\)</span> is an unbiased estimator of <span class="math inline">\(g\)</span>, the simulated sample moments converge to zero at <span class="math inline">\(\theta_{0}\)</span> by the law of large numbers. This is in contrast to MSL.</li>
+<li><strong>Simulation adds variance.</strong> Because <span class="math inline">\(\mathbb{V}[\hat{g}]\geq\mathbb{V}[g]\)</span>, the MSM estimator is less efficient than the infeasible GMM estimator that uses the true <span class="math inline">\(g\)</span>. For the common case of a <strong>frequency simulator</strong> (where <span class="math inline">\(\tilde{g}\)</span> is a binary indicator), the variance inflates by a factor of <span class="math inline">\((1+1/R)\)</span>.</li>
+<li><strong>If <span class="math inline">\(\sqrt{N}/R\rightarrow 0\)</span></strong>, the efficiency loss from simulation disappears and the MSM achieves the same asymptotic variance as GMM.</li>
+</ol>
+<p>See <span class="citation" data-cites="newey1994large">Newey and McFadden (<a href="../references.html#ref-newey1994large" role="doc-biblioref">1994</a>)</span> for a comprehensive treatment.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Simulating the Savings Model
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="exm-simulate_savings" class="theorem example">
+<p><span class="theorem-title"><strong>Example 14.1</strong></span> To estimate the savings model by MSM, we first need to be able to <strong>simulate</strong> data from it. Given a solution (the policy function <span class="math inline">\(A\)</span>), we can forward-simulate a panel of individuals by drawing income shocks and applying the optimal savings rule.</p>
+<div id="cee9c5b5" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span>, <span class="bu">Random</span>, <span class="bu">LinearAlgebra</span>, <span class="bu">Statistics</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># === Model setup (from savings model chapter) ===</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Φ_cdf</span>(x) <span class="op">=</span> <span class="fu">cdf</span>(<span class="fu">Normal</span>(),x)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">tauchen</span>(ρ,ση,Kϵ)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    sd <span class="op">=</span> ση<span class="op">/</span><span class="fu">sqrt</span>(<span class="fl">1</span><span class="op">-</span>ρ<span class="op">^</span><span class="fl">2</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    grid <span class="op">=</span> <span class="fu">range</span>(<span class="op">-</span><span class="fl">3</span>sd,stop<span class="op">=</span><span class="fl">3</span>sd,length<span class="op">=</span>Kϵ)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    Π <span class="op">=</span> <span class="fu">zeros</span>(Kϵ,Kϵ)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    Δ <span class="op">=</span> grid[<span class="fl">2</span>]<span class="op">-</span>grid[<span class="fl">1</span>]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j<span class="op">=</span><span class="fl">1</span><span class="op">:</span>Kϵ</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        Π[<span class="fl">1</span>,j] <span class="op">=</span> <span class="fu">Φ_cdf</span>((grid[<span class="fl">1</span>] <span class="op">+</span> Δ<span class="op">/</span><span class="fl">2</span> <span class="op">-</span> ρ<span class="op">*</span>grid[j])<span class="op">/</span>ση)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        Π[<span class="kw">end</span>,j] <span class="op">=</span> <span class="fl">1</span> <span class="op">-</span> <span class="fu">Φ_cdf</span>((grid[<span class="kw">end</span>] <span class="op">-</span> Δ<span class="op">/</span><span class="fl">2</span> <span class="op">-</span> ρ<span class="op">*</span>grid[j])<span class="op">/</span>ση)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k<span class="op">=</span><span class="fl">2</span><span class="op">:</span>(Kϵ<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>            Π[k,j] <span class="op">=</span> <span class="fu">Φ_cdf</span>((grid[k] <span class="op">+</span> Δ<span class="op">/</span><span class="fl">2</span> <span class="op">-</span> ρ<span class="op">*</span>grid[j])<span class="op">/</span>ση) <span class="op">-</span> <span class="fu">Φ_cdf</span>((grid[k] <span class="op">-</span> Δ<span class="op">/</span><span class="fl">2</span> <span class="op">-</span> ρ<span class="op">*</span>grid[j])<span class="op">/</span>ση)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Π,<span class="fu">collect</span>(grid)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">u</span>(c,σ) <span class="op">=</span> c<span class="op">^</span>(<span class="fl">1</span><span class="op">-</span>σ) <span class="op">/</span> (<span class="fl">1</span><span class="op">-</span>σ)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">solve_max</span>(V,t,iϵ,ia,pars)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    (;agrid,ϵgrid,Π,σ,Ka,r,β) <span class="op">=</span> pars</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    cash <span class="op">=</span> <span class="fu">exp</span>(pars.μ[t] <span class="op">+</span> ϵgrid[iϵ]) <span class="op">+</span> agrid[ia]</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    amax <span class="op">=</span> <span class="fl">1</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    vmax <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    loop <span class="op">=</span> <span class="cn">true</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> <span class="fl">1</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> loop <span class="op">&amp;&amp;</span> a<span class="op">&lt;</span>Ka</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        c <span class="op">=</span> cash <span class="op">-</span> agrid[a] <span class="op">/</span> (<span class="fl">1</span><span class="op">+</span>r)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> c<span class="op">&gt;</span><span class="fl">0</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>            v <span class="op">=</span> <span class="fu">u</span>(c,σ)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> iϵ′ <span class="kw">in</span> <span class="fu">axes</span>(V,<span class="fl">1</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>                v <span class="op">+=</span> β <span class="op">*</span> Π[iϵ′,iϵ] <span class="op">*</span> V[iϵ′,a,t<span class="op">+</span><span class="fl">1</span>]</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> v<span class="op">&gt;</span>vmax</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>                vmax <span class="op">=</span> v</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>                amax <span class="op">=</span> a</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>            loop <span class="op">=</span> <span class="cn">false</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>        a <span class="op">+=</span> <span class="fl">1</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> amax,vmax</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">iterate!</span>(V,A,t,pars)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ia <span class="kw">in</span> <span class="fu">axes</span>(V,<span class="fl">2</span>), iϵ <span class="kw">in</span> <span class="fu">axes</span>(V,<span class="fl">1</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>        A[iϵ,ia,t],V[iϵ,ia,t] <span class="op">=</span> <span class="fu">solve_max</span>(V,t,iϵ,ia,pars)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">terminal_values!</span>(V,pars)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    (;σ,ψ,agrid) <span class="op">=</span> pars</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ia <span class="kw">in</span> <span class="fu">axes</span>(V,<span class="fl">2</span>), iϵ <span class="kw">in</span> <span class="fu">axes</span>(V,<span class="fl">1</span>)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        V[iϵ,ia] <span class="op">=</span> ψ <span class="op">*</span> <span class="fu">u</span>(agrid[ia],σ)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">backward_induction!</span>(V,A,pars)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    (;T) <span class="op">=</span> pars</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@views</span> <span class="fu">terminal_values!</span>(V[<span class="op">:</span>,<span class="op">:</span>,T<span class="op">+</span><span class="fl">1</span>],pars)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="fu">reverse</span>(<span class="fl">1</span><span class="op">:</span>T)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>        <span class="fu">iterate!</span>(V,A,t,pars)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">setup_and_solve</span>(θ)</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>    β, σ, ψ <span class="op">=</span> θ</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>    T <span class="op">=</span> <span class="fl">45</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>    Ka <span class="op">=</span> <span class="fl">100</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>    Kϵ <span class="op">=</span> <span class="fl">5</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>    ρ <span class="op">=</span> <span class="fl">0.9</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>    ση <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>    μ <span class="op">=</span> <span class="fu">fill</span>(<span class="fl">2</span>., T)</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>    agrid <span class="op">=</span> <span class="fu">collect</span>(<span class="fu">LinRange</span>(<span class="fl">0</span>, μ[<span class="fl">1</span>] <span class="op">*</span> T, Ka))</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>    Π, ϵgrid <span class="op">=</span> <span class="fu">tauchen</span>(ρ, ση, Kϵ)</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>    pars <span class="op">=</span> (;T, β, σ, ρ, ση, μ, ψ, r, Ka, Kϵ, agrid, Π, ϵgrid)</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> <span class="fu">zeros</span>(Kϵ, Ka, T<span class="op">+</span><span class="fl">1</span>)</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Int64</span>, Kϵ, Ka, T)</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>    <span class="fu">backward_induction!</span>(V, A, pars)</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A, pars</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>setup_and_solve (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>Now we write a simulation function. Given the policy function, we draw income shocks and track each individual’s asset and income path.</p>
+<div id="b1ce0de2" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">simulate_panel</span>(A, pars, N_sim; seed<span class="op">=</span><span class="cn">nothing</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    (;T, Kϵ, Ka, agrid, ϵgrid, Π, μ, r) <span class="op">=</span> pars</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> !<span class="fu">isnothing</span>(seed)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">Random</span>.<span class="fu">seed!</span>(seed)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Pre-compute CDF for sampling from Markov chain</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    cumΠ <span class="op">=</span> <span class="fu">cumsum</span>(Π, dims<span class="op">=</span><span class="fl">1</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Storage</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    assets <span class="op">=</span> <span class="fu">zeros</span>(N_sim, T<span class="op">+</span><span class="fl">1</span>)   <span class="co"># assets at start of each period</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    income <span class="op">=</span> <span class="fu">zeros</span>(N_sim, T)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    consumption <span class="op">=</span> <span class="fu">zeros</span>(N_sim, T)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    iϵ_sim <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Int</span>, N_sim, T)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Initial conditions: start with zero assets, draw initial ϵ from stationary dist</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Use middle state as starting point for simplicity</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    iϵ_sim[<span class="op">:</span>, <span class="fl">1</span>] <span class="op">.=</span> (Kϵ <span class="op">+</span> <span class="fl">1</span>) <span class="op">÷</span> <span class="fl">2</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>N_sim</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        ia <span class="op">=</span> <span class="fl">1</span>  <span class="co"># start with zero assets</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> t <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>T</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>            iϵ <span class="op">=</span> iϵ_sim[n, t]</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>            y <span class="op">=</span> <span class="fu">exp</span>(μ[t] <span class="op">+</span> ϵgrid[iϵ])</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>            income[n, t] <span class="op">=</span> y</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>            cash <span class="op">=</span> y <span class="op">+</span> agrid[ia]</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Look up optimal savings</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>            ia_next <span class="op">=</span> A[iϵ, ia, t]</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>            c <span class="op">=</span> cash <span class="op">-</span> agrid[ia_next] <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> r)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>            consumption[n, t] <span class="op">=</span> c</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>            assets[n, t<span class="op">+</span><span class="fl">1</span>] <span class="op">=</span> agrid[ia_next]</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>            ia <span class="op">=</span> ia_next</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Draw next period's ϵ</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> t <span class="op">&lt;</span> T</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>                u_draw <span class="op">=</span> <span class="fu">rand</span>()</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>                iϵ_next <span class="op">=</span> <span class="fu">findfirst</span>(cumΠ[<span class="op">:</span>, iϵ] <span class="op">.&gt;=</span> u_draw)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>                iϵ_sim[n, t<span class="op">+</span><span class="fl">1</span>] <span class="op">=</span> iϵ_next</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (;assets, income, consumption)</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Solve and simulate</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>A, pars <span class="op">=</span> <span class="fu">setup_and_solve</span>((<span class="fl">0.95</span>, <span class="fl">2.0</span>, <span class="fl">5.0</span>))</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> <span class="fu">simulate_panel</span>(A, pars, <span class="fl">1000</span>; seed<span class="op">=</span><span class="fl">123</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>(assets = [0.0 0.0 … 12.727272727272727 12.727272727272727; 0.0 0.0 … 19.09090909090909 19.09090909090909; … ; 0.0 0.0 … 15.454545454545453 16.363636363636363; 0.0 0.0 … 17.27272727272727 17.27272727272727], income = [7.38905609893065 7.38905609893065 … 5.2376681994924175 5.2376681994924175; 7.38905609893065 7.38905609893065 … 7.38905609893065 7.38905609893065; … ; 7.38905609893065 7.38905609893065 … 7.38905609893065 7.38905609893065; 7.38905609893065 7.38905609893065 … 7.38905609893065 7.38905609893065], consumption = [7.38905609893065 7.38905609893065 … 5.843728805553026 5.843728805553026; 7.38905609893065 7.38905609893065 … 8.298147008021559 8.298147008021559; … ; 7.38905609893065 7.38905609893065 … 7.215895925770482 7.259185969060521; 7.38905609893065 7.38905609893065 … 8.21156692144147 8.21156692144147])</code></pre>
+</div>
+</div>
+<p>Let’s check the simulation by plotting average assets and consumption over the life cycle.</p>
+<div id="ce5689c5" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>p1 <span class="op">=</span> <span class="fu">plot</span>(<span class="fl">1</span><span class="op">:</span>pars.T, <span class="fu">mean</span>(sim.assets[<span class="op">:</span>,<span class="fl">1</span><span class="op">:</span>pars.T], dims<span class="op">=</span><span class="fl">1</span>)<span class="ch">', label="Mean Assets",</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>          xlabel<span class="op">=</span><span class="st">"Age"</span>, title<span class="op">=</span><span class="st">"Life-Cycle Profiles"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(p1, <span class="fl">1</span><span class="op">:</span>pars.T, <span class="fu">mean</span>(sim.consumption, dims<span class="op">=</span><span class="fl">1</span>)<span class="ch">', label="Mean Consumption")</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(p1, <span class="fl">1</span><span class="op">:</span>pars.T, <span class="fu">mean</span>(sim.income, dims<span class="op">=</span><span class="fl">1</span>)<span class="ch">', label="Mean Income")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoQAAAHMCAIAAADDNi6EAAAABmJLR0QA/wD/AP+gvaeTAAAgAElEQVR4nOzdd3gU1d4H8N+U7bvpgUASei+B0EGQTugdUZFmB5WrcOWqWLABiiig3itKV1FBEUUIHaQKhB5q6CGEAKnbd2fmvH8M7htDh4TdJN/Pw8Mze3Z25uxkdr5zZs7McIwxAgAAAP/h/V0BAACA0g5hDCWcoigXL168fPnyzUa4evVqt27dPvjgg/yFLpfr888/f/LJJxMSEgYOHFhYlZFleffu3cuWLVuyZMnWrVttNlthTdln+vTp3bp1O3/+/H1OJycn53Q+2dnZiqIUSg19kpOTx48fP3DgwM6dO3///feyLHfr1u3f//63b4RFixZ169YtKSmpcOcLEIBEf1cAoGilp6fHxMRUq1YtJSXlhiO4XK5Vq1YZDIb8hf37909MTKxQoUJkZGShhJDT6fzoo48+//zzrKwsX6FOp+vXr9+7775bo0aN+5+F6uDBg6tWrbJarfc5na+++ur111/PXxIUFNS1a9dJkyZVrVr1PidORAcPHmzevLksy3Xq1BFF0el0KoqyatWqvLw83zgpKSmrVq166aWX7n92AAEOYQylncViGTduXP369X0l58+fT0xMTEhIWLlyJc8XwtGjnJycrl277ty5MyYm5qWXXmrUqJFOp7tw4cLKlSsXL158+fLl9evX3/9cikKbNm1atWpFRHl5eWvXrl28ePH69et3795duXLl+5zywoULXS7X8uXLe/bsqZYoijJu3Lj7nzJAcYQwhtIuODj4k08+yV9y6tQpImrSpEmhJDERjRw5cufOnd27d1+yZInRaPSVP/XUUwcPHpw1a1ahzKUodO7c+a233lKH3W53t27dNm7c+NFHH3311Vf3OeXTp08TUbNmzXwlPM8X+EMAlB4IYyjtrFbrzJkza9WqNWDAACL66KOPjh07RkQ7d+786KOPiKhDhw5NmzZVR05KSvr+++9PnjzJcVyDBg2effbZ2NjYW09/+/bty5YtK1eu3KJFi/InsSouLu6LL75QR9uyZUtCQkLDhg3zjyDL8meffWY0GkePHu0rPHjw4KJFi44ePaooSkxMTKdOnXr06KHX629WB7vdvnDhws2bN2dmZkZHR/fq1atfv34cx935UiIinU73yiuvbNy4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0UcfPfbYYzExMX369MnKyiKitLS0nj17Vq9evWbNmu+99x4RLVq0yHdnrt27d6sXIp88ebJ///7vv/9+xYoVmzZteuTIkUmTJlWqVKlZs2ZHjx4looyMjC5dukydOrVGjRqNGzfetGkTEU2cODE9Pb1///5NmjTZu3dvYmLiF198oU559uzZDRs2rFmz5pgxY9Qvu2bNmnHjxo0dOzYmJqZt27a+e6QAQInhy+CaS7zr0tiw6vyFxzTLu4jDqvNGnB29kWIZxlLmJU9qyoP/J11Ju2F92rVrl5KSkp6enpSUFBwcXLVqVbX88uXLffv2VW+QOXr06AEDBsiyzHHcmDFjjh07lpyc7HK51DtwOZ3O33//XavVnjp1aty4caNGjSowi3379nXp0uX662Fmz57922+/bdmyZevWrcuXL1cT+uLFi5999tnrr79+9uxZo9GozmLy5MlNmjRJSUk5cuTIwIEDiSgjIyM1NVWdjtVqVfcV1JpERUWdOXOmd+/enTp1CgkJOX369IABA9THV3g8nvXr11ut1mPHjk2fPn3gwIHZ2dkTJ04sV67c0qVLk5KSGjVqlJGRcfr0aSLasGHDe++9t2zZsv3796empr755ptElJWV9b///a9r166pqamtW7eeMGFCoawVAOB32e5/ZPCztfjzj2oWthMGVUYG30axXDzWDUukKxcf/Hx5kyV8+BvXl3Mc99hjj3333Xfnzp0bMWKEr3zZsmX16tXTarV79uwJDg7Ozs4+c+ZMtWrVYmNjZ82alZeXx/P8jh071JHDw8Off/55Iho0aNDIkSNlWc5/lXBmZmZ8fPz1s/7ll1/Gjh2rXrM0duzY2bNnqxPp27dvXFwcEfXr1+/HH38kotDQ0C1btqxevbpt27Z16tS5xdeMiIhQW8m9e/eePn366NGj1WHfWWqO415//XWe59u0adOoUaP169er6X7D6j399NOVKlUiojfffLNfv37q4euWLVt26dKFiAYOHDh06NBbVAYAAp9XoeXnlbnHld1XWbcY/vnawi+dOG2xbOv5TbEM49BBL/m7CgUNHz68Z8+eVqt18uTJv/32m1qYkZFx9erVJUuWqC+HDh2q0WgOHz7crVu3V155pUqVKrm5uWoLkohCQkLUAZ1OJ8tygTCuWrWqb8z8MjMzy5Qpow5HRkb6ulDln5rauezNN9+cNWvWxx9//Mgjj7zzzjtjx47NP538934JDg72fTb/sK+Tmslk8t0bJP9Mb1i9evXqqcNlypS5RfUAoDhKyWVzTijfprCG4fRMLX5pLI8MvjfFMowDUOXKlZs2bRoVFWWxWHyFtWvXXrly5eTJk/MfXp4+fXrv3r1feeUVIrphvt5Q9+7dhwwZ8s477/ieuZSamhobG1utWrUDBw507NiRiPbv31+jRo2bTUGn040ZM2bMmDHHjx+Pi4t7+eWXQ0JCfOl47NixO/+yeXl5586dU69cOnjw4FNPPUVEGo1GkqQCY6rVU4f37dt3i+oBQDHilun388rXx5RjOTSkGretl1DJgpvK3ReEcaGZP39+gZJ+/frNnDlz2LBh/fr1y8vLW7NmzaJFixo0aPDpp5+2adPm0qVLCxYsiIyMvJOJ9+jRY/jw4Y0aNRo9enRUVNT+/fs3btyYnJw8bty4Pn36qLdX/OSTT5YtW3azKbzzzjuRkZGVKlXasmVL48aNeZ5v37792LFjv/jiC8bYokWL8j+x8daMRuOoUaOefPLJDRs2GI3Gdu3aEVF8fPy7777btm3bvn37+sYcNWpUkyZNKlasGBMT8/bbb3/00Ud3OAsACEzHctj8FGX+CaV+GPdsLb5fRV5EU7gwCBMnTizqeWzatEmj0Tz00ENEpCiKoig3vD3yDa1duzYkJKRZs2ZFWcH7UqZMmfj4+PwNYoPBUL169Ro1avA8P3ToUKfTuXfvXofD0bdv3ypVqlSuXLlGjRrbtm0LCQl555131O7NGo2mYsWKdevWVadQrly5Jk2aFOiu1a1bt5YtW6akpFy8eLFevXqfffaZTqeLjo7u1q1bUlKS3W6fMmWKel7ZYrHUqFEjJiZGrUzlypWrV69usViOHDly+PDhihUrTp06Va/Xh4SEdOzYcefOnWaz+c0336xataqvJuqxZVEUK1SoUL9+fSISBKFChQpxcXF5eXnz589ftGjRn3/+GRUVNWPGDPVO4927dxcEwePx1KxZMzIyUv2mQUFBjz76aHJyclpa2muvvaY+S8NgMFStWlXt5qbOwnco22fSpEkltWOX+qRq3Jvaj7xer1aLC2vujkumX88pL/8lf3WMxYdz/2stvFhHqHtPzzT0eDxY/tfDgyLg7qSmpjZp0iQjI6NI54IHRUARwYMi7pbNS+/ulReeVDqV55+pxbctd7/r7vUPigDCYWq4W1qttkGDBv6uBQA8CCtT2Yvb5e6x3NGBmjCdv2tToiGM4e6ULVt2zZo1/q4FABStDCe9ulPel8m+by+0LIMDOUUOZ97v1+zZs7/88kvfS1mWp06d+tNPPxXuXM6dO/fdd98V7jQBAK7HiBamKE2WSVWCKKmviCR+MBDG92vatGmvvvpqcjo5/k4AACAASURBVHKy+nL16tXvvPPOnDlzCncuR44cmTx5cuFOEwCggFN5rEuiNPu4srabMLGRoBNu/xEoFDhMXQj69u27YMGCqVOnEtG8efP69et35coV9S1FUX777bdjx47Vq1evZ8+eHMcxxrZs2bJ7927GWOfOndXzr1lZWevWrWvRosUPP/wQERHxxBNP6HQ3Pj+jKMrs2bMHDRq0cOFCjuOGDh0aGhqqvpWUlLRp0yae57t27areYys5OXnNmjVms7l///4RERFEtGnTprJlyyYnJx8/frx3795xcXFLly49ceJEjx491F7TRHT+/PkVK1a43e7evXtXqVKliBceAAQEr0KfHlKmJ8uvNRBeqsvfQzdpuB9oGReCxx577Oeff/Z6vVlZWbt27ercubNazhjr2bPnzz//XLZs2a+//nrMmDFE5Ha7Z82aZTKZNBpNv3791q1bR0QXLlx44YUXXn31VbPZrN5C8mbzkmX5ueeee+655ziOU29YrfaHnzlz5pAhQ/R6vSAI6iOkVq1a1bVrV0EQTp48GR8fr/Z/nj9//sCBA/ft28dxXPv27UePHr1r1y5FUdq1a3fx4kUi2rVrV4cOHfLy8jiO69Spk++WHQBQgu24zOJ/lbZmKEl9xX/VQxL7QbFsGU/ZMeN0zrkHP98IY9iktm9eXx4cHNy8efPVq1efPXv20Ucf9V1FvWLFiry8vJUrVxLRkCFDKlSoMHHixPDwcPUxizk5ORaLZd68eZ06dSIiu90+a9askJCQgQMHVq9e/dY1mTBhQoMGDRRFKVOmzMWLF0NCQiZMmHDgwIH8Ddl333132rRpgwcPJqKsrKwvv/xSfVhTp06dJk2aRES7d+8moilTphDRvn371q9fP3To0AkTJkyePHnQoEFEZDabP/vss+tvZgIAJYZdovf3yYtOshkt+X6V0Dzzm2IZxsPrP5rnsT74+QZpLTd7a8SIEXPmzDlz5sy8efN8rckDBw6cOHGiSZMm6kubzXb69GmTyTRixIj9+/fHxMRkZ2f77hYSExOj3rG5bNmyNpvt1tfFq3fJ4Hm+TJkymZmZmZmZISEhBQ4pHzt2zHezlGbNmvm6QNeuXVsdiIiI8A1HRkaqT1o8cODAu+++q94qy2q1qge3AaDk8Sr0wynlrT3KgErc0UGiqVimQclRLBd/OXPZclTW37X4h86dOz///PNly5atX7++L4xDQ0MTEhK+/fbb/GPOnTvX4/Go94L+8ccf//e//6nlPH8X+6QFRg4LC8vNzS3wbAn1OVGVK1cmouzsbN+zGXyf5Tgu/7B6uDskJGT+/Pm+HQgAKHmsXvrmmDLzsBIfzv3aSWgUgaPS/oeDEoVDEITly5cXuPqoZ8+eq1ev3r59OxGp/baIyOv1ut1uRVGsVusXX3xRKHOPjo6Oi4ubNGkSY4wxpj5/olevXp9++qmiKFevXp0zZ07v3r3vZFKPPvrou+++a7VaiSgnJ+fgwYOFUkMACASXnTRxr1xjsXd/JkvsKvzaGUkcKBDG9ys2Nla9u2f9+vXVc70Wi6VcuXJEVKFChV9++WXcuHFVqlSpUqXKjBkziOiJJ55gjFWoUKFt27a9evUqX748EWm12tjYWN80q1SpUuB2iWazWT0KzXFc/sPRMTExWq2W47gff/xxz549lSpVqlq1qrpP8OGHH/I8X7Vq1RYtWjz11FNqGEdGRgYFBamfjYiI8D0h0Tf85ptvxsXFNW7cuEqVKq1bt76rpzkBQMA6lcf+tUOOW+rNdlNSX3FhO6F2CGI4gODe1BCIcG9qKCKl8N7Ue66yGcnKhnT2dE3u5XpCiL+f0YB7U99QsTxnDAAAt8aI/jivzDysZDjp3/X5OQ8LGhwJDWAIYwCAkmZlKhu3Uy5vpFfjhIQYHIcpBhDGAAAlR46HXvlL3n2FzX0YD3goTnDYAgCghFh9gcX/KpU10B484KG4QcsYAKDYy/PSqzvlrZfYTx2EZpGI4eIHLWMAgOJt9QUW94tERLv7ikjiYqoYtIz37du3ZMkSf9cCHihZlv1dBYBiQG0Qb7jIvm0ntIlCDBdjgR7GnTt3/vnnn9VHG0GhkCTJ9yiLgPWvf/3L31UACHRr0tizW+SEGO5Af9EY6L9puI1A/wN27tzZ90RCKBS44h6guPM1iBe2Ex5Gg7hEwDljAIDiZG0aa7BUIqL9/UUkcYkR6C1jAABQuWX6z255VSr7vp3QqixiuERBGAMAFAPHc9ljG+R6oVxSX9Gs8XdtoLAhjAEAAt3CFOW13fLUZsKQaji3WDIhjAEAAleel0Zvk0/kss09xWpBODRdYmEnCwAgQO2+wposk8J1tLUXkriEQ8sYACDgMKKZyconh5Rv2ghdYxDDJR/CGAAgsFx20vA/JZnR7r5ilMHftYEHAoepAQACyNo01mSZ1LwMt6orkrgUQcsYACAguGV6Z6/82zn2WxchPhyHpksXtIwBAPxv8yXW/DfpspOS+opI4lIILWMAAH9KyWX/2a0cy2FTmws9YhHDpRTCGADAP7Lc9PFB+dsUNqYu/2MHQYsjlaUYwhgA4EHzKjTvhPLuXmVgZe7IQDFY6+8Kgb/dURjLsnzs2LH09PRmzZoFBQWphQcOHLhy5Yo6HBER0bBhw6KqIwBACbL8vDL2LyU+nNvaS6hswXFpILrDMK5duzYRnT9/fvPmzc2aNVMLJ06ceOnSpdjYWCKKj49HGAMA3NquK+zfO2WvQgva4rFL8A93FMb79u0zmUzR0dEFyl9++eXBgwcXQa0AAEqU8zb2ZpKy8wr7oAk/sDKPHIYC7iiMTSbTDcs3bNhw8eLFBg0adOjQoVBrBQBQQsiM3t4jzz/B/tOAn/OwoEEvLbiRe+/AVadOHVmWMzMzn3vuuTZt2sydO/dmY549e/bIkSPHjx8nIkVRLBbLlClT7nm+cJ8cDgfPY3vgNw6HgzHGcWga+QdjzOFwPLDlb/PSiO2ChueSesjBGuZ1kffBzDiAlcJNEMdxBsNt7qZ272H84YcfqgMvv/xy5cqVx40bV7du3RuOGRYWVqNGjYSEBCKSZdlsNuv1+nueL9wnSZKw/P1IURS9Xo8w9hfGmPoneADzuuhgfTeyVmXo0+Y8z+HSlWtK4SboTn7vhbB+REREREdHp6Wl3SyMg4KCoqKiHnnkESKSJEmSpNK2WxRQeJ7H8vcjdfkjjP2FMfZgfgKHsliftcq4+vwLdfBz+wdsgm7oHpeILMvnzp1Th9euXXvhwoW4uLjCqxUAQDG2Jo11XSV/3kpAEsMduqOWcf/+/Tdt2pSbm9upUydRFNPS0nieb9q0aVBQkCiKubm58+bNi4qKKuq6AgAEvm+OKR/uV/5IwMMe4C7cURgvXbr0+sKMjIz09HQiKl++fCFXCgCgGJIZTUiSV6Wyrb2EGBOSGO7CvZ8z5jgOMQwAoLJLNGSj7JbZll6iRePv2kBxg/MZAAD3K91B7f6QKprpjwQkMdwLhDEAwH1Jzmatl0vDqvMzWgoCDk7DPcGlbwAA925tGhvxp/xVa75XBbRt4N4hjAEA7tGsY8qUA8rKrkKDMLSI4b4gjAEA7sW7e5WfzyhbewrR6DgN9w1hDABwdxjRuL/k7ZfZpp5iuM7ftYESAWEMAHAXPAoN2yTbJbahu2jEFhQKCXocAADcKZuXeq+RtDwt7YQkhsKEMAYAuCOZbuqcKNUM5ua3xWOJoZBhhQIAuL2zVvbQ71K/SvyMlgKPDltQ2HCcBQDgNg5nsx6r5bfi+adqogEDRQJhDABwK39dZo+sl//XWugRixYxFBWEMQDATS0/rzy/VVncUXioLJIYihDCGADgxhamKG/tURK7CnG4wRYUMYQxAMANzEhWZh1TtvQUKpiRxFDkEMYAAAW9ulPeksE29xQj9P6uCpQOCGMAgP/HiMb+JSddZWu74cnE8OAgjAEArmFEL++Q92eyxATRjCSGBwhhDABARMSIXtouJ2ezFUhieOAQxgAAxIhe2CafsbLEBNGA7SI8cFjpAKC0kxk9tVm+7GK/dhb1gr9rA6USwhgASjWZ0cg/5Sw3+7WTqEMSg58gjAGg9JIZDf9Tdsv0a2cRD2ICP8LaBwCllFehR9bLXoUWtccjEcHPsAICQGnkUeiR9bJWoO/bIYnB/7AOAkCp41Fo0HrZKNK3bQURW0EIAFgNAaB0ccs0YJ0Uqadv2yGJIVBgTQSAUsQh0cDNYoyJ+6aNwOMBEBAwEMYAUFrYJeq1Rq4ZxP77kIAghoCCMAaAUsEuUa/VUsNwbmpjGUkMgQZhDAAln12inqulRhHctOY4OA2BCGEMACVcroc6r5SaRnKfNMcdtiBAIYwBoCTL9VDCKunhctzHzZDEELgQxgBQYuV4qEui1K4cN6UpkhgCGsIYAEqmbDd1SZR6VOCRxBD4EMYAUAJdcVG7FVKfivzb8djKQTGApzYBQElz2UmdEqXHqvKvN0ASQ/GAMAaAEiXDSZ1WSk/X5P9VD0kMxQbCGABKjktO6rRSeq4W/1JdJDEUJ1hfAaCEuGBnbf+QRtVGEkPxg5YxAJQE522sU6L8nzj+qZpIYih+EMYAUOyl2lnHlfIbDfmRNZDEUCxhxQWA4i3VzjqskMfVRxJDMYZ1FwCKsQt21mGFPLY+/3xtbM2gGMPqCwDF1QU767BSHlufH4UkhmIOazAAFEtqEr9SD0kMJQFWYgAofi45KSFRfrkukhhKCKzHAFDMXHJSxxXSC3X40XWwBYMSAqsyABQnSGIokbA2A0CxkeGkjiuk0UhiKHGwQgNA8ZDhpA4rpNF1+BeQxFDiYJ0GgGIgw0kdVyKJocTCag0AgU5N4udrI4mhxMKaDQABLd1B7VZIo2rzLyKJoeTCyg0AgeuSkzqulF7E0Wko6bB+A0CAuuykziulUTg6DaUAVnEACESXndRxpfRMLf6luthMQcmHtRwAAo4viccgiaF0wIoOAIFFTeInqiGJoRTBug4AAcSXxP9pgK0TlCJY3QEgUFxxUceV0hAkMZQ+WOMBICD4kvg1JDGUPljpAcD/1CR+vCqSGEoprPcA4GdqEj+GJIZSDKs+APiTL4lfRxJDKYa1HwD8JttN3VZJj1ZBEkNphx8AAPhHlpvar5AGVebfaIgNEZR2+A0AgB/keanrKmlQFVzFBECEMAaAB88hUa/VUrcYbgLaxABEhDAGgAfMKVHP1VKjCO7dxoK/6wIQKBDGAPDgeBQauF6qF8Z91gJJDPD/EMYA8IB4FRq4To4ycDNaIokB/gFhDAAPgsxo6CY5VEfftBE4f1cGINAgjAGgyMmMhm2SZUZz2gg8ohjgOqK/KwAAJRwjGrVNdsq0uIMgYv8f4EYQxgBQhBjRC9vk8zb2W2cRSQxwMwhjAChC43fKKXlseRdRhz5bADeHMAaAovL6bnnHZba6m6hHEgPcEsIYAIrEW3vkP9PZ6m6iCZsZgNvBrwQACpnM6O098to0trabaNH4uzYAxQHCGAAKU6qdPbFRDtVxq7uKwVp/1wagmEDvRgAoNL+eVVr8JvevxP/aWQjV+bs2AMUHWsYAUAicEr22W16XxhK7CnFhuK8HwN1ByxgA7tfhbNb8dynbTbv7ikhigHuAljEA3DtG9M0x5cP9yhet+F4VsHMPcI8QxgBwj6646MnNkkOi7b2EaBMaxAD37o7COC0tLSkp6erVq0899ZSvUFGUn3/++fDhw40bN+7du3eR1RAAAtH6i+zJzfLIGtzb8Xj2A8D9un0YnzlzpkWLFjVq1Ni9e3f+MB47duzOnTsfe+yxt95669ChQxMmTCjKegJAoPAq9OF++dsU9kN7oVVZ5DBAIbh9GFeuXDkjI+PUqVN169b1FV69evWbb745ffp02bJlu3Tp8tBDD40dO9ZgMBRlVQHA/07lsUc2yPVCuf39cUMPgEJzjx0u9uzZU7Vq1bJlyxJRrVq1dDrd0aNHC7ViABBwLthZ50R5TF1+QVsBSQxQiO6xA9elS5fCw8N9LyMjIy9dunSzkU+cOLFr165Vq1YREWMsMjJy7ty59zZfuH92u93fVSjVHA6HLMscV/yO7mZ5uIR1mnG15QHlZJvN37W5V4wxp9PJGPN3RUqvUrgJ4nneaDTeepx7DGOTyeR2u30vnU6nyWS62cixsbEmk2nw4MFEJMtySEiI2Wy+t/lCocDy9yOe5w0GQ7ELY4dEj22URtbiX4gr3re4ZIzxPH+L7RU8ANgEXe8ew7hChQpnzpxhjHEc53K50tLSKlaseLORDQZD9erVO3XqRESSJEmSdI+VBQB/8Co0YJ3UOIIbH4criQGKxB39tHJycnJzc4koOzs7Ly+PiJo2bWqxWJYsWUJEc+fObdCgQaVKlYqyngDgHwqjoZvkCD03oyUeSgxQVO6oZVy7dm232200GqtWrdqgQYONGzdyHLdgwYInnnjilVdeCQkJWbx4cVFXFAD8YuxO2S6xXzuJxezAOkCxckdhnJ6efn1hy5YtT5065XQ6cUUTQEn19h5512W2trso4vg0QFG639thIokBSqr/HlGWnWN/9hBNuG0uQBHDjwwAbuCHU8pnycqWXiIeSwzwACCMAaCgdWls/C5lfXchCke+AB4IhDEA/MPOy2z4n/IfCUKNYPTZAnhA0CsDAP7f4Ww2YL38YwchPhxJDPDgIIwB4JpUO+u1Rp7Zkm8ThSQGeKAQxgBARHTFRZ1XyhMb8f0rYbMA8KDhVwcAZPNSj9XSs7X4YdWxTQDwA/zwAEo7r0KPbJDaRnFj62ODAOAf+O0BlGqM6LmtcrCW+6gZbj0N4De4tAmgVHtjt3zWyhK7ijz6bAH4D8IYoPT66qiyIpVt7inq0CoG8CuEMUAp9fs5ZdohZUsvMUTr76oAlHoIY4DSaPMlNno7bngJECjQgQug1DmczR7bIC/uINTEDS8BAgPCGKB0SbOzXmvkLx/iW5VFEgMECoQxQCmS66Huq+U34/m+FfHbBwgg+EEClBZOiXqukR6pwj9ZAz98gMCC3yRAqSAzGvqnXDeEm9AQv3qAgIOfJUCp8MpfskemLx/CBcUAgQiXNgGUfO/tU3ZfYeu7iwL6bAEEJIQxQEnmkuk/u+RN6WxTD9GInztAoMJhaoAS61gOa/m7lO2mbb3EUJ2/awMAN4ddZYCSaWGK8tpu+ZPmwuNVsc8NEOgQxgAlTa6HRm2TT+WxLT3FqkE4SwzFjJR5yXPqkDf9LG8KEoLD+aAwIThcCArnjeZ7n6giKy6H4rQxp0NxOZjbobgczOVQXHbFaWcuu/qSOI5EDW8wc6KG0+h4g4lEDa/VczoDJ2p4g4nTaDmtQVO+MnGF/MtCGAOUKDsvsyGb5B6x3IK2ogZNYigiiqy4nMztYJJXcTmY28UkD3M5hJAIMTKaNwXd7fSkK2nukwfdpw65Tx7iNFpd1XqamGqKPc999qick6lYs+TcTMXlECwhQlAYHxwuBIUJwRFCUBhvMCpuF3M5FKft73z9O2ud1yJWcTs4UcPpjbzOyOlNvN7I642cwcTrjZzeJASFcWVi1EIiUlxO9bswr5tJXsWaI0te5nUzl51JXsXlJEUOG/ofITi8cJcowhighJAZfXJQmXVMmfew0LYcGsRQCOTsy66jSa5jSXL2FcXlYF4P8ziZ28Xp9JxGx2m0vMGsDnAGEydo5Lws6Uoa87jEyGixTIxYJloTGSNGlhcjozmt/h+TZsybcd598pDn1CH3qUO80ayrGqev0yy411M3zTnGZGu2nJup5GXKuVlyXpb71CHFZecNZl5v5HRGwRzMRZTj9UbeYP47eo283sjpisHjUBDGACVBqp09sVEO03G7+4rh6KsF94FJXvepQ+6jSa5jSYrHpa/VxNi0k6ZMLGm0vN7EaXWcqLnNFDxu6coF6cpF75ULzsM71WFOoxMjo8Uy0bLe4r6S6jlzhLeE6KrFGRq2CRkwijeH3L5mHCcEhQlBYUTVC+erBhKEMUCxt+yc8sI2ZXwcP6YejxZxaceYdPWi5/xxOS9bsIQKIRFCUJgQEslpb7OPJl1Ndx1Lch3Z7Tl3TBtbXV+rcfjIt8SysfdQBU6r00RX1URXzd8gVex50pU07+ULzow0Y7POoY++zBst9zDxkgphDFCMqZcRr0tjiV2FuDAEcSklZWV4U094zp/wnE/xpp0SgsO1sdWF0DLujFQ5L0vOuSLnZZEsC8HhQkgEHxQmhkTwQeFCSIQQHKZYc13HklxHk4hIX7uJuXUv3YgJt03ue8CbgrSmIG2l2sxmM5jvoytWCYUwBiiurriowwrp4XJcUl/RgJ9yaSLnZXnOn/CmnvCcT/GkpvAGk7ZCDW1s9aBuQ7UxVQuenSUiIiZ55dxMOTdTzr2q5GZKVy96TifLOVc4g1lfu0nEw33FiHIP/ouAD37BAMWSU6I+a6Rh1flX49BnOlAx5rmQ4jq0w3lkNyeKgiVUCI7g1UPHllAhJIK3hAiW0Jt9WrHnyXlZcm6mkpcl52aqfZfkvCw58xKJoja2hrZCDUv7AZrYarzh9g1NTtSI4VFieFShfkMoNAhjgOKHET29Ra4XxiGJAxCTJXfKAVfyDmfyTsESoq/fKnTwvzhRI+dcVazZUu5Vb9opV84V2Zoj51xVHFbeYFLjmbeEKrac68uF4HDeEqaJrqKv1VgIjhBCIu7h2iEIcAhjgOLn1Z1ytoctaIvfbwBRXHbXkd2uQztcKfu1MdX09VqW6fSoEBLhG0FTrtKNP+hrATusvN502xYzlEj4MQMUM98cUzamsz97iCJaxQFAseW4jiY59m/xnDmsrVzX2LBNyCMv3clxYx/eFMSbgm4W1VBKIIwBipPEVPbhfmVrL8F8m0s9oXAwWVJsuYotV7ZmK/ZcxZar2PJka5Ziy5XteUpeNpMlQ73m5of76J58ixOwRYV7hFUHoNjYe5U9tUVK7CrGmHAV031QFMWepzhtitPGnHbFYVOcNsVpVxxW5rRfG3baFIdVseYQU3hLKG8OFszBvClYCArlzcFiVKxgCeXNIbwpSAgKK/TbFEMphDAGKB7S7Gzgenl+W7EBrifOx+51SIpk9zrcsscje2weu1t2O23ZVnumw57jtufZ3HkOl83tdTq8DqficcseiUjHCWZOYxC0BkFnEPUmjdGoMRp0JkO42WKsZDIEGQ0heksYbzRzgqgQEccbNEZ1joxIJpKJiMioMdxzEntlr0t2q9V2Si5JkRxep8KUf4yjeF2S+4YfFzjBqDEQkUE0CDwvcLxRYyQivaDTCBoi0vCiV5GsHpukyE7J6Zbc6ktZkR2S0y15PIrH7rErjLlkl1eWiMghOWVFJiKb184YY8TsHgcRyUwWOIE4MmtMHMfd4H+tiSPOrDXdsKoKU+xeh++lx+MJM4X6PmvSGHmON2mM+Yd5jhd50SW57V673euweex2r8Puddg9DrvX4fA6bF67WqguMYvWrH5Q5EWDqNcKWp2o1Qt6jSAaNUaB4y1aMxEZRL3ACxpeoxd1RKRW27fEbs3hdcpMJiJ1Rrf/A98lhDFA4bN7HS7J7ZJcNq/dKbncktspuWweu0ty2912URRNGqNO0Bo0BnVAJ+osWrNW0OoErbrVKCDPS91Xy+Pj+C7R/9j0qxtxdbPu2+TZPHa1DgpT1BF846ubKnVYL+o0/LVtkFljonwTVmtyfTV0MpOSdypup65qPU1UpdvmkFoHm8fOiNk8dsaYzWtX66n+zxhTa6uSmOz0On0v1aBSh21euyRLTsnllFxexWvz2L2yh2MkcryJRI1CWlnRS4rWK2m9sonX6ES9XmOw6C1hekv54FiLOcJgDDFYwk1BEW5J5jW8Oimbx+aQXC7Jled1pXlsLsnp8mQ77E61VgVSpMD38r1UI1PdshORRtDohWs3zVCTQB22emzqBGUmS4qs/t21vMaoMQicYNIa1Y/n/4iPwAtG0VBgjvR3QshMUZebU3JKiuyrtllrEnnRKBq0glYraMxak8gJRo1R/fuaNEaz1qwmqC+fdIJOK2jo79wiuhbAvm9t9ziu/TWJ2Tw2RqQOWz22PLf11uuDyuPxuJlHDX71f3UtdUquAsNmrcmkMZq0JpPGYNIYTRqTSWMwaU3R+nImjdGkNZo0Rq2gdXqdMlN8i1f9uEf2WN02dT8j/1wkRVIXndVjIyKX7PbKXpnJbsmj7tz4/lj5F4uPug/xeefJEUY8KAICgEty53msee68XLdV/UV5ZI9b9ji9TonJNo9dVmS716FuMlySmxEziHp1PSYidc9XL+o1gqiu7urOpkf2umW3S3J7Fa/D65QVWd122zx23w/MI3t91SiwJ24Q9SJ/bZUWedGiNVu0ZovWZNaaLVqTRWs2X/vffNsdW5nJjmtbN5ekSB7Zq+6hO7xOq8d2bd/c43Coe+v/v+dud0luRmQQdQbRYNIY9aJOJ+rMGpNBY9ALOoOo13Jar+zN8Fyxemxq2Fg9Nrfsdkseu9fhlFxu2S0rsvafWWjzUhh5ftjr+WHvP74mEelFvYYXtYJGJ+gEnjeIBt9yVuPBoDGInEB/N3fyfzsiUpe5OqxuAa9fGjavXfG6mcvJPC5OqyeeZxeWkKKQqOU1WtLoOEHwjazmgW/uFq1ZbVGpf2I1VNR9Ao0g6kW9RWcu0KgSGOkVjnlczOtmbpdGkkS3h3NqtDarxurm89z63BwNJxotZYSQSCE4XAgOvzagXiB0y8t+GGMOh8NkunEb7v75clpdY9VCh9dp1BjUxmv+/aHSyWazmXEHrusgjAOCr/mSfyvpOyqi7tOphW7Z7UsjNfnUYXXnlNRNgPfvTcDfB53yT9btdes0OnXbrRFE9UiOXtSLnKButQ0ag8DxIq/Jc+fleqx5bmue25rrzst15+W5rbkeq81jN4g6i9YSrLMYNAZ1S6m7QQAAIABJREFUv1tt54mcYNaagnQWk8aopmz+5pe6s6l+LzVxvbJkddvytz/U8Y0ag1FjuP7Qk1bQGEQDR+SQ/r/9RETq3rrvpbqUnJLL6rHZPLZ0+2Wbx2b12Gweu9Vjs3psdq9TK2gsWrNZY1KXUr70dYq8RsOLvkjTizqtoDVpjBat2agxqIc0zRpTGWOkWWsya0xGjVHdc9eL+psdqfNxOBwGg4G7XZtSXUo6QasVtKO2ydlu+qGDUOAzruN7nXs3aaNr6es2L/QHuqkUe54jab19RyKJZlPLgcbG7Xm9yfeWO+WA68Q+95H9xDy66g11NRrqazS89R3/mdcj51yRc67KOVekq1eU3Et/n761Ky47c9oUl4MTtbzBzBlMvMHMG0y8wcQZzEJwRaF8mBCqpm/EbZ9V4C/59/NwcRLcOYTxPbJ7HephmTy3Nc9jtXpsVrctz2PN89isbmuex+aW3JSvLUL/TEQiUtPI18rxnQEiIvWwFREJvODbifYV0t9tDvrn2YtrmcqLFp1ZbXoSkRqu16YgGgRecDqdGp1GbQP5jhQpipLttWU6s+3ea8egeI4P0lmCtJZgXVCFoOggnSVIGxSkMwfrgm54HLXY8cgeq8euNgoNokHkhSI6FZSf4rK7Ni1VwiJN8W1v/Vg338rw/j7lcDZb2038/yRmzHlwm3XdYuI4U4sEz4WTeau/F4IjDPVb6uu1KJwrZBhzpxyw/5XoOnHA2KB12BPjNTHVCozCm4IMDdsYGrYhIjnrsitlnyv5r9xls3hLqL56Q12NhpxGK+dcla5F71U1g4kxISRCCIkUQiKE4AhthRq8KciXu+qzZguh/gDFDcL4BhSmZLtys105mc6sHFdulisny5md7crNdGVlO3OyXbku2W3SGIK0FovOEqQ1q/8HaS3RlnK1tOYgrSVIZ8nfQvJlJ/3zpJ1f4BiRSitoww03OC16PeZxkyDc51UrzOuxbfndtmmppk4zT1Z63h/zDfVamFp01VaqdYtP/XRa+faksq2XqBOIiJgsOZI2WDcsEYIjgns9qavRkIhMRMSYJ/WE89COrIVTmNetr9fSUK+Frko94u/6SmQ5N9Oxa639r9VCcJipRdfQR8feyTMDhLAypuYJpuYJxJj30jn3iX22bSuJmHoAWVeptnrfKCG0DKe5o2UOUNpwvnZb0Zk4caLRaBw/fjwRSZIkSZJeX+RppB74tXnsMpPtXodH9qo9LSVFckhO9V2r26ae13FITnXkbFdOtivXJblC9SFhhpBQfUi4ISxUH+wbCNOHhupDCpzSL15KThgzpjjtRKQ4bUSMuZxMkZnHRbLEvB7m9dzqs7zA6w1ExLxuxWFXXHbFaWcu9SoX+7UrXpw2xWW/dpaUOGOjtqZWPTRRFe66mrLk2Lkmb+2PumpxQd2GevQWg8HAXHbHno32v1aRJJladjU26Xj9mc4tl9hjG+WN3YXqwRzzuOw7Vln/XKqNqW7pNFhbocbNZiddTXcm73Al/+W9dF5fu7GhXkt9rcYFWuGKy86ufWub4rT//WUd3vPHPedPGBu3N7Xoem/Pzgt8RX3OGG6r5GyCClWAhrHb47iSc9HOK27F65Y9dq/D6XW6ZY9Dctq9Do/kcUoum9fultxu2eOUnLKiWD029TiwR/ao3eLNWpPACSaNUSOIOkFn1Bi1vGjUGHWiVstrzVqThhcNGoN6klLtyxqqD44whOlLdPeKB/FLYExx2pnkYWqvH0Vizms9ZhWPmyTv3+PYro3u9TDJc23A62FuJ1Nk5rIzRWFOO2MKc9qZojCXg8kS8ziZLJPk5XR64nhebyKO1BsecXoTcRyvM5AgcDzPFOXG1cuH43lOb+INZt5o5vUmzmDiDaZrJyz1Jt5gVtuFii3HvnONfXuiEBphatXD0KD1HTWUGXPs+zMv8VtNuYpB3YdroirSdeeMvRdO2v9a5TywTVutvql5gr5mI7WL8sk81mGF/FNHobnZbtvyu337Cn3NRuaOgzRl73RvQLHnuY7scib/5T55UIyMZl4Pc9kVp41JXt5g5vTqN712RpbXm3ijWYyM0ddtVrLvXIEw9juE8Q0FaBgvWzdj6fk/dbKslZmZ02h5jV7QmHi9XqPXaQxmrcmoNWt1JpMhyKQPErS6IH2woDeZDME6rdFgCSvqbxT4mCwxt4uYorjsRKQ4bETEXHZizGmzGswWIiJBVB+1xokaNXI4UctpdETEabTE88zlUFx25rQrLidz2xWX4//au/OwKM48D+BvVfXNKQIyAqJ4MYwaD+J9BEU0RkFJxJnE8UiMT3afqHGeTcZkxkSzmckxYzKbrNkojCSaJZlxJXFUiBHlECRBwQMiCB4gl8gpR59V9e4fbTpoPJumq4/v5/GPrurG+jX9dH35vfVWFdXrfmwitaJBS/U60aCj+m4qCFSvpSYD5Y3UoGeUKkYmZ+QqRqliODmj9iCEsEoVMe/lGcZysUBGrmBkN8ctWY0nIYRRahiWZdQeDMOyGk/CMIzKg2E5RqU2l8fIFZINdVKqLy/qPnHIWH1B82iMx9THZf3vetc5/fnCG4c+ZT28fRauVgwaaVl/xwlc1GTUnc3r/u4bobVRM3HuhWFzl57q/9Ho9pmXvtaePKoeN9Mr+kmuX6CVVZuMfGMNo1SZ/8hw7ay9L4Sx5BDGd+SgYfwTSkVdt6jrvOVCObouqusyjyhSo0406KlBR3mjORsIb6QCz8gVrNqTyBSsQsmoPG7u31n25mOlhpHJGIWKkSkY+c1dPOFkROBv2bjJcNtop2jQkR7nflBRoPpbpvVSg/bnDRmr9iDk9tmz5gKoUU95nlBR1GsJIdSgowJPREHU68yLRBQob6LGO5/4f0upPzaXxBxynNx8Fgqr0hDC3ExEtScv8DKZjBoNlDcRQszjujffmiD8+B5584sZpZpVaRilhlVpzF3jzcdKNavSmGfcMCzHqDXmpGRVasJy96jTNQjtzd0FGd3fH5b/YrDH1CfUv5rU8+is4XLpjQMpROB9Fq5Sjhh328/eeza1qaku5+Bhv7JjngGBXp0NHpPne85czHr69OGbcTMIY8khjO/I4f9GZhhW42numR4KNeopbxJ1XTdHPvXdhFJR22UeHaXUPOYpiNpWKvDUqKcmIzXdDDxW5XHLzBeGsZzOcXOFpZVkOUbjSQi57brw5obPMgx7S2E/DsnefKVCxXooGZmcsKx5K4xCxchkhOXMx/lYlea2aTiMQsXc5XoxjFJ1374H34Te43z9vR//rfe8p3Wl33XnHWhP+x+PyfM8Js8XO9tvHPpUaGv0XrBKPXrKw16bqcNE1pwLuh644oulK/2ulyuCw+894xoAXIbDh7G1GIWKUahYjZfUhYDrYjn1mGnqMdP45vruE+nXt73IyJXe857RRM2xYhpzUTP99THhySHMF7NlHEOI56/6omQAcEwuG8YAdiPzH+gTt8b7iVUMw1g3Sr+zXHzztJg8g5sfgutOA7gjhDGAbVg3MarDRNYeFxq0tDCeG6hBEgO4KdydHEAyp1to1Nf8ADXJXCBDEgO4M3TGANLYXSn+8ZT4yXRuQShiGMDdIYwB7K3TRF7IFy520JyF3BAvJDEAYJgawL5+aGcm7heCNSR/kQxJDABm6IwB7OdKJ12SLfvvqcziwa5/aRQAeHDojAHspNNE4o8Ir40W4sPwvQOAW2CnAGAPIiXPZAkLQplVQ+9/+woAcDcIYwB7eKVQ4Cn9UxRGpwHgDnDMGKDPfVYpflNLT8TJOEzYAoA7QRgD9K28a/S1k+LxRZz3ne/uAQCAYWqAvlTVSX+dJaRGc+E4iwkA7g5hDNBXOk0k7oiwdTw76xdIYgC4F4QxQJ8wT59eGMo8NxLfMgC4D+wmAPrEf3wvcAx5C9OnAeABYAIXgO19WiFmNdDjC2UsxqcB4AEgjAFsLO8afaNYPL6Q88T0aQB4MBimBrClqk76dJbw5WxukCeaYgB4UAhjAJsxT5/+86PslEAkMQA8BIQxgG0IlDydxccNYpYPw9cKAB4O9hoANtBiIMuOCQqWeXMCpk8DwENDGAP0VkYNnfAVP8ybfDGbw/RpALACZlMDWO+GkbxSKOQ30v+L4aL8kcMAYCV0xgBW+raOPpLGqzhStFiGJAaA3kBnDPDQtDx59aRwqIbufoybGYQYBoDeQmcM8HDyG+m4r3i9QM4myJDEAGAT6IwBHpSOJ1tPC3sv0+SZXDRuxAQAtoPOGOCBfHedjv+abzOQMwkyJDEA2BY6Y4D7MAjk9SLhn1fojulcbDBiGABsD2EMcC/FzXRljhAVwJxZIvNRSF0NALgohDHAnfEi2VYibj8vfjiVXRyGAzoA0IcQxgB3cL6drswWhngxxUtk/iqpqwEAV4cwBriFSEnyBXFrsfjORPa3uOUDANgFwhjgJ1c66epcQSMjhfFcsAfmagGAneAPfwBCCKGE7CwXpx8Qnh7Kps+TIYkBwJ7QGQOQq1302VyBYch38VwoYhgA7A6dMbi7vVfEqQeEucHs4fkyJDEASML6zjgtLa2ystL8ODw8fOnSpTYqCcBOGnVkzXG+3UhynuCGeiOGAUAy1nfGe/bsOXfunA1LAbCng1dp1Nf8zCA25wkZkhgApNWrY8ZxcXHLli2zVSkA9qEXyO8LhSN1dP9cbjzuQwwADqBXx4xTUlJWrFjxwQcfaLVaWxUE0KdK2+ik/XybgZxcLEMSA4CDYCil1v1kcnKyRqNRKBTJycmdnZ25ubkcx93xlYmJifn5+YGBgebFfv367d+/38p6ode6u7s9PDykrkIClJBPKmQfXpBtG29cECxKVYZOp1OpVAyDvwOkQSnV6XQajUbqQtyXG+6CWJa971u2PowtDAZDSEhIenr6o48+escX/PGPf+R5fu3atYQQQRDkcvngwYN7uVGwWldXl6enp9RV2Ns1HVmdwwuUfDqLG6iRMgi1Wq1arUYYS4VSqtVq3S0MHIp77oLuywbnGSuVSm9v787OzrtuQybz9vYODw8nhPA8z/N87zcK8ODSqsT1BeK6SPblMSyLEAQAx2NlGJtMpm+++SY6OprjuO3bt3d1dU2YMMG2lQH0npYnr54UjtbTQ/O4R/yQwwDgoKyfwPW3v/1t2LBhQ4YMOXLkSEZGho+Pjw3LAui9k0103Fe8XiCF8TIkMQA4Mis7Y7lcfvToUduWAmArAiV/PiMmXxCTZ3BzgxHDAODocG1qcDXVXXR5tuCvZIoW41bEAOAccG1qcCn7rohT/yU8NZhNm8shiQHAWaAzBheh48mmk8LRepoxnxuDI8QA4FTQGYMrONX801wtJDEAOB10xuDcKCEflop/KRE/mcYtHIQYBgCnhDAGJ9aoI6tyeJ6SwniJr6sFANAbGKYGZ3W4lkZ9zU8KZA7PlyGJAcCpoTMG52O5B+K/Yrlx/RHDAOD00BmDkylppVFf83qBnFosQxIDgGtAZwxOQ6Tk/VLxb6Xih1PYhMH4OxIAXAfCGJxDVSddnSuoOPJ9HBfsgYYYAFwK2gtwArsrxWkHhN8MZdPny5DEAOB60BmDQ7umI2uPC60GmrOQG+aNGAYA14TOGBzX3iti1Nf8tAFM7kIZkhgAXBg6Y3BE7Uby4gmh8gbNfJyL8EUMA4CLQ2cMDiejho5N40M8SN4iGZIYANwBOmNwIB0m8vL3Qn4j3RfDTfBHDAOAu0BnDI7iWD0dm8b3U5KixTIkMQC4FXTGID29QP5wSjhwlX7+GDd1AGIYANwOwhgk9kMbXZ4tjO7HFC2WecmlrgYAQAoIY5CM+VbEfy0RP5rKLg7DERMAcF8IY5BGTTddmS3IWfI9bkUMAG4P7QhIYO8Vccq/hPgw9pvHcStiAAB0xmBfN4xk3QmhrJ0eXcCN9EEMAwAQgs4Y7OlYPR37FT/Qg+THyZDEAAAW6IzBHgwCeaNY2HuZ7p7FzQhCDAMA3AKdMfS5c6300f18s56cSZAhiQEAfg6dMfQhk0jeOSvuLMfJSwAA94Iwhr5S2kZX5whDvJjiJbIAldTVAAA4MIQx2B4vkm0l4n+fFz+YzD41BA0xAMB9IIzBxn5oo6vQEAMAPAyEMdiMpSF+fzK7FA0xAMADQxiDbfzQRlfnCgPUuLwlAMBDQ/sCvcWL5N2zYkw6v2YkeyAWl7cEAHho6IyhVywNcdESxDAAgJUQxmAlg0DeOyfuKBf/OpH99VAMsQAAWA9hDNbIaqD/ni9MDGCKF8sC1VJXAwDg5BDG8HBaDeTVk0JWA90+lZsbjHFpAAAbwOgiPChKyO5K8ZE0/hcaUpIgQxIDANgKOmN4IOda6b/lC0qWHHmci/BFDAMA2BLCGO5Dy5P3zgkpFfQ/J7ArhmMoBQDA9hDGcC8HroobCsS5wUzJkzJvudTVAAC4KIQx3FldN33pO/FiB/0impsUiHFpAIA+hFFHuJ1RJO+cFR/dz88MYk4tliGJAQD6GjpjuEVWA113QhjiRb6Pl4V6IIYBAOwBYQw31XXTV0+KhU30I5xADABgXximBmISyX+VilFf8+He5NyTOIEYAMDe0Bm7u2P1dN0JIdybFC7GuDQAgDQQxu7LPC59spl+NIWLQTcMACAdDFO7o57j0mcTZEhiAABpoTN2O9/Ws5vO8lMCmdMJ8iDccAkAwAEgjN1I5Q36u++Fq52yXTO46UHohgEAHAWGqd1CN0+2FAuzDvExA9ncWCOSGADAoaAzdnGUkP+7Iv6+UJwbzJxLkPurSFeX1DUBAMCtEMaurKiZri8QlCzZP5cb7YduGADAQSGMXVODlmwpFg7X0jdx30MAAIeH3bSrMZ+2NP4r0y80pHypDEkMAOD40Bm7lMw6uqFACPcm38XLwjwxLg0A4BwQxi7iXCt9pVBo1pOdM7hpAxDDAADOBGHs9K520deLxOwGumU8u2I4yyKIAQCcDcLYibUZyLvnhD2VdP2v2P+ZxqnxYQIAOCfsv52SUSSfVohvnhafCGXOJMgCVFIXBAAAvYAwdjIiJfuqxE2F4gR/5vhCbogXRqUBAJwewtiZZNbRlwsFfxXZF8ON7Y8YBgBwEQhj53Cyif6+UOg0kW2TuNkDEcMAAC4FYezoytvp5iLxbCv9zwlsYjjmSgMAuCCEseOq7qJbi8UjdfTVR9jUaE6OS2kBALgohLEjataTv5YIeyrp8xHM+adkXnKpCwIAgL6EMHYsnSby8Xnxv34QVgxnf3hK5quQuiAAAOh7CGNHoeXJRz+IH5QK8WFs8RJ5kFrqggAAwF4QxtIziSSlQnzztDg1kDkRJwvHqcMAAG4GYSwl8xU8XjspjuvPHF3AjfRBDAMAuCOEsTSMIvn8ovjuWXG4N9k7B1fwAABwawhjezMI5LNK8c9nxNF+ZPcsblIgYhgAwN0hjO2n00R2XRD/UiJODWTS53ORvohhAAAgBGFsH016sv288EmZGBvMZi3ghuPYMAAA9IAw7ltXu+i2EvHLy+Kvw9niJbKBGsQwAADcDmHcVy510A9/EPdV0TUjmbKn5H5KqQsCAABHhTC2MV4kh2rEpHKxpI1sHMVeWMp54HcMAAD3hKCwmdpu+r8X6Sfl4jBvsjaCXRzG4tYOAADwIBDGvWUUyeFacU8lLbhOnxnGHF3A4RJaAADwUBDG1qu8Qf9eIe6uFH/Vj1kbwaZGczK0wgAA8PAQxg/NIJB/XRV3lovl7eSZYUxBnCzME60wAABYD2H8oDpM5HCteOgq/aZWnB7E/sdobm4wwyKFAQCg1xDG91F5gx6soYeuimdaaPRA9olQ5i+T5AEqqcsCAAAXgjC+A4GSgkZ6sEbMrKNtBhITzGwYxcYGs0pO6soAAMAVIYx/0mIgx+rFA9U0vUaM8GUWDWJ3TGcn+GMkGgAA+pb1YdzR0fH222+Xl5ePGzfulVdeUamcb+hWy5MzLfRkEz3VTE820XYjjQ1mFw5iPpwq91VIXRwAALgN68N41apVGo1m48aN27Zt27Bhw44dO2xYVh/hRXLhBi1qvvmvvJ1G+DIT/Jm5wcymR9jIfgy6YAAAsD8rw7i6uvrw4cPXr1/38PAYMWLE0KFD3333XV9fX9sW10t6gVztojXdpKqTnm6hp5rphXYa4cs8GsBE+TMv/JId6YPp0AAAID0rw7ikpCQiIsLDw4MQEhQUFBAQcOHChUmTJtm0tgciUHJNS6u7SE03rekmNV20uovUdtOabmoSSYgHE+ZJBnkyY/2Y50ayo/oxuEQlAAA4GivDuLm52cfHx7Lo6+vb1NR0txeXlJRkZGS8/fbb5sVBgwbl5+ff+//fdYl74+wDzV02iSRITUI0NERDQjXicA15zJ+GetBQDfGQ0dtebNASw4P8py6tu7tb6hLcmlarFQSBwSERiVBKdTodpbfvHMBu3HAXxLKsRqO592usDGNfX9+uri7LYkdHh5+f391ePGrUqDFjxqxfv54QwvO8Uqn09PS89///76PJbyPuXwbDEMy0ssJ9f//Qd1iWVavVCGOpUEpZljWP6oFUsAv6OSvDeMSIERUVFUajUaFQtLe3NzQ0DB069G4vZhhGrVb369ePEMLzPM/z9y+LJf1wA2AAAHAPVh5BjYyMHDVq1J/+9KempqbNmzfPnz9/wIABtq0MAADATVg/nSk1NbW0tHT69OltbW07d+60YU0AAABuxfrzjAcNGrRv3z4blgIAAOCe7H2iT0VFxfHjx+28UbCglKakpEhdhVvLyMioq6uTugr3VV9fn56eLnUVbi0lJQWz2X/O3mGcl5e3f/9+O28ULEwm0+bNm6Wuwq19+eWXxcXFUlfhvk6fPv3FF19IXYVb27Jli16vl7oKh4NLYAAAAEgMYQwAACAxhDEAAIDEGDscSF+9evXevXsVCgUhxGQyCYLgjPdbdBmdnZ1eXl5SV+G+tFqtQqGQyXArcWnwPG80Gu97bULoO264C1IoFGVlZeYrX92NPcIYAAAA7gHD1AAAABJDGAMAAEgMYQwAACAxhDEAAIDEEMYAAAAS47Zs2WK3jXV0dKSmphYUFAQHB7vb1HapCIJQVlaWl5fn5eXl7e1tWX/58uXPP//80qVLw4YNk8vlElbo2gRBOH78+MGDBysqKkJDQ9VqtXk9pTQ9PT09PZ1l2eDgYGmLdG2FhYUZGRl5eXlGozEsLMyyvqysLDU1taamZsSIERzHSVihmygoKDh//vywYcPMiyaTKS0tLTMz09fX19/fX9raHIH9OmOtVjtx4sSsrKxLly6NGzfuypUrdtu0O4uJiUlISHj22WcLCgosK4uLiydOnNjQ0LB3797Zs2cLgiBhha5t06ZNmzdvrqmpycjIGDly5KVLl8zrX3zxxa1bt7a3tycmJu7evVvaIl3bpk2bysrKrl+//txzz61bt868Misra9asWS0tLUlJSfHx8dJW6A4qKysXLVr0u9/9zrImPj4+KSmppaVl5syZWVlZEtbmKKi9JCUlzZkzx/x448aNGzZssNum3Zler6eUTpky5Z///KdlZWJi4jvvvEMpFQRh9OjRBw8elKw+V3fjxg3L49/85jd/+MMfKKW1tbWenp4tLS2U0mPHjg0dOlQQBMlKdBslJSVqtVoURUrpnDlzkpKSKKVGozE0NLSgoEDq6lyZIAjR0dFvvfVWZGSkeU1BQUFISIjBYKCUJicnW6LBndmvM87Ozo6NjTU/jo2Nzc7Ottum3ZlSqfz5yuzs7Hnz5hFCWJadO3cuPou+0/PQgOXCT/n5+WPHjvXz8yOEzJw5s66urra2VrIS3caJEyciIyMZhhFFMTc317w7ksvl0dHR+Ar0qe3bt0dFRU2YMMGyJicnJzo62nxZxnnz5uXm5oqiKF2BDsF+YXzt2rWAgADz48DAwPr6erttGnrieb65ubnnZ9HQ0CBtSe4gMzMzLy9v7dq1hJCGhgbL75/jOH9/f3wEfWr27Nmenp6vv/66+WbeLS0tJpMpMDDQ/Cy+An2quro6KSnpjTfe6LnytjgwmUxNTU1SVOdA7BfGSqXSaDSaHxsMBstMFrAzjuPkcjk+C3s6derUypUr9+3bZ56oolKpTCaT5VmDwYCrtfepY8eOXb9+/bXXXouLi9Pr9ebftuUrYDQa8RXoO88///z777/v4eHRc6VSqbR8BQwGAyEEH4H9wjg0NLS6utr8uLq6OjQ01G6bhp4YhgkJCamqqjIv4rPoa2fOnFm8ePGePXumTZtmXhMaGmr5/Xd0dLS1tYWEhEhWn3vQaDTr169va2urqKjw8vLy9fW1fARVVVX4CvQRk8mUmZmZmJjo5+e3dOnSCxcu+Pn58Tzf8ytQVVXl4+PT84COe7JfGCcmJv7jH//o6OgQBOHvf/97YmKi3TYNt0lMTExKSiKEXLt27cCBA0uXLpW6IpdVXl4eFxe3Y8eO2bNnW1bOnj372rVrJ06cIITs2rXrscce69+/v3Q1urLW1tbGxkbz44yMDJ7nw8PDCSFLly41fwUuX76ck5OzZMkSKat0XXK5XBTF1tbW1tbWvXv3jhw5srW1VSaTLVmyJCcnx3xyQXJyMuKAEDvOphZFccOGDUFBQWFhYXFxcVqt1m6bdmdr1qzp+XGfP3+eUtra2jpjxoyhQ4cGBga+9dZbUtfoym77/T/zzDPm9WlpaUFBQZGRkcOHDy8tLZW2SBdWUlISHBwcHh4eFhYWHh5+6NAh8/q6urrx48ePHDkyICBg+/bt0hbpJjIyMiyzqSml27dvDwgIiIiImDBhQn19vYSFOQh730Kxo6PDaDTiFG9H0NjY6OnpeduxHLAbo9HY3NwcFBTEsrgQXt+6fv26QqHw9fW9bX19fb2fnx8O2EtFr9e3trYOHDhQ6kIcAu5nDAAAIDH8SQ4AACAxhDEAAIDEEMYAAAASQxgDAABIDGEMAAA85vpPAAADuklEQVQgMYQxAACAxBDGAK6guLj4/PnzUlcBAFaSSV0AAPTWyZMnJ06cqFAoamtrLTfDAQAngs4YwOmlpKQMHjyY47jU1FSpawEAa+AKXADOTa/XDxw48KWXXiovLy8tLT137lzPZwVBSEtLO3v2bEhISGJi4sWLF7u7u6Ojoy0vOHXqVGZmZldX15gxYxISEmQyjJYBSABhDODcUlNTly9ffvHixcrKyvnz5xcVFY0fP978FM/zixYtOnr06KxZswRBuHLlSnh4uMlkys3NJYRQStetW/fxxx9PnjzZz88vLy8vIiIiMzPT09NT0jcE4JYkvU0FAPRWTEzMrFmzKKWCIISEhLz44ouWp3bs2EEIOXz4sHnxyy+/JITMmDHDvPjZZ59xHJeenm5erK6u7t+//6ZNm+xaPQBQSinFMWMAJ1ZdXX3s2LEVK1YQQliWffrpp1NTU/V6vfnZQ4cOTZs2LTY21ry4bNmyX/7yl5afTU5Ojo2Nffzxx82LgwYNWr58eWZmpn3fAQAQgtnUAE4tJSVFqVQ++eST5sWVK1e+9957+/fvX7ZsGSHkypUrUVFRPV8fERHR3NxsflxWVsaybM8XNDY2dnd326t2APgJwhjAWVFK9+zZo9PpbrtTb0pKijmMNRqNTqfr+ZRWq+25OHny5HXr1vVcw3Fcn9ULAHeFMAZwVllZWZcvX962bduYMWMsK7/99ttt27bV1NSEhoZGRETk5uYKgmCOWJ1OV1xcHBERYX7lqFGj6urq5syZwzCMNG8AAH6EY8YAzmrXrl0BAQHr1q2L6eHll19mWfazzz4jhDz//PNVVVUbN25sa2tramp64YUXOjs7LT/+0ksvFRUVbd26led585qrV68eOXJEmjcD4N4QxgBO6caNG1999VViYqJcLu+5PiAgICYmZteuXZTSadOmffLJJ7t27fLz8wsKCmJZdsGCBZYzl+Lj4z/44IP33ntvwIABUVFRYWFhQ4YMOXz4sBTvBsDd4TxjAKfU2dlZUVExePDg/v373/ZUfX19Q0PDmDFjzDnd3d198eLFgQMHBgQEjB07durUqR9//LHlxc3NzdnZ2a2treZnhwwZYte3AQCEEIQxgGsrLy+3HCROSUl59tln9+3bl5CQIG1VAHAbhDGAK4uMjDQYDIMHD66tra2oqFizZs3OnTsxYwvA0SCMAVxZQ0NDfn5+fX29SqWaPHlyz3nXAOA4EMYAAAASw2xqAAAAiSGMAQAAJIYwBgAAkBjCGAAAQGL/D6PRwGDLWYhiAAAAAElFTkSuQmCC">
+</div>
+</div>
+<p>The hump-shaped asset profile and the smooth consumption path are consistent with the model’s predictions: individuals accumulate assets during working years and draw them down toward the end of life, with the bequest motive preventing full decumulation.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Simulated Moments for the Savings Model
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="exm-bootstrap_savings" class="theorem example">
+<p><span class="theorem-title"><strong>Example 14.2</strong></span> Now let’s use the simulation machinery to define a set of moments and construct an MSM estimator for the preference parameters <span class="math inline">\((\beta,\sigma,\psi)\)</span>. We take the income process parameters <span class="math inline">\((\rho,\sigma_{\eta})\)</span> as given (estimated in <a href="extremum_intro_examples.html#exm-md_income" class="quarto-xref">Example&nbsp;<span>12.2</span></a>).</p>
+<p>Our target moments will be:</p>
+<ol type="1">
+<li>Mean assets at ages 30, 40, 50, 60 (to pin down the savings profile)</li>
+<li>Variance of log consumption at ages 30, 40, 50, 60 (to pin down risk aversion)</li>
+</ol>
+<div id="49c6c676" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute moments from simulated data</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">simulated_moments</span>(θ; N_sim<span class="op">=</span><span class="fl">2000</span>, seed<span class="op">=</span><span class="fl">42</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    A, pars <span class="op">=</span> <span class="fu">setup_and_solve</span>(θ)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    sim <span class="op">=</span> <span class="fu">simulate_panel</span>(A, pars, N_sim; seed<span class="op">=</span>seed)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    target_ages <span class="op">=</span> [<span class="fl">6</span>, <span class="fl">16</span>, <span class="fl">26</span>, <span class="fl">36</span>]  <span class="co"># ages 30, 40, 50, 60 (relative to t=1 at age 25)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    m_assets <span class="op">=</span> [<span class="fu">mean</span>(sim.assets[<span class="op">:</span>, t]) for t <span class="kw">in</span> target_ages]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    m_var_logc <span class="op">=</span> [<span class="fu">var</span>(<span class="fu">log</span>.(sim.consumption[<span class="op">:</span>, t])) for t <span class="kw">in</span> target_ages]</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">vcat</span>(m_assets, m_var_logc)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># "True" parameters and data moments</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>θ_true <span class="op">=</span> (<span class="fl">0.95</span>, <span class="fl">2.0</span>, <span class="fl">5.0</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>m_data <span class="op">=</span> <span class="fu">simulated_moments</span>(θ_true; N_sim<span class="op">=</span><span class="fl">10_000</span>, seed<span class="op">=</span><span class="fl">1</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co"># MSM objective</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">msm_objective</span>(x, m_data)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    β <span class="op">=</span> <span class="fl">0.8</span> <span class="op">+</span> <span class="fl">0.19</span> <span class="op">*</span> (<span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu">exp</span>(<span class="op">-</span>x[<span class="fl">1</span>])))  <span class="co"># map to (0.8, 0.99)</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    σ <span class="op">=</span> <span class="fu">exp</span>(x[<span class="fl">2</span>])</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    ψ <span class="op">=</span> <span class="fu">exp</span>(x[<span class="fl">3</span>])</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    θ <span class="op">=</span> (β, σ, ψ)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    m_sim <span class="op">=</span> <span class="fu">simulated_moments</span>(θ)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    diff <span class="op">=</span> m_data <span class="op">.-</span> m_sim</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> diff<span class="op">'</span> <span class="op">*</span> diff</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>msm_objective (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>This estimator is computationally intensive — each evaluation of the objective requires solving the dynamic programming problem and simulating the model. In practice, derivative-free optimization methods or finite-difference gradients are often used.</p>
+<div id="0d368a70" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Optim</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> [<span class="fl">0.0</span>, <span class="fu">log</span>(<span class="fl">2.0</span>), <span class="fu">log</span>(<span class="fl">5.0</span>)]</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> <span class="fu">optimize</span>(x <span class="op">-&gt;</span> <span class="fu">msm_objective</span>(x, m_data), x0, <span class="fu">NelderMead</span>(),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>               Optim.<span class="fu">Options</span>(iterations<span class="op">=</span><span class="fl">200</span>, show_trace<span class="op">=</span><span class="cn">true</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="indirect-inference" class="level2" data-number="14.4">
+<h2 data-number="14.4" class="anchored" data-anchor-id="indirect-inference"><span class="header-section-number">14.4</span> Indirect Inference</h2>
+<p><strong>Indirect inference</strong> is a simulation-based estimator that works by fitting an <em>auxiliary model</em> to both the real data and to data simulated from the structural model, and then finding the structural parameters that make the two sets of auxiliary estimates as close as possible.</p>
+<section id="setup" class="level3" data-number="14.4.1">
+<h3 data-number="14.4.1" class="anchored" data-anchor-id="setup"><span class="header-section-number">14.4.1</span> Setup</h3>
+<p>Let <span class="math inline">\(\hat{\beta}_{N}\)</span> be a vector of statistics estimated from the data (the “auxiliary parameters”). For example, <span class="math inline">\(\hat{\beta}\)</span> might be OLS coefficients from a wage regression, or the parameters of a reduced-form probit. The key requirement is that <span class="math inline">\(\hat{\beta}\)</span> is asymptotically normal:</p>
+<p><span class="math display">\[\sqrt{N}(\hat{\beta}_{N}-\beta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\Omega)\]</span></p>
+<p>Now, for each candidate <span class="math inline">\(\theta\)</span>, simulate data from the structural model and compute the same statistic on the simulated data, yielding <span class="math inline">\(\hat{\beta}^{R}(\theta)\)</span>. Let <span class="math inline">\(\beta(\theta)=\text{plim}\ \hat{\beta}^{R}(\theta)\)</span> denote the “pseudo-true” value of the auxiliary parameter implied by <span class="math inline">\(\theta\)</span>. The <strong>indirect inference estimator</strong> is:</p>
+<p><span class="math display">\[\hat{\theta}_{II} = \arg\min_{\theta}\ (\hat{\beta}_{N}-\hat{\beta}^{R}(\theta))'\mathbf{W}(\hat{\beta}_{N}-\hat{\beta}^{R}(\theta))\]</span></p>
+</section>
+<section id="asymptotic-distribution-1" class="level3" data-number="14.4.2">
+<h3 data-number="14.4.2" class="anchored" data-anchor-id="asymptotic-distribution-1"><span class="header-section-number">14.4.2</span> Asymptotic Distribution</h3>
+<div id="thm-ii-asymptotics" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 14.2 (Asymptotic Distribution of Indirect Inference)</strong></span> Suppose:</p>
+<ol type="1">
+<li><span class="math inline">\(\sqrt{N}(\hat{\beta}_{N}-\beta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\Omega)\)</span></li>
+<li><span class="math inline">\(R,N\rightarrow\infty\)</span> with <span class="math inline">\(\sqrt{N}/R\rightarrow 0\)</span></li>
+<li><span class="math inline">\(\theta_{0}\)</span> is the unique solution to <span class="math inline">\(\beta(\theta)=\beta_{0}\)</span> (<strong>identification</strong>)</li>
+</ol>
+<p>Then: <span class="math display">\[\sqrt{N}(\hat{\theta}_{II}-\theta_{0})\rightarrow_{d}\mathcal{N}\left(\mathbf{0},\ (\nabla_{\theta}\beta_{0}\mathbf{W}\nabla_{\theta}\beta_{0}')^{-1}\nabla_{\theta}\beta_{0}\mathbf{W}\Omega\mathbf{W}\nabla_{\theta}\beta_{0}'(\nabla_{\theta}\beta_{0}\mathbf{W}\nabla_{\theta}\beta_{0}')^{-1}\right)\]</span></p>
+<p>where <span class="math inline">\(\nabla_{\theta}\beta_{0}=\frac{\partial\beta(\theta_{0})'}{\partial\theta}\)</span>.</p>
+</div>
+<p>The variance formula has the same sandwich structure as minimum distance estimation (<a href="extremum_theory.html#thm-md-asymptotics" class="quarto-xref">Theorem&nbsp;<span>13.7</span></a>), which makes sense: indirect inference <em>is</em> a simulated minimum distance estimator where the reduced-form statistics play the role of <span class="math inline">\(\pi\)</span>.</p>
+</section>
+<section id="relationship-to-msm" class="level3" data-number="14.4.3">
+<h3 data-number="14.4.3" class="anchored" data-anchor-id="relationship-to-msm"><span class="header-section-number">14.4.3</span> Relationship to MSM</h3>
+<p>Indirect inference nests MSM as a special case. If the auxiliary model consists of sample moments <span class="math inline">\(\hat{\beta}=\frac{1}{N}\sum_{n}g(\mathbf{w}_{n})\)</span> and the simulated counterpart is <span class="math inline">\(\hat{\beta}^{R}(\theta)=\frac{1}{NR}\sum_{r}\sum_{n}g(\mathbf{w}_{n}^{r}(\theta))\)</span>, then the indirect inference estimator reduces to MSM. The appeal of indirect inference is that it allows the use of <em>richer</em> auxiliary models — like regressions or multinomial choice models — that can capture complex features of the data.</p>
+<div class="callout callout-style-default callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Discussion: Choosing Auxiliary Statistics
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The choice of auxiliary model is both an art and a science. A good auxiliary model should:</p>
+<ol type="1">
+<li>Be sensitive to the structural parameters of interest (for efficiency).</li>
+<li>Capture the key features of the data that the structural model is designed to explain.</li>
+<li>Be computationally cheap to estimate (since it must be re-estimated on each simulated dataset).</li>
+</ol>
+<p>In practice, it is useful to think of the auxiliary model as a <em>diagnostic</em>: if the structural model cannot match the auxiliary estimates, it suggests the model is missing something important. This perspective connects indirect inference to the broader goal of model evaluation.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="the-bootstrap" class="level2" data-number="14.5">
+<h2 data-number="14.5" class="anchored" data-anchor-id="the-bootstrap"><span class="header-section-number">14.5</span> The Bootstrap</h2>
+<p>We now turn to a fundamentally different use of simulation: not for evaluating the objective function, but for <strong>inference</strong>. The <strong>bootstrap</strong> uses resampling to approximate the sampling distribution of an estimator, providing standard errors and confidence intervals without requiring analytical derivations.</p>
+<section id="motivation" class="level3" data-number="14.5.1">
+<h3 data-number="14.5.1" class="anchored" data-anchor-id="motivation"><span class="header-section-number">14.5.1</span> Motivation</h3>
+<p>In many settings we face one or more of the following challenges:</p>
+<ol type="1">
+<li>The variance formula is difficult to derive (e.g.&nbsp;for multi-step estimators).</li>
+<li>The derivatives of the criterion function are hard or costly to compute.</li>
+<li>The estimation criterion is non-smooth in finite samples.</li>
+<li>The sample size is too small for the CLT to provide a good approximation.</li>
+</ol>
+<p>The bootstrap addresses all of these by directly approximating the finite-sample distribution.</p>
+</section>
+<section id="framework" class="level3" data-number="14.5.2">
+<h3 data-number="14.5.2" class="anchored" data-anchor-id="framework"><span class="header-section-number">14.5.2</span> Framework</h3>
+<p>Let <span class="math inline">\(T_{N} = T_{N}(X_{1},\ldots,X_{N})\)</span> be a statistic — for instance, <span class="math inline">\(T_{N}=\hat{\theta}\)</span> or <span class="math inline">\(T_{N}=\sqrt{N}(\hat{\theta}-\theta_{0})\)</span>. The finite-sample distribution <span class="math inline">\(G_{N}(\cdot,F_{0})\)</span> is typically unknown. The bootstrap idea is to replace <span class="math inline">\(F_{0}\)</span> with an estimate <span class="math inline">\(\hat{F}_{N}\)</span> and use <span class="math inline">\(G_{N}(\cdot,\hat{F}_{N})\)</span> to approximate <span class="math inline">\(G_{N}(\cdot,F_{0})\)</span>.</p>
+<p>There are two main approaches to constructing <span class="math inline">\(\hat{F}_{N}\)</span>:</p>
+<div id="def-nonparametric-bootstrap" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 14.1 (Nonparametric Bootstrap)</strong></span> Replace <span class="math inline">\(F_{0}\)</span> with the <strong>empirical distribution function</strong>: <span class="math display">\[\hat{F}_{N}(x) = \frac{1}{N}\sum_{n=1}^{N}\mathbf{1}\{X_{n}\leq x\}\]</span> Bootstrap samples are obtained by sampling <span class="math inline">\(N\)</span> observations <strong>with replacement</strong> from the original data.</p>
+</div>
+<div id="def-parametric-bootstrap" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 14.2 (Parametric Bootstrap)</strong></span> Replace <span class="math inline">\(F_{0}\)</span> with <span class="math inline">\(F(\cdot,\hat{\theta}_{N})\)</span>, the model-implied distribution evaluated at the estimated parameters. Bootstrap samples are obtained by <strong>simulating</strong> from the estimated model.</p>
+</div>
+<p>The nonparametric bootstrap is more general and requires fewer assumptions, while the parametric bootstrap can be more efficient when the model is correctly specified. For structural models, the parametric bootstrap is natural since we already have the machinery to simulate from the model.</p>
+</section>
+<section id="procedure" class="level3" data-number="14.5.3">
+<h3 data-number="14.5.3" class="anchored" data-anchor-id="procedure"><span class="header-section-number">14.5.3</span> Procedure</h3>
+<p>Given an estimator <span class="math inline">\(\hat{\theta}_{N}\)</span>:</p>
+<ol type="1">
+<li>Draw a bootstrap sample of size <span class="math inline">\(N\)</span>: <span class="math inline">\(\mathbf{X}^{b}=\{X_{1}^{b},\ldots,X_{N}^{b}\}\)</span>
+<ul>
+<li><strong>Nonparametric</strong>: sample with replacement from <span class="math inline">\(\{X_{1},\ldots,X_{N}\}\)</span></li>
+<li><strong>Parametric</strong>: simulate from <span class="math inline">\(F(\cdot,\hat{\theta}_{N})\)</span></li>
+</ul></li>
+<li>Compute the bootstrap estimate: <span class="math inline">\(\hat{\theta}^{b}_{N}=T_{N}(\mathbf{X}^{b})\)</span></li>
+<li>Repeat steps 1-2 for <span class="math inline">\(b=1,\ldots,B\)</span> to obtain the bootstrap distribution <span class="math inline">\(\{\hat{\theta}^{1}_{N},\ldots,\hat{\theta}^{B}_{N}\}\)</span></li>
+</ol>
+<p>From this distribution we can compute:</p>
+<ul>
+<li><strong>Bootstrap standard errors</strong>: <span class="math inline">\(\text{se}^{*}(\hat{\theta}) = \text{sd}(\hat{\theta}^{1},\ldots,\hat{\theta}^{B})\)</span></li>
+<li><strong>Percentile confidence intervals</strong>: <span class="math inline">\([q_{\alpha/2},\ q_{1-\alpha/2}]\)</span> where <span class="math inline">\(q_{\alpha}\)</span> is the <span class="math inline">\(\alpha\)</span>-quantile of the bootstrap distribution</li>
+<li><strong>Bootstrap-<span class="math inline">\(t\)</span> confidence intervals</strong>: based on the distribution of the pivotal statistic <span class="math inline">\(t^{b}=(\hat{\theta}^{b}-\hat{\theta})/\text{se}(\hat{\theta}^{b})\)</span></li>
+</ul>
+</section>
+<section id="when-does-the-bootstrap-work" class="level3" data-number="14.5.4">
+<h3 data-number="14.5.4" class="anchored" data-anchor-id="when-does-the-bootstrap-work"><span class="header-section-number">14.5.4</span> When Does the Bootstrap Work?</h3>
+<p>The bootstrap is <strong>consistent</strong> when the statistic <span class="math inline">\(T_{N}\)</span> is asymptotically normal. In this case, <span class="math inline">\(G_{N}(\cdot,\hat{F}_{N})\rightarrow_{p}G_{\infty}(\cdot,F_{0})\)</span>, so the bootstrap distribution converges to the true asymptotic distribution.</p>
+<p>The bootstrap can actually do <em>better</em> than the asymptotic normal approximation when the statistic is <strong>asymptotically pivotal</strong> — that is, when its asymptotic distribution does not depend on unknown parameters. The <span class="math inline">\(t\)</span>-statistic <span class="math inline">\(\sqrt{N}(\hat{\theta}-\theta_{0})/\text{se}(\hat{\theta})\)</span> is a canonical example. In this case, the bootstrap provides a higher-order refinement over the normal approximation. See <span class="citation" data-cites="horowitz2001bootstrap">Horowitz (<a href="../references.html#ref-horowitz2001bootstrap" role="doc-biblioref">2001</a>)</span> for a detailed discussion.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Replicating the Dependence Structure
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The bootstrap requires that the resampling scheme correctly replicates the dependence structure in the data. For iid data, sampling with replacement is sufficient. For <strong>panel data</strong>, one should resample entire individuals (not individual observations) to preserve the within-person correlation structure. For time series data, block bootstrap methods are needed.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Bootstrap Confidence Intervals for the Income Process
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="exm-bootstrap_income" class="theorem example">
+<p><span class="theorem-title"><strong>Example 14.3</strong></span> Let’s apply the bootstrap to construct confidence intervals for the income process parameters estimated by minimum distance in <a href="extremum_intro_examples.html#exm-md_income" class="quarto-xref">Example&nbsp;<span>12.2</span></a>. Rather than relying on the analytical standard errors from <a href="extremum_theory.html#exm-md_income_se" class="quarto-xref">Example&nbsp;<span>13.2</span></a>, we resample individuals from the PSID panel and re-estimate the parameters on each bootstrap sample.</p>
+<p>Since the PSID is panel data, we resample <strong>entire individuals</strong> (all observations for a given person) to preserve the within-person correlation.</p>
+<div id="ade76e39" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span>, <span class="bu">DataFrames</span>, <span class="bu">DataFramesMeta</span>, <span class="bu">Statistics</span>, <span class="bu">Optim</span>, <span class="bu">Plots</span>, <span class="bu">Random</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and prepare data</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>data_psid <span class="op">=</span> <span class="pp">@chain</span> <span class="cf">begin</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    CSV.<span class="fu">read</span>(<span class="st">"../data/abb_aea_data.csv"</span>,DataFrame,missingstring <span class="op">=</span> <span class="st">"NA"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@select</span> <span class="op">:</span>person <span class="op">:</span>y <span class="op">:</span>tot_assets1 <span class="op">:</span>asset <span class="op">:</span>age <span class="op">:</span>year</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@subset</span> <span class="op">:</span>age<span class="op">.&gt;=</span><span class="fl">25</span> <span class="op">:</span>age<span class="op">.&lt;=</span><span class="fl">64</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Model moments and estimation functions (from @exm-md_income)</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">model_moments</span>(θ, T)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    ρ, σ<span class="fl">2</span>_α, σ<span class="fl">2</span>_η <span class="op">=</span> θ</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> [σ<span class="fl">2</span>_α <span class="op">+</span> (<span class="fl">1</span><span class="op">-</span>ρ<span class="op">^</span>(<span class="fl">2</span>(t<span class="op">-</span><span class="fl">1</span>)))<span class="op">/</span>(<span class="fl">1</span><span class="op">-</span>ρ<span class="op">^</span><span class="fl">2</span>) <span class="op">*</span> σ<span class="fl">2</span>_η for t <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>T]</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> m</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">md_estimate</span>(data)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    m_hat <span class="op">=</span> <span class="pp">@chain</span> data <span class="cf">begin</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">groupby</span>(<span class="op">:</span>age)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        <span class="pp">@combine</span> <span class="op">:</span>var_logy <span class="op">=</span> <span class="fu">var</span>(<span class="fu">log</span>.(<span class="op">:</span>y))</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        <span class="pp">@orderby</span> <span class="op">:</span>age</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        _.var_logy</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    T <span class="op">=</span> <span class="fu">length</span>(m_hat)</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="kw">function</span> <span class="fu">md_objective</span>(x)</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>        ρ <span class="op">=</span> <span class="fu">tanh</span>(x[<span class="fl">1</span>])</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>        σ<span class="fl">2</span>_α <span class="op">=</span> <span class="fu">exp</span>(x[<span class="fl">2</span>])</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>        σ<span class="fl">2</span>_η <span class="op">=</span> <span class="fu">exp</span>(x[<span class="fl">3</span>])</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>        θ <span class="op">=</span> (ρ, σ<span class="fl">2</span>_α, σ<span class="fl">2</span>_η)</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>        m_model <span class="op">=</span> <span class="fu">model_moments</span>(θ, T)</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>        diff <span class="op">=</span> m_hat <span class="op">.-</span> m_model</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> diff<span class="op">'</span> <span class="op">*</span> diff</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    x0 <span class="op">=</span> [<span class="fl">0.5</span>, <span class="fu">log</span>(<span class="fl">0.1</span>), <span class="fu">log</span>(<span class="fl">0.05</span>)]</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> <span class="fu">optimize</span>(md_objective, x0, <span class="fu">Newton</span>(), autodiff<span class="op">=:</span>forward)</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> res.minimizer</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="fu">tanh</span>(x[<span class="fl">1</span>]), <span class="fu">exp</span>(x[<span class="fl">2</span>]), <span class="fu">exp</span>(x[<span class="fl">3</span>])]</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Point estimate</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>θ_hat <span class="op">=</span> <span class="fu">md_estimate</span>(data_psid)</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Point estimates: ρ=</span><span class="sc">$</span>(<span class="fu">round</span>(θ_hat[<span class="fl">1</span>],digits<span class="op">=</span><span class="fl">3</span>))<span class="st">, σ²_α=</span><span class="sc">$</span>(<span class="fu">round</span>(θ_hat[<span class="fl">2</span>],digits<span class="op">=</span><span class="fl">3</span>))<span class="st">, σ²_η=</span><span class="sc">$</span>(<span class="fu">round</span>(θ_hat[<span class="fl">3</span>],digits<span class="op">=</span><span class="fl">3</span>))<span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Point estimates: ρ=0.918, σ²_α=0.279, σ²_η=0.085</code></pre>
+</div>
+</div>
+<p>Now the bootstrap. We resample persons with replacement and re-estimate on each bootstrap sample.</p>
+<div id="3e777aa8" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">42</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>persons <span class="op">=</span> <span class="fu">unique</span>(data_psid.person)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>N_persons <span class="op">=</span> <span class="fu">length</span>(persons)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> <span class="fl">200</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>θ_boot <span class="op">=</span> <span class="fu">mapreduce</span>(vcat, <span class="fl">1</span><span class="op">:</span>B) <span class="cf">do</span> b</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Resample persons with replacement</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    boot_persons <span class="op">=</span> persons[<span class="fu">rand</span>(<span class="fl">1</span><span class="op">:</span>N_persons, N_persons)]</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Build bootstrap dataset (preserving panel structure)</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    boot_data <span class="op">=</span> <span class="fu">mapreduce</span>(vcat, boot_persons) <span class="cf">do</span> p</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="pp">@subset</span>(data_psid, <span class="op">:</span>person <span class="op">.==</span> p)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="fu">md_estimate</span>(boot_data)<span class="ch">'</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">catch</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> [<span class="cn">NaN</span> <span class="cn">NaN</span> <span class="cn">NaN</span>]</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove any failed bootstrap replications</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>θ_boot <span class="op">=</span> θ_boot[.!<span class="fu">any</span>(<span class="fu">isnan</span>.(θ_boot), dims<span class="op">=</span><span class="fl">2</span>)[<span class="op">:</span>], <span class="op">:</span>]</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Bootstrap standard errors</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>se_boot <span class="op">=</span> <span class="fu">std</span>.(<span class="fu">eachcol</span>(θ_boot))</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Bootstrap standard errors (B=</span><span class="sc">$</span>B<span class="st">):"</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"  se(ρ)    = </span><span class="sc">$</span>(<span class="fu">round</span>(se_boot[<span class="fl">1</span>], digits<span class="op">=</span><span class="fl">4</span>))<span class="st">"</span>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"  se(σ²_α) = </span><span class="sc">$</span>(<span class="fu">round</span>(se_boot[<span class="fl">2</span>], digits<span class="op">=</span><span class="fl">4</span>))<span class="st">"</span>)</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"  se(σ²_η) = </span><span class="sc">$</span>(<span class="fu">round</span>(se_boot[<span class="fl">3</span>], digits<span class="op">=</span><span class="fl">4</span>))<span class="st">"</span>)</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 95% percentile confidence intervals</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>ci_lower <span class="op">=</span> [<span class="fu">quantile</span>(θ_boot[<span class="op">:</span>,j], <span class="fl">0.025</span>) for j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>]</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>ci_upper <span class="op">=</span> [<span class="fu">quantile</span>(θ_boot[<span class="op">:</span>,j], <span class="fl">0.975</span>) for j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>]</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">95% Confidence Intervals:"</span>)</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"  ρ:    [</span><span class="sc">$</span>(<span class="fu">round</span>(ci_lower[<span class="fl">1</span>],digits<span class="op">=</span><span class="fl">3</span>))<span class="st">, </span><span class="sc">$</span>(<span class="fu">round</span>(ci_upper[<span class="fl">1</span>],digits<span class="op">=</span><span class="fl">3</span>))<span class="st">]"</span>)</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"  σ²_α: [</span><span class="sc">$</span>(<span class="fu">round</span>(ci_lower[<span class="fl">2</span>],digits<span class="op">=</span><span class="fl">3</span>))<span class="st">, </span><span class="sc">$</span>(<span class="fu">round</span>(ci_upper[<span class="fl">2</span>],digits<span class="op">=</span><span class="fl">3</span>))<span class="st">]"</span>)</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"  σ²_η: [</span><span class="sc">$</span>(<span class="fu">round</span>(ci_lower[<span class="fl">3</span>],digits<span class="op">=</span><span class="fl">3</span>))<span class="st">, </span><span class="sc">$</span>(<span class="fu">round</span>(ci_upper[<span class="fl">3</span>],digits<span class="op">=</span><span class="fl">3</span>))<span class="st">]"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Bootstrap standard errors (B=200):
+  se(ρ)    = 0.079
+  se(σ²_α) = 0.115
+  se(σ²_η) = 0.0758
+
+95% Confidence Intervals:
+  ρ:    [0.742, 1.0]
+  σ²_α: [0.144, 0.515]
+  σ²_η: [0.012, 0.249]</code></pre>
+</div>
+</div>
+<p>Let’s visualize the bootstrap distributions.</p>
+<div id="8790bd74" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> [<span class="st">"ρ"</span>, <span class="st">"σ²_α"</span>, <span class="st">"σ²_η"</span>]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>pl <span class="op">=</span> [begin</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">histogram</span>(θ_boot[<span class="op">:</span>,j], normalize<span class="op">=:</span>pdf, label<span class="op">=</span><span class="cn">false</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot!</span>([θ_hat[j], θ_hat[j]], [<span class="fl">0</span>, <span class="fu">ylims</span>()[<span class="fl">2</span>]<span class="op">*</span><span class="fl">0.9</span>], color<span class="op">=</span><span class="st">"red"</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>          linewidth<span class="op">=</span><span class="fl">2</span>, label<span class="op">=</span><span class="st">"Point Estimate"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot!</span>(title<span class="op">=</span>labels[j])</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span> for j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>]</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pl<span class="op">...</span>, layout<span class="op">=</span>(<span class="fl">1</span>,<span class="fl">3</span>), size<span class="op">=</span>(<span class="fl">900</span>,<span class="fl">300</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<img src="data:image/png;base64,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n+SGaebkt27dKi0tbdhjm7s01Gg0CxcuXLhwYTMv9yUwceJEjUbDdQoA+BeNRhMWFvbLL79wHcT4bNu2reoOIYCaNBrNgQMHXFxcuA5ifKysrBr8WPQ1BAAAAAAtlIYAAAAAoIXSEAAAAAC0UBoCAAAAgBZKQwAAAADQQmkIAAAAAFrNPXhN4xUXF+/atYsQIhQK27dvHxkZWdso0BMmTFi3bp2/v7/e/+bm5mo0Gnd392rTHzx4cPToUd3dVq1a6R1qp6SkpLi42MfHh7k7fPjwb7/91svL68WfECGEPHnyxN7evlWrVg17OAAYtS+++EImkxFC3NzcxowZU9uoExs3bnR1dX3ttdf0/lcikWRlZfn5+VWbXlZW9sUXX1SdsnjxYmtr62qzqVSqpKSkbt26MXfff//9wMDACRMmNODpEELy8vLUanXNDSxAM7t27dqlS5cIIebm5v369evevbve2TIzM19//fVz587V1k5ycrKnp6eFhUW16YcPH3748KHubmho6KBBg2o+PC0tzcbGpnXr1oSQhw8frlixomql8UIoirp7925gYGDDHm4I49trWFhYuGrVKkKIQqH46KOPxowZU9ucY8aMsbe3r+2/u3fv/vzzz2tOv3v37u7du03/UXWkzarOnj373//+V3d34sSJjRnTf/HixRcvXmzwwwHAqK1fvz4rK4sQEhsb6+/vX1JSone2kJCQzp0719bInTt3Zs6cWXN6aWnp6tWrTavQO+5uUVFReHi47m6/fv18fX1f9Ino1LaBBWhmFy5cYIYdzc/PHzx48Pfff693Nmtr66ioqDramT59+r1792pO//nnn2/duqVbuYRC/Xvc3nvvvd9++425bWdnN3bs2Bd7GlXI5fKQkJAGP9wQxrfXkBAiFAqXL19OCJk1a5aLi0tWVpa7u3tsbOytW7fc3d1nzpzJXItJd1WoP/74o127dnFxcc+ePRsxYkTfvn3z8/Nv3bolk8l27tzZrl27qhtEQoibm9s777xTdQpFUUeOHLl9+7aJicngwYNDQkKY1nbu3Ong4DBu3DgTExNma3vixImOHTuePHkyPz8/JibGx8dn586d+fn50dHRHTt2JISkpqaeOHEiJyfH29v7tddeMzMzS0hIyMzMPHPmTH5+ft++fTt16lRWVrZv377s7OzevXuPHDmy2V5YAODKjBkz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">
+</div>
+</div>
+<p>Notice that bootstrapping panel data by resampling individuals is straightforward to implement and automatically accounts for within-person dependence, arbitrary heteroskedasticity, and the full complexity of the minimum distance estimator. Compare these to the analytical standard errors from <a href="extremum_theory.html#exm-md_income_se" class="quarto-xref">Example&nbsp;<span>13.2</span></a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Bootstrap for the Savings Model
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="exm-bootstrap_savings_model" class="theorem example">
+<p><span class="theorem-title"><strong>Example 14.4</strong></span> For the savings model, we use the <strong>parametric bootstrap</strong>. Since we are estimating by MSM using simulated data, the natural bootstrap procedure is:</p>
+<ol type="1">
+<li>Estimate <span class="math inline">\(\hat{\theta}\)</span> by MSM.</li>
+<li>Simulate a “new” dataset from the model at <span class="math inline">\(\hat{\theta}\)</span> (this is the bootstrap sample).</li>
+<li>Re-estimate <span class="math inline">\(\hat{\theta}^{b}\)</span> from the bootstrap sample (using the same MSM procedure).</li>
+<li>Repeat to build the bootstrap distribution.</li>
+</ol>
+<p>Here is a sketch of the procedure. The key idea is that the “data moments” in each bootstrap replication come from a fresh simulation at the estimated <span class="math inline">\(\hat{\theta}\)</span>, mimicking the sampling variability in the real data.</p>
+<div id="f1d51d9c" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">parametric_bootstrap</span>(θ_hat, B; N_data<span class="op">=</span><span class="fl">1000</span>, N_sim<span class="op">=</span><span class="fl">2000</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    θ_boot <span class="op">=</span> <span class="fu">zeros</span>(B, <span class="fl">3</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> b <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>B</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Step 1: Simulate "data" from model at θ̂ (with new random seed)</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        A, pars <span class="op">=</span> <span class="fu">setup_and_solve</span>(θ_hat)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        sim_data <span class="op">=</span> <span class="fu">simulate_panel</span>(A, pars, N_data; seed<span class="op">=</span>b)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Step 2: Compute "data" moments from simulated data</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        target_ages <span class="op">=</span> [<span class="fl">6</span>, <span class="fl">16</span>, <span class="fl">26</span>, <span class="fl">36</span>]</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        m_boot <span class="op">=</span> <span class="fu">vcat</span>(</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>            [<span class="fu">mean</span>(sim_data.assets[<span class="op">:</span>, t]) for t <span class="kw">in</span> target_ages],</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>            [<span class="fu">var</span>(<span class="fu">log</span>.(sim_data.consumption[<span class="op">:</span>, t])) for t <span class="kw">in</span> target_ages]</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Step 3: Re-estimate by MSM (matching m_boot instead of m_data)</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>        x0 <span class="op">=</span> [<span class="fl">0.0</span>, <span class="fu">log</span>(θ_hat[<span class="fl">2</span>]), <span class="fu">log</span>(θ_hat[<span class="fl">3</span>])]</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> <span class="fu">optimize</span>(x <span class="op">-&gt;</span> <span class="fu">msm_objective</span>(x, m_boot), x0, <span class="fu">NelderMead</span>(),</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>                       Optim.<span class="fu">Options</span>(iterations<span class="op">=</span><span class="fl">200</span>))</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> res.minimizer</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>        θ_boot[b,<span class="op">:</span>] <span class="op">=</span> [<span class="fl">0.8</span> <span class="op">+</span> <span class="fl">0.19</span><span class="op">/</span>(<span class="fl">1</span><span class="fu">+exp</span>(<span class="op">-</span>x[<span class="fl">1</span>])), <span class="fu">exp</span>(x[<span class="fl">2</span>]), <span class="fu">exp</span>(x[<span class="fl">3</span>])]</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> θ_boot</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Run bootstrap (computationally intensive!)</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="co"># θ_boot = parametric_bootstrap(θ_hat, 100)</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co"># se_boot = std.(eachcol(θ_boot))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Each bootstrap replication requires solving the dynamic programming problem twice (once for the data simulation, once for each objective function evaluation during optimization). This makes the parametric bootstrap for structural models computationally expensive, but it is conceptually simple and automatically accounts for all sources of estimation uncertainty.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="practical-considerations" class="level2" data-number="14.6">
+<h2 data-number="14.6" class="anchored" data-anchor-id="practical-considerations"><span class="header-section-number">14.6</span> Practical Considerations</h2>
+<section id="simulation-noise-and-smoothing" class="level3" data-number="14.6.1">
+<h3 data-number="14.6.1" class="anchored" data-anchor-id="simulation-noise-and-smoothing"><span class="header-section-number">14.6.1</span> Simulation Noise and Smoothing</h3>
+<p>When simulation draws are held fixed across evaluations of the objective function, the simulated objective is a smooth function of <span class="math inline">\(\theta\)</span> (assuming the model itself is smooth in <span class="math inline">\(\theta\)</span>). This means standard gradient-based optimizers can be used. If simulation draws are re-drawn at each evaluation, the objective becomes noisy and optimization may fail or converge to the wrong point. <strong>Always fix the random seed</strong> when evaluating the simulated objective across different <span class="math inline">\(\theta\)</span> values.</p>
+</section>
+<section id="how-many-draws" class="level3" data-number="14.6.2">
+<h3 data-number="14.6.2" class="anchored" data-anchor-id="how-many-draws"><span class="header-section-number">14.6.2</span> How Many Draws?</h3>
+<p>For MSM, consistency holds for any fixed <span class="math inline">\(R\)</span>, but efficiency improves with <span class="math inline">\(R\)</span>. A practical approach is to start with a moderate <span class="math inline">\(R\)</span> for exploration, then increase <span class="math inline">\(R\)</span> and check that the estimates are stable. If the estimates change substantially, <span class="math inline">\(R\)</span> is too small.</p>
+<p>For MSL, the bias from taking logarithms of simulated probabilities is of order <span class="math inline">\(1/R\)</span>. In practice, <span class="math inline">\(R\)</span> should be large enough that this bias is negligible relative to the standard error.</p>
+</section>
+<section id="choosing-moments-for-msm" class="level3" data-number="14.6.3">
+<h3 data-number="14.6.3" class="anchored" data-anchor-id="choosing-moments-for-msm"><span class="header-section-number">14.6.3</span> Choosing Moments for MSM</h3>
+<p>In <a href="#exm-bootstrap_savings" class="quarto-xref">Example&nbsp;<span>14.2</span></a>, we chose a small set of moments. In practice, the choice of moments should be guided by:</p>
+<ol type="1">
+<li><strong>Identification</strong>: the moments should be informative about the parameters. Moments that are insensitive to a parameter will not help estimate it.</li>
+<li><strong>Parsimony</strong>: more moments improve efficiency (in principle) but increase computational cost and can lead to poorly conditioned weighting matrices.</li>
+<li><strong>Model fit</strong>: if the model cannot match a particular moment, including it will distort the estimates of other parameters. Start with moments the model should be able to match.</li>
+</ol>
+<p>The discussion in the <a href="../lectures/identification_savings.html">identification chapter</a> on which moments pin down which preference parameters is directly relevant here.</p>
+</section>
+<section id="diagonal-weighting-matrices" class="level3" data-number="14.6.4">
+<h3 data-number="14.6.4" class="anchored" data-anchor-id="diagonal-weighting-matrices"><span class="header-section-number">14.6.4</span> Diagonal Weighting Matrices</h3>
+<p>When using MSM or minimum distance with many moments, the optimal weighting matrix <span class="math inline">\(\mathbf{W}^{*}=\hat{S}^{-1}\)</span> can be poorly estimated and lead to erratic results in finite samples. A common and practical alternative is to use a <strong>diagonal</strong> weighting matrix, where each moment is weighted by the inverse of its variance but cross-moment covariances are ignored. This sacrifices some efficiency but tends to be much more stable in practice.</p>
+</section>
+</section>
+<section id="exercises" class="level2" data-number="14.7">
+<h2 data-number="14.7" class="anchored" data-anchor-id="exercises"><span class="header-section-number">14.7</span> Exercises</h2>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-savings_estimation" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 14.1</strong></span> Estimate the preference parameters <span class="math inline">\((\beta,\sigma,\psi)\)</span> of the <a href="../models/savings.html">savings model</a> using the method of simulated moments. Take the income process parameters as given from <a href="extremum_intro_examples.html#exm-md_income" class="quarto-xref">Example&nbsp;<span>12.2</span></a>.</p>
+<ol type="1">
+<li>Choose a set of target moments from the PSID data (<a href="identification_savings.html#exm-psid" class="quarto-xref">Example&nbsp;<span>10.1</span></a>) that are informative about <span class="math inline">\((\beta,\sigma,\psi)\)</span>. Justify your choice based on the identification discussion in the <a href="../lectures/identification_savings.html">savings identification chapter</a>.</li>
+<li>Implement the MSM estimator using the simulation code from <a href="#exm-simulate_savings" class="quarto-xref">Example&nbsp;<span>14.1</span></a>.</li>
+<li>Report your estimates and plot the model fit for your chosen moments.</li>
+<li>Assess sensitivity: how do the estimates change when you use a different set of moments?</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-savings_bootstrap" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 14.2</strong></span> Continuing from <a href="#exr-savings_estimation" class="quarto-xref">Exercise&nbsp;<span>14.1</span></a>:</p>
+<ol type="1">
+<li>Implement a parametric bootstrap to compute standard errors for <span class="math inline">\((\hat{\beta},\hat{\sigma},\hat{\psi})\)</span> following the approach in <a href="#exm-bootstrap_savings_model" class="quarto-xref">Example&nbsp;<span>14.4</span></a>. Use <span class="math inline">\(B=100\)</span> bootstrap replications.</li>
+<li>Construct 95% confidence intervals for each parameter.</li>
+<li>Which parameter is most precisely estimated? Which is least? Does this match your intuition from the identification discussion?</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="exr-income_diagonal" class="theorem exercise">
+<p><span class="theorem-title"><strong>Exercise 14.3</strong></span> Return to the minimum distance estimation of the income process from <a href="extremum_intro_examples.html#exm-md_income" class="quarto-xref">Example&nbsp;<span>12.2</span></a>. Instead of using the identity weighting matrix, implement estimation with:</p>
+<ol type="1">
+<li>The <strong>diagonal</strong> weighting matrix, where each moment is weighted by the inverse of the variance of the corresponding sample moment.</li>
+<li>The <strong>optimal</strong> weighting matrix from <a href="extremum_theory.html#exm-md_income_se" class="quarto-xref">Example&nbsp;<span>13.2</span></a>.</li>
+</ol>
+<p>Compare the estimates and standard errors across all three weighting schemes. How much does the choice of weighting matrix matter in practice?</p>
+</div>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-horowitz2001bootstrap" class="csl-entry" role="listitem">
+Horowitz, Joel L. 2001. <span>“The Bootstrap.”</span> In <em>Handbook of Econometrics</em>, 5:3159–3228. Elsevier.
+</div>
+<div id="ref-newey1994large" class="csl-entry" role="listitem">
+Newey, Whitney K, and Daniel McFadden. 1994. <span>“Large Sample Estimation and Hypothesis Testing.”</span> <em>Handbook of Econometrics</em> 4: 2111–2245.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../lectures/extremum_theory.html" class="pagination-link" aria-label="Asymptotic Theory">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Asymptotic Theory</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../lectures/discrete-choice.html" class="pagination-link" aria-label="Discrete Choice">
+        <span class="nav-page-text">Discrete Choice</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

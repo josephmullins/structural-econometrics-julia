@@ -1,0 +1,399 @@
+\documentclass[xcolor=dvipsnames,handout,c]{beamer}
+%\documentclass[xcolor=dvipsnames]{beamer}
+\usepackage{amssymb}
+\usepackage{amsmath}
+%\usepackage{mathtools}
+%\usepackage{mathpazo}
+\usepackage{multimedia}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{pgfpages}
+
+\usetheme{default}
+\usepackage{graphicx}
+\usepackage{amsthm}
+\usepackage{bm}
+\newcommand\ov{\overline}
+\newcommand\un{\underline}
+\newcommand\BB{\mathbb}
+\newcommand\EE{\mathbb{E}}
+\newcommand\mc{\mathcal}
+\newcommand\ti{\tilde}
+\newcommand\h{\hat}
+\newcommand\beq{\begin{equation}}
+\newcommand\eeq{\end{equation}}
+\newcommand\barr{\begin{array}}
+\newcommand\earr{\end{array}}
+\newcommand\bfp{\mathbf{p}}
+\newcommand\pder[2]{\frac{\partial #1}{\partial #2}}
+%\DeclareMathOperator*{\plim}{plim}
+\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand\eps{\epsilon}
+\newcommand\veps{\varepsilon}
+
+
+\setcounter{MaxMatrixCols}{10}
+\mode<presentation>
+\newtheorem{acknowledgement}[theorem]{Acknowledgement}
+\newtheorem{algorithm}[theorem]{Algorithm}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{case}[theorem]{Case}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{conclusion}[theorem]{Conclusion}
+\newtheorem{condition}[theorem]{Condition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{criterion}[theorem]{Criterion}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{summary}[theorem]{Summary}
+%\newenvironment{stepenumerate}{\begin{enumerate}[<+->]}{\end{enumerate}}
+%\newenvironment{stepitemize}{\begin{itemize}[<+->]}{\end{itemize} }
+%\newenvironment{enumerate}{\begin{enumerate}[<+-| alert@+>]}{\end{enumerate}}
+%\newenvironment{stepitemizewithalert}{\begin{itemize}[<+-| alert@+>]}{\end{itemize} }
+\beamertemplatetransparentcoveredhigh
+\usefonttheme[onlymath]{serif}
+%\usetheme[height=7mm]{Boadilla}
+\setbeamercovered{dynamic}
+\usecolortheme[named=Blue]{structure}
+\def\hilite<#1>{\temporal<#1>{\color{black!50}}{\color{blue}}{\color{black}}}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\begin{document}
+
+\title[Applied Econometrics]{Applied Econometrics: Simulation Methods}
+\author[Mullins]{Joseph Mullins \\
+\bigskip \bigskip Econ 8208}
+\institute{University of Minnesota}
+\date{Spring 2022}
+\maketitle
+
+\begin{frame}\frametitle{Introduction}
+\begin{itemize}
+\item Building intuition for how to estimate structural models. \pause
+\item Theme: as long as you're making the model ``close'' to data in systematic way, you're probably on track. \pause
+\item GMM, MLE, Minimum Distance \pause
+\item Simple models usually have simple estimators, with sometimes simple variance calculations. \pause
+\item Complex models often don't. \pause
+  \begin{itemize}
+  \item Restrictions on data require high-dimensional integrals. \pause
+  \item Variance calculations might be tricky.
+  \end{itemize}
+\item We're going to think about intuitive techniques to work around these challenges.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}\frametitle{Motivating Example: a Life-Cycle Model}
+Let's consider a model to motivate our next set of estimators, based on simulation.
+  \begin{itemize}
+  \item One period = one year, indexed by $t$. \pause
+  \item Choices: $d\in\{\text{Work Occupation}\ o,\text{School},\text{Neither}\}$, with $o=1,2,3,...,N_o$. \pause
+    \item Wages: $\log(W_{oit}) = \log(R_{o}) + \log(HC_{oit}) + \eps_{oit} $, $\eps_{oit}$ iid. \pause
+    \item Human capital: $\log(HC_{oit}) = \mu_oS_{it} + \mu_1\text{Exp}_{oit} + \mu_2 \text{Age}_{it}$ \pause
+    \item $S_{it+1} = S_{it} + \mathbf{1}\{d_{it}=\text{School}\}$ \pause
+    \item $\text{Exp}_{oit+1} = \text{Exp}_{oit} + \bm{1}\{d_{it}=\text{Work}\ o\}$ \pause
+    \item Income: $Y_{it}(d) = b + \sum_{o}\bm{1}\{d=\text{Work }o\}W_{oit}\}$ \pause
+    \item Optional: life-cycle savings. \pause
+  \end{itemize}
+  Dynamic program:
+  \[V_t(X,\eps) = \max_{d}\left\{u(d,Y_{it}(d)) + \beta\EE_{\hat{\eps}}[V_{t+1}(\hat{X},\hat{\eps})|X,d]\right\} \]
+  with $X_{it}=\{\text{Exp}_{it},S_{it},\text{Age}_{it}\}$ where $\dim(\text{Exp}_{it})=N_O$.
+\end{frame}
+
+\begin{frame}\frametitle{Estimating the Model}
+  Suppose that:
+  \begin{itemize}
+  \item $\theta$ is full set of parameters (utility, wages, distribution of wage shocks) \pause
+  \item We have data on individuals $y_{it}=\{d_{it},\text{Age}_{it},W_{it}\}_{t=1}^{T}$, $T$ small. \pause
+  \item So: short panels beginning at different ages, $16,25,30$ etc. \pause
+  \item Model is summarized by \emph{choice probabilities}, $\theta\mapsto P[d|X_{it},\theta]$. \pause
+  \item But a key state is missing, $\text{Exp}_{it}$:
+    \[L(y_i,\theta) =\log\left(\sum_{e}\prod_{t=1}^TP[d_{it}|X_{it},\theta]\cdot P[e|\theta]\right) \] \pause
+  \item Note the space of $e$ is almost as large as $N_O^{\text{Age}_{it}-16}$.
+  \item Even if $\text{Exp}_{oit}$ observed, still have to integrate over $W_{oit}$ for occupations not observed.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Estimating the Model}
+Potential solutions:
+\begin{enumerate}
+\item $\text{Exp}_{oit}$ is missing, but we could integrate by simulation to get choice probabilities: \pause
+\begin{itemize}
+\item Choose $\theta$. Draw $\eps^r_{it}\sim F_\eps(\theta)$. Solve for choices, get simulated data. Do it $R$ times, $r=1,2,...,R$ \pause
+\item $P[d_{it}|X_{it},\theta] \approx \frac{1}{R}\sum_{r} \mathbf{1}\{d^r_{it}=d_{it}\}$ \pause
+\end{itemize}
+\item Choose moments or statistics we think are informative, then simulate $R$ datasets for each. \pause
+\begin{itemize}
+\item If $g_n = \frac{1}{n}\sum g(\mathbf{y}_i)$, then simulate $\hat{g}_n(\theta) = \frac{1}{n}\sum_i\frac{1}{R}\sum_{r=1}g(\mathbf{y}_i^r)$. \pause
+\item Choose $\theta$ to minimize weighted distance between empirical and model-implied moments. \pause
+\item Examples here: choice probabilities, mean wages, interactions, etc. \pause
+\end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}\frametitle{Integration by Simulation}
+  Consider the integration problem:
+  \[f(y|\mathbf{x},\theta) = \int h(y|\mathbf{x},\theta,\mathbf{u})g(\mathbf{u})d\mathbf{u} \]
+  \begin{itemize} \pause
+  \item Could do this numerically, for example with Simpson's Rule of Gauss-Hermite Quadrature. \pause
+  \item If the dimensionality of $\mathbf{u}$ is large, could be very costly. \pause
+  \item Alternative: Monte-Carlo integration.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Integration by Simulation}
+  Some examples to approximate $f$:
+  \begin{itemize}
+  \item Draw $\mathbf{u}^r$ from $g$, \[\hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_rh(y|\mathbf{x},\theta,\mathbf{u}^r)\] \pause
+  \item Draw from $\mathbf{u}^r$ from some other density, $w$, then \[\hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_rh(y|\mathbf{x},\theta,\mathbf{u}^r)g(\mathbf{u}^r)w(\mathbf{u}^r)^{-1}\] \pause
+  \item In either case, $\EE_{\mathbf{u}}[h(y|\mathbf{x},\theta,\mathbf{u})g(\mathbf{u})w(\mathbf{u})^{-1}] = f(y|\mathbf{x},\theta)$ and so $\hat{f}(y|\mathbf{x},\theta)\rightarrow_p f(y|\mathbf{x},\theta)$ as $R\rightarrow\infty$. \pause
+  \item If $\hat{f} = \frac{1}{R}\sum\tilde{f}$, then $\BB{V}[\hat{f}]=\frac{1}{R}\BB{V}[\tilde{f}]$, so we can see how importance sampling might improve precision of the simulation (by choosing $w$ to minimize variance of $\tilde{f}$). \pause
+  \item Some importance sampling methods are differentiable (example: Geweke-Hajivassiliou-Keane method).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Simulated Likelihood}
+  Recall:
+  \[\h\theta_{ML} = \arg\max \sum \log(f(y_i|\mathbf{x}_i,\theta))\] \pause
+  Define \[\h\theta_{MSL}=\arg\max\sum_i \log(\hat{f}(y_i|\mathbf{x}_i,\theta))\]
+  where $\hat{f}(y_i|\mathbf{x}_i,\theta)=\frac{1}{R}\sum_{r}\tilde{f}(y_i,\mathbf{x}_i,\mathbf{u}^r,\theta)$.
+\end{frame}
+
+\begin{frame}\frametitle{Distribution of MSL}
+  \begin{proposition}[Asymptotic Behavior of MSL]
+  Assume:
+  \begin{enumerate}
+  \item Regularity conditions for MLE. \pause
+  \item $\EE_{\mathbf{u}}[\tilde{f}(y_i,\mathbf{x}_i,\mathbf{u},\theta)]=f(y_i|\mathbf{x}_i,\theta)$ \pause
+  \item  $R,n \rightarrow \infty$ and $\frac{\sqrt{n}}{R}\rightarrow 0$ \pause
+  \end{enumerate}
+  then $\theta_{SML}$ has same asymptotic distribution as $\theta_{ML}$. \pause
+\end{proposition}
+Notes:
+\begin{itemize}
+\item Estimator inconsistent if $R$ does not go to $\infty$. \pause
+\item Related to log-transformation of $\hat{f}$: $\EE[\log(\hat{f})]\neq\log(f)$. \pause
+\item Bias-corrections available. \pause
+\item If simulation differentiable, then all the better.
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Applying to the Model}
+  Suppose we see $\text{Exp}_{i1}$ (simpler):
+  \[\hat{L}(y_i,\theta) =\log\left(\prod_{t=1}^T\hat{P}[d_{it}|X_{it},\theta]\right) \]
+  where $\hat{P}[d_{it}|=\frac{1}{R}\sum_r\mathbf{1}\{d(\eps^r,\theta,X_{it})=d_{it}\}$ (for example). \\ \pause
+  Notes:
+  \begin{itemize}
+  \item If one wage observed, have to draw $\eps^r$ from conditional distribution. \pause
+  \item Requires solution of the model at each state $X_{it}$. \pause
+  \item This model probably too simple to fit data (temporal dependence, heterogeneity). \pause
+  \item If $\text{Exp}_{i1}$ unobserved, have to integrate out by simulation. \pause
+  \item See Keane \& Wolpin (JPE, 1997).
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}\frametitle{Method of Simulated Moments}
+  Define $\mathbf{g}(\mathbf{w}_i,\theta) = \int \mathbf{h}(\mathbf{w}_i,\theta,\mathbf{u})f(\mathbf{u}|\theta)d\mathbf{u}$.
+  Suppose that $\theta$ identified by the moment condition:
+  \[\EE \mathbf{g}(\mathbf{w}_i,\theta) = \mathbf{0} \] \pause
+  Let $\hat{g}(\mathbf{w}_i,\theta) = \frac{1}{R}\sum_r\tilde{\mathbf{g}}(\mathbf{w}_i,\mathbf{u}^r,\theta)$. Then:
+    \[\h{\theta}_{MSM} = \arg\min \h{\mathbf{g}}_n(\theta)' \mathbf{W} \h{\mathbf{g}}_n(\theta)\]
+  where $\h{\mathbf{g}}_n(\theta) = \frac{1}{n}\sum_i \h{\mathbf{g}}(\mathbf{w}_i,\theta)$. \pause Note that typically $\hat{g}$ is unbiased estimator for $g$.
+\end{frame}
+
+\begin{frame}\frametitle{Distribution of MSM}
+  \begin{proposition}[Asymptotic Behavior of MSM (McFadden 1989)]
+  Assume:
+  \begin{enumerate}
+  \item Regularity conditions for GMM. \pause
+  \item $\EE_{\mathbf{u}}[\tilde{g}(\mathbf{w}_i,\mathbf{u},\theta)]=g(\mathbf{w}_i,\theta)$ \pause
+  \end{enumerate}
+  then with $R$ fixed, $\theta_{MSM}$ is consistent and asymptotically normal with:
+  \begin{eqnarray}
+    \sqrt{n}(\h{\theta}_{MSM}-\theta_0) \rightarrow_d \mc{N}(\mathbf{0},\Sigma) \nonumber\\
+    \Sigma = (\nabla_{\theta}g_0 \mathbf{W}\nabla_\theta g_0')^{-1}\nabla_\theta g_0 \mathbf{W} E[\hat{g}_0\hat{g}_0'] \mathbf{W} \nabla_\theta g_0'(\nabla_{\theta}g_0 \mathbf{W}\nabla_\theta g_0')^{-1} \nonumber \\
+    g_0 = E[\hat{g}(\mathbf{w}_i,\theta_0)] = E[g(\mathbf{w},\theta_0)] \nonumber
+  \end{eqnarray}
+\end{proposition}
+\end{frame}
+
+\begin{frame}\frametitle{Note on MSM Result}
+\begin{itemize}
+\item Proof sketch on board. \pause
+\item Don't need $R\rightarrow\infty$. \pause
+\item $R$ contributes to variance relative to GMM. $\BB{V}[\hat{g}]\geq\BB{V}[g]$. \pause
+\item If $\frac{\sqrt{n}}{R} \rightarrow 0$, efficiency loss disappears. \pause
+\item If $\hat{g}$ not differentiable, need \emph{Stochastic Equicontinuity} (Newey \& McFadden 1994)
+\item If $\hat{g}$ is the frequency simulator, $\BB{V}[\hat{g}] = (1+1/R)\BB{V}[g]$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Applying to the Model}
+Let's choose informative moments to match: \pause
+\begin{itemize}
+\item Mean log-wage by occupation $\times$ schooling \pause
+\item Mean log-wage by age. \pause
+\item Mean log-wage by schooling level. \pause
+\item Mean log-wage by experience (if observed). \pause
+\item Variances of log-wages. \pause
+\item Dist of occupation choices by age, experience, schooling. \pause
+\item Dist of occupation switches by age, experience. \pause
+\end{itemize}
+Notes: \pause
+\begin{itemize}
+\item Could be simpler than MSL if experience unobserved. \pause
+\item Model over-identified. \pause
+\item Have liberty to ``ignore'' features of the data. \pause
+\item But do we want to?
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Indirect Inference}
+  % derive asymptotic distribution for this case (in terms of R)
+\begin{itemize}
+\item Let $\h{\beta}:\left\{\mathbf{w}_i\right\}_{i=1}^n\mapsto\BB{R}^q$ be vector of statistics from data. Sometimes called ``auxiliary model''. Call $\h{\beta}_n=\hat{\beta}(\mathbf{w})$. \pause
+\item Let $\mathbf{w}^R(\theta)=\{\mathbf{w}_i(\theta,\mathbf{u}_r)\}_{r=1,i=1}^{R,n}$ be simulated data, such that $\hat{\beta}^R(\theta) = \hat{\beta}(\mathbf{w}^R(\theta))$. \pause
+\item Let $\beta(\theta) = \text{plim}\hat{\beta}^R(\theta)$. \pause
+\end{itemize}
+Define
+\[\h{\theta}_{II} = (\hat{\beta}_n-\hat{\beta}^R(\theta))'\mathbf{W}(\hat{\beta}_n-\hat{\beta}^R(\theta)) \]
+to be the \emph{Indirect Inference} estimator.
+\end{frame}
+
+\begin{frame}\frametitle{Distribution of II}
+  \begin{proposition}[Asymptotic Behavior of Indirect Inference]
+  Assume:
+  \begin{enumerate}
+  \item $\sqrt{n}(\hat{\beta}_n-\beta_0)\rightarrow_d\mathcal{N}(0,\Omega)$ \pause
+  \item  $R,n \rightarrow \infty$ and $\frac{\sqrt{n}}{R}\rightarrow 0$ \pause
+  \item $\theta_0$ is unique solution to $\beta(\theta)=\beta_0$. \pause
+  \end{enumerate}
+  then  $\theta_{II}$ is consistent and asymptotically normal with:
+  \begin{eqnarray}
+    \sqrt{n}(\h{\theta}_{II}-\theta_0) \rightarrow_d \mc{N}(\mathbf{0},\Sigma) \nonumber\\
+    \Sigma = (\nabla_{\theta}\beta_0 \mathbf{W}\nabla_\theta \beta_0')^{-1}\nabla_\theta \beta_0 \mathbf{W}\Omega \mathbf{W} \nabla_\theta \beta_0'(\nabla_{\theta}\beta_0 \mathbf{W}\nabla_\theta \beta_0')^{-1} \nonumber
+  \end{eqnarray}
+\end{proposition}
+Notes:
+\begin{itemize}
+\item $\beta_0$ sometimes called ``pseudo-true'' value. \pause
+\item $R\rightarrow\infty$ not necessary, only matters for variance calculation (board). \pause
+\item This is just simulated minimum distance. \pause
+\item Nests MSM.
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Applying to the Model}
+  \begin{itemize}
+  \item Could replace wage moments from MSM procedure with wage regressions, e.g.:
+    \[\log(W_{it}) = \mathbf{w}_{1,it}\gamma_w + \tilde{\eps}_{it} \] \pause
+    where $\mathbf{w}_{it}$ includes occupation dummy, age, schooling, experience, etc.
+  \item Could estimate multivariate probit (simplied model) for occupation choice:
+    \[d_{it} = \arg\max \mathbf{w}_{2,it}\gamma_{u} + v_{ito},\ v_{it}\sim\mathcal{N}(0,\Sigma) \]
+    where $\mathbf{w}_{2,it}$ includes all observable state variables, past experience, previous occupation choice, etc. \pause
+  \item Idea: this is not the ``true'' model, but an approximation that might be invormative about truth. \pause
+  \item $\beta = (\gamma_w,\BB{V}[\eps_{it}],\gamma_u,\Sigma)$. \pause
+  \item Can use however you like. Sometimes, researchers use parameters of auxiliary model as preliminary analysis or evidence.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Practical Considerations}
+  Some practical considerations for simulation-based estimators:
+  \begin{itemize}
+  \item When simulating, fix draw of $\mathbf{u}$ (i.e. fix seed) to remove ``jitter''. Don't want $Q_n$ jumping around. \pause
+  \item MSL can get tricky when there are many missing states. Application-specific tricks. \pause
+  \item MSM/II usually more intuitive, but requires more thought in moment selection. You might miss crucial feature of data! \pause
+  \item Differentiable methods help a lot, but you can always ``approximate'' derivative. \pause
+  \item Doubly important when it comes to estimating variance of $\h{\theta}_n$.
+  \end{itemize}
+\end{frame}
+
+% motivating example for  bootstrap
+\begin{frame}\frametitle{Introducing the Bootstrap}
+  Some challenges when estimating the variance of chosen $\h{\theta}_n$:
+  \begin{itemize}
+  \item Variance difficult to derive (many step estimator). \pause
+  \item Derivatives of criterion hard/cost to compute (many parameters). \pause
+  \item Estimation criterion non-smooth (in finite sample). \pause
+  \item Sample size too small for CLT to kick in. \pause
+  \end{itemize}
+  Bootstrap provides a potential solution to each of these.
+\end{frame}
+
+\begin{frame}\frametitle{Bootstrap}
+\begin{itemize}
+\item Let $T_n(X_1,...,X_n)$ be known statistic from the data. \pause
+\item Let $F(\cdot,\theta)$ be distribution of $X$ given $\theta$, $F_0=F(\cdot,\theta_0)$.  \pause
+\item Let $G_\infty(\cdot,F)$ be asymptotic distribution of $T_n$. \pause
+\item $G_n(\cdot,F_0)$ is unknown. \pause
+\item So far we just use $G_\infty$. Bootstrap designed to estimate $G_n$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Bootstrap Sampling}
+  Two potential estimates of $F_0$:
+  \begin{eqnarray}
+    F_n(x) = \frac{1}{n}\sum_i\mathbf{1}\{X_i\leq x\}\\ \pause
+    F_n(x) = F(x,\hat{\theta}_n) \pause
+  \end{eqnarray}
+  \begin{itemize}
+  \item Depends on model/preferences.\pause
+  \item (1) Nonparametric (Empirical Distribution Function) vs (2) Parametric Bootstrap. \pause
+  \item Procedure will estimate $G_n(\cdot,F_0)$ with $G_n(\cdot,F_n)$. \pause
+  \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Bootstrap Procedure}
+\begin{enumerate}
+\item Draw a sample of size $n$: $\mathbf{X}^b=\{X^b_1,...,X^b_n\}$ \pause
+  \begin{itemize}
+  \item Sample with replacement from $\{X_1,...,X_n\}$ (equiv to EDF) \pause
+  \item Draw from $F(\cdot,\h{\theta}_n)$ \pause
+  \end{itemize}
+\item Compute $T^b_n = T(X^b_1,...,X^b_n)$ \pause
+\end{enumerate}
+Notes:
+\begin{itemize}
+\item Do this $B$ times, the bootstrap sample is $\{T^1_n,...,T^B_n\}$. \pause
+\item Use this to estimate features of $G_n$ (variance, quantiles, confidence intervals)
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Applying to the Model}
+  You have estimate $\h{\theta}_n$ from chosen procedure. You want confidence intervals (for example). \pause
+  \begin{itemize}
+  \item Draw 100 samples with replacement (by sampling over individuals).\pause
+  \item Have bootstrap sample $\Phi^B=\{\theta^1_n,...,\theta^{100}_n\}$. \pause
+  \item 95\% confidence interval given by quantiles $q_{0.025}(\Phi^B)$ and $q_{0.975}(\Phi^B)$. \pause
+  \item Can also compute variances, any function of parameter estimates (example: counterfactual experiments). \pause
+  \item Alternative: use model to simulate data, if you prefer.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Things to know about Bootstrap}
+  \begin{itemize}
+  \item If statistic is \emph{asymptotically pivotal}, ($G_\infty(\cdot,F)$ unaffected by $F$) then bootstrap can outperform asymptotic approximation. \pause
+    \begin{itemize}
+    \item[] Examples: t statistic ($\mathcal{N}(0,1)$), Wald statistic ($\chi^2_{DF}$). \pause
+    \end{itemize}
+  \item If statistic asymptotically normal, bootstrap is consistent. \pause
+  \item Be careful that resampling replicates dependence structure in data. (Example: what if you didn't sample of individuals in application?) \pause
+  \item See Horowitz (2001) chapter in Handbook of Econometrics for more details.
+  \end{itemize}
+\end{frame}
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
