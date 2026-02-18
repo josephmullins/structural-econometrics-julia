@@ -104,6 +104,72 @@ $$Q_{N}(\theta) \leq Q_{0}(\theta) + \varepsilon/2 \leq Q_{0}(\theta_{0}) - \var
 also with probability approaching 1. Thus $\hat{\theta}$ cannot lie outside $\mathcal{N}$, and since $\mathcal{N}$ was arbitrary, $\hat{\theta}\rightarrow_{p}\theta_{0}$.
 :::
 
+:::{.callout-note icon="false"}
+## The Necessity of Uniform Convergence
+
+Here is an example to show the necessity of uniform (as opposed to pointwise) convergence. Suppose that $\{X_{n}\}_{n}^{N}$ are iid data with $\mathbb{E}[X]= 1 $ and $\overline{X}_{N}=\sum X_{n} / N$. Define:
+
+$$Q_{N}(\theta) = 2\mathbf{1}\{\theta = \sqrt{N}/(1+\sqrt{N})\} + \overline{X}_{N} - \theta^2 $$
+
+Note that $Q_{0}(\theta) = 1 - \theta^2$ and so $\theta_{0} = 0$, but that $\hat{\theta}_{N}\rightarrow_{p}1$.
+
+The following animation illustrates this. For each $N$, we draw $\{X_n\}$ and plot $Q_N(\theta)$ as a continuous curve (the $\overline{X}_N - \theta^2$ part) plus the spike at $\theta = \sqrt{N}/(1+\sqrt{N})$. Even though $Q_N$ converges *pointwise* to $Q_0$ (shown in red), the spike always makes the maximizer $\hat{\theta}_N$ (orange diamond) drift toward 1, never settling at $\theta_0 = 0$ (green circle).
+
+```{julia}
+#| echo: false
+using Distributions, Plots, Random, Statistics, Logging
+
+Random.seed!(42)
+θ_grid = range(-1.5, 1.5, length=300)
+
+anim = @animate for N in [5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000]
+    X̄ = mean(rand(Normal(1, 1), N))
+
+    # Continuous part of Q_N: X̄_N - θ²
+    Q_continuous = X̄ .- θ_grid.^2
+
+    # Population limit: Q_0(θ) = 0.5 - θ² (as stated in the text)
+    Q_0 = 1 .- θ_grid.^2
+
+    # The spike location
+    θ_spike = √N / (1 + √N)
+
+    # Q_N at the spike = 1 + X̄_N - θ_spike²
+    Q_at_spike = 2 + X̄ - θ_spike^2
+
+    # Q_N at θ = 0 (the true maximizer of Q_0)
+    Q_at_zero = X̄
+
+    # Plot Q_0 (population limit)
+    p = plot(θ_grid, Q_0, color=:red, lw=2, linestyle=:dash, label="Q₀(θ)",
+             xlabel="θ", ylabel="Q(θ)", title="N = $N",
+             xlim=(-1.5, 1.5), ylim=(-1.5, 3),
+             legend=:topleft, size=(600, 400))
+
+    # Plot Q_N (continuous part)
+    plot!(θ_grid, Q_continuous, color=:blue, lw=2, label="Qₙ(θ)")
+
+    # Mark the spike at θ = N/(1+N) with a vertical line segment
+    plot!([θ_spike, θ_spike], [X̄ - θ_spike^2, Q_at_spike],
+          color=:blue, lw=2, label=false)
+    scatter!([θ_spike], [Q_at_spike], color=:orange, ms=8,
+             marker=:diamond, label="θ̂ₙ = $(round(θ_spike, digits=3))")
+
+    # Mark θ₀ = 0
+    scatter!([0.0], [Q_at_zero], color=:green, ms=8,
+             marker=:circle, label="θ₀ = 0")
+
+    # Vertical dashed line at θ = 1 (limit of θ̂_N)
+    vline!([1.0], color=:gray, linestyle=:dot, alpha=0.5, label=false)
+end
+
+with_logger(NullLogger()) do
+    gif(anim, fps=1)
+end
+```
+
+:::
+
 Compactness is a strong assumption. Many parameter spaces of interest are not bounded (e.g. regression coefficients). The following result relaxes compactness at the cost of requiring concavity.
 
 :::{#thm-consistency-concave}

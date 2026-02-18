@@ -1,0 +1,326 @@
+---
+title: "Asymptotic Theory"
+subtitle: "Lecture Notes"
+format:
+  pdf:
+    documentclass: article
+    geometry:
+      - margin=1in
+    fontsize: 11pt
+    toc: false
+---
+
+# Overview
+
+- We now develop the statistical theory governing extremum estimators
+- Two key properties to establish:
+  1. **Consistency**: Does $\hat{\theta}\rightarrow\theta_{0}$ as the sample grows?
+  2. **Inference**: What is the sampling distribution of $\hat{\theta}$ around $\theta_{0}$?
+- Results apply broadly to all extremum estimators, then we specialize to MLE, minimum distance, and GMM
+- Treatment follows Newey & McFadden (1994) closely
+
+---
+
+# Definitions
+
+## Extremum Estimator
+
+- $\hat{\theta}$ is an **extremum estimator** if:
+  $$ \hat{\theta} = \arg\max_{\theta\in\Theta}Q_{N}(\theta) $$
+  where $\Theta\subset\mathbb{R}^{p}$ and $Q_{N}(\cdot)$ depends on the data
+- All of our estimators fall into this class; what distinguishes them is the structure of $Q_{N}$
+
+## M-Estimators
+
+- An **M-estimator** has an objective that is a sample average:
+  $$ Q_{N}(\theta) = \frac{1}{N}\sum_{n=1}^{N}m(\mathbf{w}_{n},\theta) $$
+- Two key examples:
+  - **Maximum Likelihood**: $m(\mathbf{w}_{n},\theta) = \log f(y_{n}|\mathbf{x}_{n},\theta)$
+  - **Nonlinear Least Squares**: $m(\mathbf{w}_{n},\theta) = -(y_{n}-\varphi(\mathbf{x}_{n},\theta))^{2}$
+
+## GMM Estimator
+
+- Defined by moment conditions $\mathbb{E}[g(\mathbf{w},\theta_{0})]=\mathbf{0}$:
+  $$ Q_{N}(\theta) = -\frac{1}{2}\mathbf{g}_{N}(\theta)'\hat{\mathbf{W}}\mathbf{g}_{N}(\theta),\qquad\mathbf{g}_{N}(\theta)=\frac{1}{N}\sum_{n}g(\mathbf{w}_{n},\theta) $$
+- GMM is itself an M-estimator (expand the quadratic form)
+
+## Minimum Distance Estimator
+
+- Works with a first-stage reduced-form estimate $\hat{\pi}$ and model restrictions $\psi(\pi,\theta)$:
+  $$ Q_{N}(\theta) = -\frac{1}{2}\psi(\hat{\pi}_{N},\theta)'\hat{\mathbf{W}}\psi(\hat{\pi}_{N},\theta) $$
+  where $\psi(\pi_{0},\theta_{0})=\mathbf{0}$ and $\sqrt{N}(\hat{\pi}_{N}-\pi_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\Omega)$
+- Differs from GMM: objective depends on data only through the first-stage statistic $\hat{\pi}$, not through individual observations
+
+---
+
+# Consistency
+
+- An extremum estimator solves $\hat{\theta}=\arg\max_{\theta\in\Theta}Q_{N}(\theta)$
+- Let $Q_{0}(\theta)$ denote the population analogue (probability limit of $Q_{N}(\theta)$)
+- Two conditions needed intuitively:
+  1. **Identification**: $Q_{0}(\theta)$ is uniquely maximized at $\theta_{0}$
+  2. **Convergence**: $Q_{N}(\theta)\rightarrow Q_{0}(\theta)$ in a sufficiently strong sense
+
+## Consistency with Compactness
+
+- **Theorem**: Under the following conditions, $\hat{\theta}\rightarrow_{p}\theta_{0}$:
+  1. $\Theta$ is compact
+  2. $Q_{N}(\theta)$ is continuous in $\theta$
+  3. $Q_{N}(\theta)$ is measurable
+  4. **Identification**: $Q_{0}(\theta)$ is uniquely maximized at $\theta_{0}$
+  5. **Uniform convergence**: $\sup_{\theta\in\Theta}|Q_{N}(\theta)-Q_{0}(\theta)|\rightarrow_{p}0$
+
+- **Proof intuition**: Pick any neighborhood $\mathcal{N}$ around $\theta_{0}$. Since $\theta_{0}$ uniquely maximizes $Q_{0}$ and $\Theta\setminus\mathcal{N}$ is compact, there is a gap:
+  $$ \varepsilon = Q_{0}(\theta_{0}) - \sup_{\theta\in\Theta\setminus\mathcal{N}}Q_{0}(\theta) > 0 $$
+  Uniform convergence ensures $Q_{N}(\hat{\theta})\geq Q_{0}(\theta_{0})-\varepsilon/2$ while $Q_{N}(\theta)\leq Q_{0}(\theta_{0})-\varepsilon/2$ outside $\mathcal{N}$, so $\hat{\theta}$ must be in $\mathcal{N}$
+
+## Consistency without Compactness
+
+- Compactness is a strong assumption---many parameter spaces are unbounded
+- **Theorem**: Replace compactness with:
+  1. $\theta_{0}\in\text{int}(\Theta)$
+  2. $Q_{N}(\theta)$ is **concave** in $\theta$
+  3. **Pointwise convergence** (not uniform): $Q_{N}(\theta)\rightarrow_{p}Q_{0}(\theta)$ for all $\theta$
+- Key insight: concavity turns pointwise convergence into uniform convergence on compact subsets (Rockafellar, 1970)
+
+## Uniform Law of Large Numbers for M-Estimators
+
+- For M-estimators, uniform convergence reduces to a uniform LLN
+- **Sufficient conditions** (with $\{\mathbf{w}_n\}$ ergodic stationary):
+  1. $\Theta$ compact
+  2. $m(\mathbf{w},\theta)$ continuous in $\theta$
+  3. $m(\mathbf{w},\theta)$ measurable in $\mathbf{w}$
+  4. Dominance: $|m(\mathbf{w},\theta)|\leq d(\mathbf{w})$ for all $\theta$ with $\mathbb{E}[d(\mathbf{w})]<\infty$
+- Then $\sup_{\theta\in\Theta}|Q_{N}(\theta)-Q_{0}(\theta)|\rightarrow_{p}0$
+- In practice, verify $\mathbb{E}[\sup_{\theta\in\Theta}|m(\mathbf{w},\theta)|]<\infty$
+
+## Consistency of Maximum Likelihood
+
+- For MLE: $Q_{N}(\theta)=\frac{1}{N}\sum_{n}\log f(\mathbf{w}_{n};\theta)$ and $Q_{0}(\theta)=\mathbb{E}_{\theta_{0}}[\log f(\mathbf{w};\theta)]$
+- **Identification via the Kullback-Leibler inequality**: for any two densities $g$ and $h$:
+  $$ \mathbb{E}_{g}\left[\log\frac{g(\mathbf{w})}{h(\mathbf{w})}\right]\geq 0 $$
+  with equality iff $g=h$ a.e.
+- Applying with $g=f(\cdot;\theta_{0})$ and $h=f(\cdot;\theta)$:
+  $$ \mathbb{E}_{\theta_{0}}[\log f(\mathbf{w};\theta_{0})] \geq \mathbb{E}_{\theta_{0}}[\log f(\mathbf{w};\theta)] $$
+  with equality iff $f(\cdot;\theta)=f(\cdot;\theta_{0})$ a.e.
+- So: as long as different $\theta$ imply different densities, the population log-likelihood is uniquely maximized at $\theta_{0}$
+
+- **Theorem** (MLE Consistency): Under compactness, continuity, identification ($f(\mathbf{w};\theta_0)\neq f(\mathbf{w};\theta)$ w.p.p. for $\theta\neq\theta_0$), and dominance, $\hat{\theta}_{ML}\rightarrow_{p}\theta_{0}$
+- Identification here is model-specific: different parameters must imply different distributions
+- Analogous result holds without compactness when log-likelihood is concave (e.g. exponential family)
+
+---
+
+# Asymptotic Normality for M-Estimators
+
+- Having established consistency, now characterize the rate and distribution of $\hat{\theta}$ around $\theta_{0}$
+- Define the **score** and **Hessian** of $m$:
+  $$ \mathbf{s}(\mathbf{w},\theta) = \frac{\partial m(\mathbf{w},\theta)}{\partial\theta}\qquad(p\times 1) $$
+  $$ \mathbf{H}(\mathbf{w},\theta) = \frac{\partial^{2}m(\mathbf{w},\theta)}{\partial\theta\partial\theta'}\qquad(p\times p) $$
+
+## Derivation via the Mean Value Theorem
+
+- FOC: $\frac{1}{N}\sum_{n}\mathbf{s}(\mathbf{w}_{n},\hat{\theta})=\mathbf{0}$
+- Mean value expansion around $\theta_{0}$:
+  $$ \mathbf{0} = \frac{1}{N}\sum_{n}\mathbf{s}(\mathbf{w}_{n},\theta_{0}) + \left[\frac{1}{N}\sum_{n}\mathbf{H}(\mathbf{w}_{n},\bar{\theta})\right](\hat{\theta}-\theta_{0}) $$
+- Rearranging:
+  $$ \sqrt{N}(\hat{\theta}-\theta_{0}) = -\left[\frac{1}{N}\sum_{n}\mathbf{H}(\mathbf{w}_{n},\bar{\theta})\right]^{-1}\frac{1}{\sqrt{N}}\sum_{n}\mathbf{s}(\mathbf{w}_{n},\theta_{0}) $$
+- Two standard arguments:
+  1. **CLT**: $\frac{1}{\sqrt{N}}\sum_{n}\mathbf{s}(\mathbf{w}_{n},\theta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\Sigma)$ where $\Sigma=\mathbb{E}[\mathbf{s}\mathbf{s}']$
+  2. **LLN + continuity**: $\frac{1}{N}\sum_{n}\mathbf{H}(\mathbf{w}_{n},\bar{\theta})\rightarrow_{p}\mathbb{E}[\mathbf{H}(\mathbf{w},\theta_{0})]$
+- Combine via Slutsky's theorem
+
+## Asymptotic Normality Theorem
+
+- **Theorem**: Under consistency conditions plus interiority, twice-differentiability, CLT for score, bounded Hessian, and nonsingular expected Hessian:
+  $$ \sqrt{N}(\hat{\theta}-\theta_{0})\rightarrow_{d}\mathcal{N}\left(\mathbf{0},\ \mathbb{E}[\mathbf{H}]^{-1}\Sigma\mathbb{E}[\mathbf{H}]^{-1}\right) $$
+  where $\mathbb{E}[\mathbf{H}]=\mathbb{E}[\mathbf{H}(\mathbf{w},\theta_{0})]$ and $\Sigma=\mathbb{E}[\mathbf{s}(\mathbf{w},\theta_{0})\mathbf{s}(\mathbf{w},\theta_{0})']$
+- This is the **sandwich formula**
+- In practice, replace population expectations with sample analogues:
+  $$ \widehat{\mathbb{V}}[\hat{\theta}] = \hat{H}^{-1}\hat{\Sigma}\hat{H}^{-1}/N $$
+
+## The Information Matrix Equality
+
+- For MLE, $m(\mathbf{w},\theta)=\log f(\mathbf{w};\theta)$, and a remarkable simplification occurs
+- The **information matrix equality**:
+  $$ \mathcal{I}(\theta_{0}) \equiv \mathbb{E}[\mathbf{s}\mathbf{s}'] = -\mathbb{E}[\mathbf{H}] $$
+- **Why it holds**: Since $\int f(\mathbf{w};\theta)d\mathbf{w}=1$, differentiate under the integral:
+  - First derivative: $\mathbb{E}_{\theta}[\mathbf{s}(\mathbf{w},\theta)]=0$
+  - Second derivative: $\mathbb{E}[\mathbf{H}]+\mathbb{E}[\mathbf{s}\mathbf{s}']=0$
+- Consequence: for MLE, the sandwich collapses to:
+  $$ \sqrt{N}(\hat{\theta}_{ML}-\theta_{0})\rightarrow_{d}\mathcal{N}\left(\mathbf{0},\ \mathcal{I}(\theta_{0})^{-1}\right) $$
+- $\mathcal{I}(\theta)$ is the **Fisher information matrix**
+- MLE variance can be estimated three ways: Hessian, outer product of scores, or sandwich (robust to misspecification)
+
+## Probit Standard Errors (Key Results)
+
+- Illustrating the three variance estimators (Hessian, OPG, sandwich) on the probit model from the Roy Model example
+- All three should agree when model is correctly specified
+- Monte Carlo verification: asymptotic SEs match the standard deviation of MC estimates across replications
+- The asymptotic normal approximation matches the MC sampling distribution well
+
+---
+
+# The Delta Method
+
+- Often interested in $g(\theta)$ rather than $\theta$ itself (e.g. $\lambda$ and $b$ in the search model)
+- **Theorem**: If $\sqrt{N}(\hat{\theta}-\theta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},V)$ and $g:\mathbb{R}^{p}\rightarrow\mathbb{R}^{k}$ is continuously differentiable with full-rank Jacobian $\nabla g(\theta_{0})$, then:
+  $$ \sqrt{N}(g(\hat{\theta})-g(\theta_{0}))\rightarrow_{d}\mathcal{N}\left(\mathbf{0},\ \nabla g(\theta_{0})V\nabla g(\theta_{0})'\right) $$
+- Proof: continuous mapping theorem applied to first-order Taylor expansion
+- In practice, the Jacobian $\nabla g$ can be computed by automatic differentiation
+
+---
+
+# Minimum Distance Estimators
+
+- Different approach: two stages
+  1. Estimate reduced-form object $\hat{\pi}$ with $\sqrt{N}(\hat{\pi}-\pi_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\Omega)$
+  2. Find structural $\theta$ that best fits model restrictions $\psi(\pi,\theta)=\mathbf{0}$
+
+## The Estimator
+
+$$ \hat{\theta} = \arg\min_{\theta}\psi(\hat{\pi},\theta)'\mathbf{W}_{N}\psi(\hat{\pi},\theta) $$
+
+## Asymptotic Distribution
+
+- **Theorem**: Under identification ($\psi(\pi_{0},\theta)\neq\mathbf{0}$ for $\theta\neq\theta_{0}$), asymptotic normality of $\hat{\pi}$, $\mathbf{W}_{N}\rightarrow_{p}\mathbf{W}$, and full-rank $\nabla_{\theta}\psi_{0}$:
+  $$ \sqrt{N}(\hat{\theta}-\theta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},V_{MD}) $$
+  where:
+  $$ V_{MD} = (\nabla_{\theta}\psi_{0}\mathbf{W}\nabla_{\theta}\psi_{0}')^{-1}\nabla_{\theta}\psi_{0}\mathbf{W}\nabla_{\pi}\psi_{0}'\Omega\nabla_{\pi}\psi_{0}\mathbf{W}\nabla_{\theta}\psi_{0}'(\nabla_{\theta}\psi_{0}\mathbf{W}\nabla_{\theta}\psi_{0}')^{-1} $$
+- **Derivation intuition**: FOC + expand $\psi(\hat{\pi},\hat{\theta})$ around $(\pi_{0},\theta_{0})$, solve for $\sqrt{N}(\hat{\theta}-\theta_{0})$ as a linear function of $\sqrt{N}(\hat{\pi}-\pi_{0})$
+
+## The Optimal Weighting Matrix
+
+- Optimal $\mathbf{W}$ minimizes $V_{MD}$ (in the PSD sense):
+  $$ \mathbf{W}^{*} = \left(\nabla_{\pi}\psi_{0}'\Omega\nabla_{\pi}\psi_{0}\right)^{-1} $$
+- Variance simplifies to:
+  $$ V_{MD}^{*} = \left(\nabla_{\theta}\psi_{0}\left(\nabla_{\pi}\psi_{0}'\Omega\nabla_{\pi}\psi_{0}\right)^{-1}\nabla_{\theta}\psi_{0}'\right)^{-1} $$
+- **Common case** $\psi(\pi,\theta)=\pi-h(\theta)$: then $\nabla_{\pi}\psi=I$, $\nabla_{\theta}\psi=-\nabla_{\theta}h$, and $\mathbf{W}^{*}=\Omega^{-1}$:
+  $$ V_{MD}^{*} = \left(\nabla_{\theta}h_{0}\Omega^{-1}\nabla_{\theta}h_{0}'\right)^{-1} $$
+
+## Efficiency of Optimal Minimum Distance
+
+- When model is **just-identified** ($\dim(\psi)=\dim(\theta)$) and $\hat{\pi}$ is MLE: the optimally weighted MD estimator achieves the Cramér-Rao lower bound
+- Uses the implicit function theorem to show $V_{MD}^{*}=\mathcal{I}_\theta^{-1}$
+- Over-identification introduces some loss relative to MLE but gains robustness
+
+## Income Process Standard Errors (Key Results)
+
+- Matching variance of log income at each age to model-implied variances
+- With $\psi(\pi,\theta)=\pi-\mathbf{v}(\theta)$: Jacobian $\nabla_{\theta}\mathbf{v}$ computed via ForwardDiff
+- Variance of sample moments $\Omega$ estimated using $\text{Var}(\hat{\sigma}^2)\approx 2\sigma^4/(n-1)$
+- Optimally weighted estimator is more precise, especially when moments have different scales/variances
+- **Important caveat**: variance estimate assumes normality and zero off-diagonal covariances; the latter is explicitly wrong since same individuals appear at multiple ages; the bootstrap (next chapter) will fix this
+
+---
+
+# The Generalized Method of Moments
+
+- GMM objective:
+  $$ Q_{N}(\theta) = -\frac{1}{2}\mathbf{g}_{N}(\theta)'\mathbf{W}_{N}\mathbf{g}_{N}(\theta) $$
+
+## Asymptotic Distribution
+
+- **Theorem**: Let $G=\mathbb{E}[\nabla_{\theta}g(\mathbf{w},\theta_{0})']$ and $S=\mathbb{E}[g(\mathbf{w},\theta_{0})g(\mathbf{w},\theta_{0})']$. Then:
+  $$ \sqrt{N}(\hat{\theta}_{GMM}-\theta_{0})\rightarrow_{d}\mathcal{N}\left(\mathbf{0},\ (G'\mathbf{W}G)^{-1}G'\mathbf{W}S\mathbf{W}G(G'\mathbf{W}G)^{-1}\right) $$
+
+## Optimal Weighting Matrix
+
+- Optimal: $\mathbf{W}^{*}=S^{-1}$
+- Variance simplifies to: $V_{GMM}^{*}=(G'S^{-1}G)^{-1}$
+- When **just-identified**: GMM does not depend on $\mathbf{W}$ at all (sample moments set exactly to zero)
+
+## Feasible Efficient GMM
+
+- $S$ depends on $\theta_{0}$ and must be estimated; use **two-step GMM**:
+  1. Estimate $\hat{\theta}_{1}$ with initial $\mathbf{W}$ (e.g. $I$)
+  2. Compute $\hat{S}=\frac{1}{N}\sum_{n}g(\mathbf{w}_{n},\hat{\theta}_{1})g(\mathbf{w}_{n},\hat{\theta}_{1})'$
+  3. Re-estimate: $\hat{\theta}_{2}=\arg\min_{\theta}\mathbf{g}_{N}(\theta)'\hat{S}^{-1}\mathbf{g}_{N}(\theta)$
+- $\hat{\theta}_{2}$ is asymptotically efficient; first-stage estimation of $\hat{S}$ does not affect the asymptotic variance
+
+---
+
+# Efficiency
+
+- $\hat{\theta}_{1}$ is **asymptotically efficient** relative to $\hat{\theta}_{2}$ if $V_{2}-V_{1}\geq 0$ (PSD)
+
+## Efficiency of Maximum Likelihood
+
+- MLE achieves the **Cramér-Rao lower bound**: $V[\hat{\theta}]-\mathcal{I}(\theta_{0})^{-1}\geq 0$ for any consistent, asymptotically normal estimator
+- MLE is efficient relative to any GMM estimator using moments implied by the model
+- The efficiency gap: $V_{GMM}-V_{MLE}=\mathbb{E}[\mathbf{m}\mathbf{s}']^{-1}\mathbb{E}[\mathbf{U}\mathbf{U}']\mathbb{E}[\mathbf{s}\mathbf{m}']^{-1}\geq 0$
+  - Where $\mathbf{U}$ is the projection residual of the GMM influence function on the MLE score
+  - Equals zero only when the GMM estimator fully exploits the likelihood
+
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\textbf{STOP FOR DISCUSSION}
+
+Efficiency vs.\ Robustness:
+\begin{itemize}
+\item MLE requires the \textbf{entire parametric model} to be correctly specified. If the density is wrong, MLE converges to a pseudo-true value and the information matrix equality fails.
+\item GMM only requires the \textbf{moment conditions} to be correct---more robust to partial misspecification.
+\item The sandwich variance estimator remains valid for MLE even under misspecification.
+\end{itemize}
+}}
+\end{center}
+
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\textbf{STOP FOR DISCUSSION}
+
+Pros and Cons of MLE:
+\begin{itemize}
+\item Greatest strength: MLE \textbf{uses every piece of information in the data}. If the model is identified by the population distribution, you don't have to choose which features to match. Particularly useful for unobserved heterogeneity with panel data.
+\item Greatest weakness: MLE \textbf{uses every piece of information in the data}. You don't control which features the model fits vs.\ misses. The most credible identification strategy (``whether vs.\ how'') may not coincide with MLE.
+\end{itemize}
+}}
+\end{center}
+
+---
+
+# Two-Step Estimators
+
+- Many structural estimators proceed in stages (e.g. probit then selection-corrected OLS in the Roy Model)
+- Need to account for first-stage estimation uncertainty in second-stage inference
+
+## Setup
+
+- **First step**: Estimate $\hat{\gamma}$ via $\frac{1}{N}\sum_{n}g_{1}(\mathbf{w}_{n},\hat{\gamma})=\mathbf{0}$
+- **Second step**: Estimate $\hat{\beta}$ via $\frac{1}{N}\sum_{n}g_{2}(\mathbf{w}_{n},\hat{\gamma},\hat{\beta})=\mathbf{0}$
+
+## Asymptotic Distribution
+
+- Stack moment conditions with $\alpha=(\gamma',\beta')'$:
+  $$ \frac{1}{N}\sum_{n}\begin{bmatrix}g_{1}(\mathbf{w}_{n},\gamma)\\ g_{2}(\mathbf{w}_{n},\gamma,\beta)\end{bmatrix} = \mathbf{0} $$
+- The Jacobian has a **block-triangular** structure:
+  $$ \Gamma = \begin{bmatrix}\Gamma_{1\gamma} & 0 \\ \Gamma_{2\gamma} & \Gamma_{2\beta}\end{bmatrix} $$
+  - Zero in the upper-right reflects that the first step does not depend on $\beta$
+
+## Corrected Variance Formula
+
+- Asymptotic variance of $\hat{\beta}$:
+  $$ V_{\beta} = \Gamma_{2\beta}^{-1}\mathbb{E}\left[(g_{2}-\Gamma_{2\gamma}\Gamma_{1\gamma}^{-1}g_{1})(g_{2}-\Gamma_{2\gamma}\Gamma_{1\gamma}^{-1}g_{1})'\right]\Gamma_{2\beta}^{-1\prime} $$
+- The term $\Gamma_{2\gamma}\Gamma_{1\gamma}^{-1}g_{1}$ is the **correction** for first-stage estimation error
+- Ignoring this correction gives incorrect inference in general
+
+## When Does the First Stage Not Matter?
+
+- If $\Gamma_{2\gamma}=\mathbb{E}[\nabla_{\gamma}g_{2}']=0$, the correction vanishes
+- This means the second-step moments are **locally insensitive** to first-step parameters at the true values
+- Classic example: two-stage IV with a probit first stage
+  - $\mathbb{E}[\nabla_{\gamma}g_{2}']=0$ because the projection of the error on functions of instruments is zero by construction
+
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\textbf{STOP FOR DISCUSSION}
+
+Bootstrap vs.\ Analytical Standard Errors:
+\begin{itemize}
+\item Computing analytical SEs for two-step estimators can be tedious
+\item Alternative: \textbf{bootstrap}---resample data, re-run the entire two-step procedure, compute SEs from the distribution of bootstrap estimates
+\item Automatically accounts for first-stage estimation uncertainty without explicit correction terms
+\item We will discuss the bootstrap formally in the simulation methods chapter
+\end{itemize}
+}}
+\end{center}
