@@ -567,7 +567,7 @@ n_age = moments_df.n
 # Model-implied moments
 function model_moments(θ, T)
     ρ, σ2_α, σ2_η = θ
-    m = [σ2_α + (1-ρ^(2(t-1)))/(1-ρ^2) * σ2_η for t in 1:T]
+    m = [σ2_α + (1-ρ^(2t))/(1-ρ^2) * ρ^2 * σ2_η for t in 1:T]
     return m
 end
 

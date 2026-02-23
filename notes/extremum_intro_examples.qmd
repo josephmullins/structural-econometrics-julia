@@ -89,7 +89,7 @@ format:
 
 - Let $X_{n} = (W^o,t_u,E)$ denote the data (observed wage, unemployment duration, employment status)
 - Log-likelihood of a single observation:
-  $$ l(X;\theta) = E \times \int f_{W|W>w^*}(\log(W^{o})-\zeta)\phi(\zeta;\sigma_\zeta)d\zeta + (1-E)\times[\log(h) + t_u\log(1-h)]  $$
+  $$ l(X;\theta) = E \times \log\left(\int f_{W|W>w^*}(\log(W^{o})-\zeta)\phi(\zeta;\sigma_\zeta)d\zeta\right) + (1-E)\times[\log(h) + t_u\log(1-h)]  $$
 - The truncated wage density:
   $$ f_{W|W>w^*}(w) = \frac{\phi(w;\sigma_{W})}{1-\Phi(w^*/\sigma_{W})}$$
 
@@ -186,7 +186,7 @@ format:
 
 - Define $\epsilon = \log(y) - \mu_{t} = \alpha + \varepsilon$
 - Variance at age $t$:
-  $$ \mathbb{V}[\epsilon_{t}] = \sigma^2_{\alpha} + \frac{(1-\rho^{2(t-1)})}{1-\rho^2}\sigma^2_{\eta}$$
+  $$ \mathbb{V}[\epsilon_{t}] = \sigma^2_{\alpha} + \frac{(1-\rho^{2t})}{1-\rho^2}\rho^2\sigma^2_{\eta}$$
 - Recursive variance relationship:
   $$ \mathbb{V}[\epsilon_{t+1}] = \sigma^2_{\alpha} + \rho^2\mathbb{V}[\varepsilon_{t}] + \sigma^2_{\eta} $$
 - Autocovariance:

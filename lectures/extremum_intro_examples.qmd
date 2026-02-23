@@ -63,7 +63,7 @@ $$ \theta = (\mu,\sigma^2_{W},h,\delta,w^*) $$
 
 and invert out $\lambda$ and $b$ (the latter using the reservation wage equation). Let $X_{n} = (W^o,t_u,E)$ indicate the data. The log-likelihood of a single observation is:
 
-$$ l(X;\theta) = E \times \int f_{W|W>w^*}(\log(W^{o})-\zeta)\phi(\zeta;\sigma_\zeta)d\zeta + (1-E)\times[\log(h) + t_u\log(1-h)]  $$
+$$ l(X;\theta) = E \times \log\left(\int f_{W|W>w^*}(\log(W^{o})-\zeta)\phi(\zeta;\sigma_\zeta)d\zeta\right) + (1-E)\times[\log(h) + t_u\log(1-h)]  $$
 
 where, according to our parametric specifications:
 
@@ -112,7 +112,7 @@ data = @chain data begin
                 return missing
             end
         elseif :PAIDHOUR==1
-            if :EARNWEEK>0 && :UHRSWORKT<997 && :UHRSWORKT>0
+            if :EARNWEEK>100 && :UHRSWORKT<997 && :UHRSWORKT>0
                 return :EARNWEEK / :UHRSWORKT
             else
                 return missing
@@ -127,6 +127,7 @@ data = @chain data begin
         :female = :SEX.==2
         :DURUNEMP = round.(:DURUNEMP .* 12/52)
     end
+    @subset :female .!:bachelors
 end
 
 # the whole dataset in a named tuple
@@ -137,6 +138,8 @@ N = length(data.AGE)
 dat = (;logwage = log.(wage),wage_missing,E = data.E,tU = data.DURUNEMP) 
 ```
 
+**Note** that we limit the sample in the last line to women without a bachelor's degree, and that we drop imputed wages with reported weekly earnings less than $100. This is to avoid infeasibly low imputed wages.
+
 Now, let's write the log-likelihood as above.
 ```{julia}
 using Distributions, Optim
@@ -145,22 +148,22 @@ using Distributions, Optim
 Φ(x,μ,σ) = cdf(Normal(μ,σ),x)
 
 # a function for the log-likelihood of observed wages (integrating out measurement error)
-function logwage_likelihood(logwage,F,σζ,wres)
-    f(x) = pdf(F,x) / (1-cdf(F,wres)) * ϕ(logwage,log(x),σζ)
+function logwage_likelihood(logwage,F,σζ,log_wres)
+    f(x) = pdf(F,x) / (1-cdf(F,log_wres)) * ϕ(logwage,x,σζ)
     ub = quantile(F,0.9999)
-    return integrateGL(f,wres,ub)
+    return integrateGL(f,log_wres,ub)
 end
 
 # a function to get the log-likelihood of a single observation
 # note this function assumes that data holds vectors 
 # E, tU, and logwage
 function log_likelihood(n,data,pars)
-    (;h,δ,wres,F,σζ) = pars
+    (;h,δ,log_wres,F,σζ) = pars
     ll = 0.
     if data.E[n]
         ll += log(h) - log(h + δ)
         if !data.wage_missing[n]
-            ll += logwage_likelihood(data.logwage[n],F,σζ,wres)
+            ll += log(logwage_likelihood(data.logwage[n],F,σζ,log_wres))
         end
     else
         ll += log(δ) - log(h + δ)
@@ -194,20 +197,21 @@ function update(pars,x)
     δ = logit(x[2])
     μ = x[3]
     σ = exp(x[4])
-    wres = exp(x[5])
-    F = LogNormal(μ,σ)
-    return (;pars...,h,δ,μ,σ,wres,F)
+    log_wres = x[5]
+    F = Normal(μ,σ)
+    return (;pars...,h,δ,μ,σ,log_wres,F)
 end
 ```
 
 Now we can finally test our likelihood to see how it runs:
 
 ```{julia}
-x0 = [logit_inv(0.5),logit_inv(0.03),2.,log(1.),log(5.)]
+x0 = [logit_inv(0.5),logit_inv(0.03),2.,log(1.),log(1.)]
 pars = (;σζ = 0.05, β = 0.995)
 log_likelihood_obj(x0,pars,dat) #<- test.
-res = optimize(x->-log_likelihood_obj(x,pars,dat),x0,Newton(),Optim.Options(show_trace=true))
+res = optimize(x->-log_likelihood_obj(x,pars,dat),x0,BFGS(),Optim.Options(show_trace=true))
 ```
+
 
 Here we tell `Optim` to make use of automatic differentiation with `ForwardDiff`. Let's take a peek at the parameter estimates:
 
@@ -295,7 +299,7 @@ $$\epsilon = \log(y) - \mu_{t} = \alpha + \varepsilon $$
 
 Let's begin by noting the following generic relationships:
 
-$$ \mathbb{V}[\epsilon_{t}] = \sigma^2_{\alpha} + \frac{(1-\rho^{2(t-1)})}{1-\rho^2}\sigma^2_{\eta}$$
+$$ \mathbb{V}[\epsilon_{t}] = \sigma^2_{\alpha} + \frac{(1-\rho^{2t})}{1-\rho^2}\rho^2\sigma^2_{\eta}$$
 
 and
 
@@ -350,7 +354,7 @@ function model_moments(θ, T)
     ρ, σ2_α, σ2_η = θ
     # Variance of transitory component (assuming stationarity for simplicity)
     var_eps = σ2_η / (1 - ρ^2)
-    m = [σ2_α + (1-ρ^(2(t-1)))/(1-ρ^2) * σ2_η for t in 1:T]
+    m = [σ2_α + (1-ρ^(2t))/(1-ρ^2) * ρ^2 * σ2_η for t in 1:T]
     return m
 end
 
