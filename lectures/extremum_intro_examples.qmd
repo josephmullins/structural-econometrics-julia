@@ -280,7 +280,7 @@ Relevant questions for GMM are:
 Let's consider estimation of the income process for this model and save estimation of the preference parameters for our chapter on simulation. Recall from our discussion of identification and from @exr-income_process that we can identify the parameters of this process by matching implied variances and covariances. Supposing that we have more of these moments than we do parameters (i.e. that the parameters are **over-identified** by the moments), we can estimate the income process by **minimum distance**.
 
 Recall the income process:
-$$ \varepsilon_{n,t+1} = \rho \varepsilon_{n,t} + \eta_{n,t},\qquad \eta_{n,t}\sim\mathcal{N}(0,\sigma^2_\eta) $$
+$$ \varepsilon_{n,t+1} = \rho \varepsilon_{n,t} + \eta_{n,t+1},\qquad \eta_{n,t}\sim\mathcal{N}(0,\sigma^2_\eta) $$
 
 and consider the extended specification with permanent heterogeneity:
 $$ \log(y_{n,t}) = \mu_t + \alpha_n + \varepsilon_{n,t} $$

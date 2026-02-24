@@ -463,14 +463,14 @@ Example: Coding the Log-Likelihood
 <div class="callout-body-container callout-body">
 <div id="exm-search_likelihood" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.1</strong></span> First, let’s load the routines that we previously wrote to solve the model and take numerical integrals with quadrature. These are identical to what we’ve seen before and are available on the course github.</p>
-<div id="8338de02" class="cell" data-execution_count="1">
+<div id="d65c7628" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"../scripts/search_model.jl"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>solve_res_wage (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>Before writing the likelihood, let’s load the data, clean, and create the data frame.</p>
-<div id="4d3a2d0a" class="cell" data-execution_count="2">
+<div id="2ff85556" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span>, <span class="bu">DataFrames</span>, <span class="bu">DataFramesMeta</span>, <span class="bu">Statistics</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="st">"../data/cps_00019.csv"</span>,DataFrame)</span>
@@ -516,7 +516,7 @@ Example: Coding the Log-Likelihood
 </div>
 <p><strong>Note</strong> that we limit the sample in the last line to women without a bachelor’s degree, and that we drop imputed wages with reported weekly earnings less than $100. This is to avoid infeasibly low imputed wages.</p>
 <p>Now, let’s write the log-likelihood as above.</p>
-<div id="c06aaee7" class="cell" data-execution_count="3">
+<div id="cb9b83a6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span>, <span class="bu">Optim</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ϕ</span>(x,μ,σ) <span class="op">=</span> <span class="fu">pdf</span>(<span class="fu">Normal</span>(μ,σ),x)</span>
@@ -561,7 +561,7 @@ Example: Coding the Log-Likelihood
 </div>
 </div>
 <p>Finally, since routines like <code>Optim</code> optimize over vectors, we want to write an update routine that takes a vector <code>x</code> and maps it to new parameters. Here we are going to use transformation functions to ensure that parameters obey their bound constraints. There are other ways to ensure this, but this is one way that works.</p>
-<div id="046acbfe" class="cell" data-execution_count="4">
+<div id="a8dbb5a9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">logit</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x) <span class="op">/</span> (<span class="fl">1</span><span class="fu">+exp</span>(x))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">logit_inv</span>(x) <span class="op">=</span> <span class="fu">log</span>(x<span class="op">/</span>(<span class="fl">1</span><span class="op">-</span>x))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -579,7 +579,7 @@ Example: Coding the Log-Likelihood
 </div>
 </div>
 <p>Now we can finally test our likelihood to see how it runs:</p>
-<div id="18970c0e" class="cell" data-execution_count="5">
+<div id="964bbc8f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> [<span class="fu">logit_inv</span>(<span class="fl">0.5</span>),<span class="fu">logit_inv</span>(<span class="fl">0.03</span>),<span class="fl">2</span>.,<span class="fu">log</span>(<span class="fl">1</span>.),<span class="fu">log</span>(<span class="fl">1</span>.)]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> (;σζ <span class="op">=</span> <span class="fl">0.05</span>, β <span class="op">=</span> <span class="fl">0.995</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">log_likelihood_obj</span>(x0,pars,dat) <span class="co">#&lt;- test.</span></span>
@@ -587,47 +587,47 @@ Example: Coding the Log-Likelihood
 <div class="cell-output cell-output-stdout">
 <pre><code>Iter     Function value   Gradient norm 
      0     2.695311e+00     4.354820e+00
- * time: 0.025577068328857422
+ * time: 0.029794931411743164
      1     1.465845e+00     1.244146e+00
- * time: 1.4065170288085938
+ * time: 1.5059549808502197
      2     1.152272e+00     8.200154e-01
- * time: 2.0906851291656494
+ * time: 2.212378978729248
      3     9.856815e-01     7.907121e-02
- * time: 3.37153697013855
+ * time: 3.5121729373931885
      4     9.073466e-01     3.514847e-01
- * time: 3.671721935272217
+ * time: 3.8127570152282715
      5     8.991289e-01     3.496958e-01
- * time: 4.361626148223877
+ * time: 4.490542888641357
      6     8.834816e-01     1.167976e-01
- * time: 4.615227937698364
+ * time: 4.738764047622681
      7     8.571654e-01     2.784639e-01
- * time: 4.89484715461731
+ * time: 5.024207830429077
      8     8.355131e-01     2.331614e-01
- * time: 5.205608129501343
+ * time: 5.3254640102386475
      9     8.339832e-01     1.054750e-01
- * time: 5.508440971374512
+ * time: 5.628005027770996
     10     8.288339e-01     4.371160e-02
- * time: 5.712734937667847
+ * time: 5.826665878295898
     11     8.180490e-01     8.527979e-02
- * time: 6.0139360427856445
+ * time: 6.1325578689575195
     12     8.164072e-01     5.947682e-02
- * time: 6.2144551277160645
+ * time: 6.326333045959473
     13     8.162999e-01     2.171927e-02
- * time: 6.423213005065918
+ * time: 6.521878004074097
     14     8.157441e-01     2.210340e-02
- * time: 6.804612159729004
+ * time: 6.917778015136719
     15     8.154739e-01     1.114722e-02
- * time: 7.077065944671631
+ * time: 7.21499490737915
     16     8.154678e-01     3.934880e-04
- * time: 7.372208118438721
+ * time: 7.5108559131622314
     17     8.154677e-01     6.184821e-05
- * time: 7.546594142913818
+ * time: 7.702697992324829
     18     8.154677e-01     4.480149e-07
- * time: 7.8057661056518555
+ * time: 7.997041940689087
     19     8.154677e-01     2.228867e-08
- * time: 7.987758159637451
+ * time: 8.190263032913208
     20     8.154677e-01     9.935743e-09
- * time: 8.255542039871216</code></pre>
+ * time: 8.480978965759277</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code> * Status: success
@@ -653,7 +653,7 @@ Example: Coding the Log-Likelihood
 </div>
 </div>
 <p>Here we tell <code>Optim</code> to make use of automatic differentiation with <code>ForwardDiff</code>. Let’s take a peek at the parameter estimates:</p>
-<div id="d75ce59b" class="cell" data-execution_count="6">
+<div id="8d1d731d" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(;<span class="fu">update</span>(pars,res.minimizer)<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div><div style="float: left;"><span>1×8 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -759,7 +759,7 @@ Exercise
 <section id="the-savings-model" class="level2" data-number="12.4">
 <h2 data-number="12.4" class="anchored" data-anchor-id="the-savings-model"><span class="header-section-number">12.4</span> The Savings Model</h2>
 <p>Let’s consider estimation of the income process for this model and save estimation of the preference parameters for our chapter on simulation. Recall from our discussion of identification and from <a href="identification_savings.html#exr-income_process" class="quarto-xref">Exercise&nbsp;<span>10.1</span></a> that we can identify the parameters of this process by matching implied variances and covariances. Supposing that we have more of these moments than we do parameters (i.e.&nbsp;that the parameters are <strong>over-identified</strong> by the moments), we can estimate the income process by <strong>minimum distance</strong>.</p>
-<p>Recall the income process: <span class="math display">\[ \varepsilon_{n,t+1} = \rho \varepsilon_{n,t} + \eta_{n,t},\qquad \eta_{n,t}\sim\mathcal{N}(0,\sigma^2_\eta) \]</span></p>
+<p>Recall the income process: <span class="math display">\[ \varepsilon_{n,t+1} = \rho \varepsilon_{n,t} + \eta_{n,t+1},\qquad \eta_{n,t}\sim\mathcal{N}(0,\sigma^2_\eta) \]</span></p>
 <p>and consider the extended specification with permanent heterogeneity: <span class="math display">\[ \log(y_{n,t}) = \mu_t + \alpha_n + \varepsilon_{n,t} \]</span></p>
 <p>where <span class="math inline">\(\alpha_n \sim (0,\sigma^2_\alpha)\)</span> is an individual fixed effect. Let us further assume that in the first period, <span class="math inline">\(\varepsilon_{0} = 0\)</span>. This gives us that</p>
 <p><span class="math display">\[\varepsilon_{t} = \sum_{s=1}^{t}\rho^{t-s}\eta_{s}.\]</span></p>
@@ -792,7 +792,7 @@ Example: Minimum Distance Estimation of the Income Process
 <div class="callout-body-container callout-body">
 <div id="exm-md_income" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.2</strong></span> Building on <a href="identification_savings.html#exm-psid" class="quarto-xref">Example&nbsp;<span>10.1</span></a>, let’s implement a minimum distance estimator for the income process parameters. First, we compute sample moments from the PSID data.</p>
-<div id="e6cb3df0" class="cell" data-execution_count="7">
+<div id="bc16c5b0" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span>, <span class="bu">DataFrames</span>, <span class="bu">DataFramesMeta</span>, <span class="bu">Statistics</span>, <span class="bu">Optim</span>, <span class="bu">Plots</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and prepare data</span></span>
@@ -840,7 +840,7 @@ Example: Minimum Distance Estimation of the Income Process
 </div>
 </div>
 <p>Now we define the model-implied moments. Since PSID is biennial, we adjust for two-year gaps:</p>
-<div id="adc4cad4" class="cell" data-execution_count="8">
+<div id="2cce137c" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">model_moments</span>(θ, T)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    ρ, σ<span class="fl">2</span>_α, σ<span class="fl">2</span>_η <span class="op">=</span> θ</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Variance of transitory component (assuming stationarity for simplicity)</span></span>
@@ -866,7 +866,7 @@ Example: Minimum Distance Estimation of the Income Process
 </div>
 </div>
 <p>Finally, we estimate the parameters:</p>
-<div id="65fed178" class="cell" data-execution_count="9">
+<div id="f16b11db" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial values</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> [<span class="fl">0.5</span>, <span class="fu">log</span>(<span class="fl">0.1</span>), <span class="fu">log</span>(<span class="fl">0.05</span>)]</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>

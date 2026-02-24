@@ -6,7 +6,7 @@ $$ \log(y_{n,t}) = \mu_{t} + \varepsilon_{n,t}$$
 
 where
 
-$$ \varepsilon_{n,t+1} = \rho \varepsilon_{n,t} + \eta_{n,t},\qquad \eta_{m,t}\sim\mathcal{N}(0,\sigma^2_\eta) $$.
+$$ \varepsilon_{n,t+1} = \rho \varepsilon_{n,t} + \eta_{n,t+1},\qquad \eta_{m,t}\sim\mathcal{N}(0,\sigma^2_\eta) $$.
 
 Collecting parameters, we want to identify
 
