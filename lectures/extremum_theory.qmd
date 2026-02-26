@@ -719,11 +719,53 @@ $$V[\hat{\theta}] - \mathcal{I}(\theta_{0})^{-1}\geq 0$$
 
 in the positive semi-definite sense. Since the MLE has asymptotic variance $\mathcal{I}(\theta_{0})^{-1}$, no other estimator in this class can do better.
 
-More concretely, one can show that MLE is efficient relative to *any* GMM estimator that uses moment conditions implied by the model. The argument proceeds by showing that for any GMM estimator with moments $g(\mathbf{w},\theta)$, the difference in asymptotic variances is:
+More concretely, we can show that MLE is efficient relative to *any* GMM estimator that uses moment conditions implied by the model.
 
-$$V_{GMM} - V_{MLE} = \mathbb{E}[\mathbf{m}\mathbf{s}']^{-1}\mathbb{E}[\mathbf{U}\mathbf{U}']\mathbb{E}[\mathbf{s}\mathbf{m}']^{-1}\geq 0$$
+:::{.callout-note icon="false" collapse="true"}
+## Proof: MLE is Efficient Relative to GMM
 
-where $\mathbf{m}$ is the influence function of the GMM estimator and $\mathbf{U} = \mathbf{m}-\mathbb{E}[\mathbf{m}\mathbf{s}']\mathbb{E}[\mathbf{s}\mathbf{s}']^{-1}\mathbf{s}$ is the projection residual of $\mathbf{m}$ on $\mathbf{s}$. This is non-negative by construction, and equals zero only when $\mathbf{m}$ is a linear function of $\mathbf{s}$ --- i.e. when the GMM estimator fully exploits the likelihood.
+**Influence functions.** From the asymptotic expansions derived earlier in this chapter, each estimator can be written as a sample average of an **influence function** $\mathbf{m}(\mathbf{w})$:
+$$\sqrt{N}(\hat{\theta}-\theta_{0})\approx\frac{1}{\sqrt{N}}\sum_{n=1}^{N}\mathbf{m}(\mathbf{w}_{n}),\qquad V = \mathbb{E}[\mathbf{m}\mathbf{m}']$$
+
+For MLE (using $-\mathbb{E}[\mathbf{H}] = \mathcal{I}$): $\quad\mathbf{m}_{MLE} = \mathcal{I}(\theta_{0})^{-1}\mathbf{s}(\mathbf{w},\theta_{0})$, giving $V_{MLE} = \mathcal{I}^{-1}$.
+
+For GMM: $\quad\mathbf{m}_{GMM} = -(G\mathbf{W}G')^{-1}G\mathbf{W}g(\mathbf{w},\theta_{0})$, giving $V_{GMM} = (G\mathbf{W}G')^{-1}G\mathbf{W}S\mathbf{W}G'(G\mathbf{W}G')^{-1}$.
+
+**A key identity.** When the model is correctly specified, $\int g(\mathbf{w},\theta)f(\mathbf{w};\theta)d\mathbf{w} = \mathbf{0}$ holds as an identity for all $\theta$. Differentiating both sides with respect to $\theta$:
+
+$$\int\frac{\partial g}{\partial\theta'}f\,d\mathbf{w} + \int g\cdot\frac{\partial\log f}{\partial\theta'}f\,d\mathbf{w} = \mathbf{0}$$
+
+In matrix notation, evaluating at $\theta_{0}$:
+
+$$\mathbb{E}[\nabla_{\theta}g(\mathbf{w},\theta_{0})] + \mathbb{E}[g(\mathbf{w},\theta_{0})\mathbf{s}(\mathbf{w},\theta_{0})'] = \mathbf{0}$$
+
+Since $G' = \mathbb{E}[\nabla_{\theta}g]$, this gives us $G' = -\mathbb{E}[g\mathbf{s}']$. This is the bridge between the moment conditions and the likelihood score --- it is the analogue of the information matrix equality, but for arbitrary moment conditions rather than the score.
+
+**Both influence functions have the same covariance with the score.** Using the identity above:
+
+\begin{align}
+\mathbb{E}[\mathbf{m}_{GMM}\mathbf{s}'] &= -(G\mathbf{W}G')^{-1}G\mathbf{W}\mathbb{E}[g\mathbf{s}'] = -(G\mathbf{W}G')^{-1}G\mathbf{W}(-G') = I_{p} \\
+\mathbb{E}[\mathbf{m}_{MLE}\mathbf{s}'] &= \mathcal{I}^{-1}\mathbb{E}[\mathbf{s}\mathbf{s}'] = I_{p}
+\end{align}
+
+**The variance decomposition.** Define the residual $\mathbf{U} = \mathbf{m}_{GMM} - \mathbf{m}_{MLE}$. Since both influence functions have the same covariance with $\mathbf{s}$, the cross terms simplify:
+
+$$\mathbb{E}[\mathbf{m}_{GMM}\mathbf{m}_{MLE}'] = \mathbb{E}[\mathbf{m}_{GMM}\mathbf{s}']\mathcal{I}^{-1} = I_{p}\cdot\mathcal{I}^{-1} = V_{MLE}$$
+
+Expanding $\mathbb{E}[\mathbf{U}\mathbf{U}']$:
+
+\begin{align}
+\mathbb{E}[\mathbf{U}\mathbf{U}'] &= \mathbb{E}[\mathbf{m}_{GMM}\mathbf{m}_{GMM}'] - \mathbb{E}[\mathbf{m}_{GMM}\mathbf{m}_{MLE}'] - \mathbb{E}[\mathbf{m}_{MLE}\mathbf{m}_{GMM}'] + \mathbb{E}[\mathbf{m}_{MLE}\mathbf{m}_{MLE}'] \\
+&= V_{GMM} - V_{MLE} - V_{MLE} + V_{MLE} \\
+&= V_{GMM} - V_{MLE}
+\end{align}
+
+Therefore:
+
+$$V_{GMM} - V_{MLE} = \mathbb{E}[\mathbf{U}\mathbf{U}'] \geq \mathbf{0}$$
+
+The inequality holds because $\mathbb{E}[\mathbf{U}\mathbf{U}']$ is a variance matrix --- positive semi-definite by construction. Equality holds if and only if $\mathbf{U}=\mathbf{0}$ almost surely, i.e. when the GMM influence function equals the MLE influence function. This happens only when the GMM estimator fully exploits the likelihood.
+:::
 
 :::{.callout-warning icon="false"}
 ## Discussion: Efficiency vs. Robustness

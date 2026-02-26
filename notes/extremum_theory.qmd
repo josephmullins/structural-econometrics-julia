@@ -248,9 +248,28 @@ $$ \hat{\theta} = \arg\min_{\theta}\psi(\hat{\pi},\theta)'\mathbf{W}_{N}\psi(\ha
 
 - MLE achieves the **Cramér-Rao lower bound**: $V[\hat{\theta}]-\mathcal{I}(\theta_{0})^{-1}\geq 0$ for any consistent, asymptotically normal estimator
 - MLE is efficient relative to any GMM estimator using moments implied by the model
-- The efficiency gap: $V_{GMM}-V_{MLE}=\mathbb{E}[\mathbf{m}\mathbf{s}']^{-1}\mathbb{E}[\mathbf{U}\mathbf{U}']\mathbb{E}[\mathbf{s}\mathbf{m}']^{-1}\geq 0$
-  - Where $\mathbf{U}$ is the projection residual of the GMM influence function on the MLE score
-  - Equals zero only when the GMM estimator fully exploits the likelihood
+
+### Proof sketch: MLE efficient relative to GMM
+
+**Influence functions.** Each estimator has a representation $\sqrt{N}(\hat{\theta}-\theta_{0})\approx\frac{1}{\sqrt{N}}\sum\mathbf{m}(\mathbf{w}_{n})$ with $V=\mathbb{E}[\mathbf{m}\mathbf{m}']$:
+
+- MLE: $\mathbf{m}_{MLE}=\mathcal{I}^{-1}\mathbf{s}$, so $V_{MLE}=\mathcal{I}^{-1}$
+- GMM: $\mathbf{m}_{GMM}=-(G\mathbf{W}G')^{-1}G\mathbf{W}g$, so $V_{GMM}=(G\mathbf{W}G')^{-1}G\mathbf{W}S\mathbf{W}G'(G\mathbf{W}G')^{-1}$
+
+**Key identity.** When the model is correctly specified, $\int g(\mathbf{w},\theta)f(\mathbf{w};\theta)d\mathbf{w}=\mathbf{0}$ for all $\theta$. Differentiating w.r.t. $\theta$:
+$$\mathbb{E}[\nabla_{\theta}g] + \mathbb{E}[g\mathbf{s}'] = \mathbf{0} \qquad\Longrightarrow\qquad G' = -\mathbb{E}[g\mathbf{s}']$$
+This bridges moment conditions and the likelihood score (analogue of the information matrix equality for arbitrary moments).
+
+**Both influence functions have the same covariance with the score:**
+\begin{align}
+\mathbb{E}[\mathbf{m}_{GMM}\mathbf{s}'] &= -(G\mathbf{W}G')^{-1}G\mathbf{W}(-G') = I_{p} \\
+\mathbb{E}[\mathbf{m}_{MLE}\mathbf{s}'] &= \mathcal{I}^{-1}\mathbb{E}[\mathbf{s}\mathbf{s}'] = I_{p}
+\end{align}
+
+**Variance decomposition.** Define $\mathbf{U}=\mathbf{m}_{GMM}-\mathbf{m}_{MLE}$. The equal covariance with $\mathbf{s}$ implies $\mathbb{E}[\mathbf{m}_{GMM}\mathbf{m}_{MLE}']=I_{p}\cdot\mathcal{I}^{-1}=V_{MLE}$, so:
+$$\mathbb{E}[\mathbf{U}\mathbf{U}'] = V_{GMM} - V_{MLE} - V_{MLE} + V_{MLE} = V_{GMM} - V_{MLE}$$
+
+Therefore: $V_{GMM}-V_{MLE}=\mathbb{E}[\mathbf{U}\mathbf{U}']\geq\mathbf{0}$. Equality iff $\mathbf{m}_{GMM}=\mathbf{m}_{MLE}$ (GMM fully exploits the likelihood).
 
 \begin{center}
 \fbox{\parbox{0.9\textwidth}{

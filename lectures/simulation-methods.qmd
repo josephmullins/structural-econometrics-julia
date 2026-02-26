@@ -22,7 +22,11 @@ Sometimes we want to draw from an alternative density $w(\mathbf{u})$ instead of
 
 $$\hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_{r=1}^{R}h(y|\mathbf{x},\theta,\mathbf{u}^{r})\frac{g(\mathbf{u}^{r})}{w(\mathbf{u}^{r})},\qquad \mathbf{u}^{r}\sim w$$
 
-This is still unbiased and consistent, and the choice of $w$ can substantially reduce variance. The ratio $g/w$ is called the **importance weight**.
+This is still unbiased and consistent. The ratio $g/w$ is called the **importance weight**.
+
+**Variance reduction.** Why can the choice of $w$ reduce variance? The variance of the importance-sampling estimator depends on the variance of $h \cdot g/w$ under draws from $w$. Intuitively, if $w$ concentrates draws in regions where the integrand $h \cdot g$ is large, the estimator "wastes" fewer draws on regions that contribute little to the integral, reducing variance. The ideal importance density is proportional to $|h| \cdot g$, which puts the most weight exactly where it matters most. In practice, one looks for a convenient $w$ that roughly approximates this shape.
+
+**Differentiability.** Importance sampling also plays a role in making simulated integrals *differentiable* with respect to the parameters $\theta$. When the integrand involves indicator functions --- as in discrete choice models where $h(y|\mathbf{x},\theta,\mathbf{u})=\mathbf{1}\{\cdot\}$ --- the crude Monte Carlo approximation is a step function in $\theta$, which creates problems for gradient-based optimization. Through a change of variables, it is sometimes possible to move the dependence on $\theta$ out of the indicator and into smooth importance weights, yielding a simulated integral that is differentiable in $\theta$. The GHK simulator for multivariate probit models is a prominent example of this strategy (see @sec-msl-differentiability below).
 
 ## Maximum Simulated Likelihood
 
@@ -45,6 +49,41 @@ Under standard regularity conditions and $\sqrt{N}/R\rightarrow 0$, the MSL esti
 $$\sqrt{N}(\hat{\theta}_{MSL}-\theta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\ \mathcal{I}(\theta_{0})^{-1})$$
 
 In practice, one should use enough draws that the simulation error is small relative to the sampling variability. A common rule of thumb is to set $R$ large enough that results are insensitive to further increases.
+
+:::{.callout-warning}
+## Differentiability of the Simulated Likelihood {#sec-msl-differentiability}
+
+A separate challenge with MSL arises when the model involves discrete outcomes. Consider a simple probit: $Y=\mathbf{1}\{X\beta+\varepsilon>0\}$ with $\varepsilon\sim\mathcal{N}(0,1)$. The true choice probability $\Phi(X\beta)$ is a smooth function of $\beta$. But if we approximate it by crude Monte Carlo --- drawing $\varepsilon^{1},\ldots,\varepsilon^{R}\sim\mathcal{N}(0,1)$ and computing $\hat{P}=\frac{1}{R}\sum_{r}\mathbf{1}\{X\beta+\varepsilon^{r}>0\}$ --- the result is a **step function** in $\beta$. Each indicator $\mathbf{1}\{X\beta+\varepsilon^{r}>0\}$ switches from 0 to 1 at $\beta=-\varepsilon^{r}/X$, so $\hat{P}$ jumps at finitely many points and is flat everywhere else. Its derivative is zero almost everywhere, making gradient-based optimization of the simulated log-likelihood impossible.
+
+The figure below illustrates this for $X=1$ and $R=20$ draws. The true probability $\Phi(\beta)$ is smooth, but the simulated probability is a step function that jumps at each $\beta=-\varepsilon^{r}$. The kernel-smoothed simulator replaces the indicator with $\Phi(\cdot/h)$, restoring differentiability at the cost of a small bias.
+
+```{julia}
+using Distributions, Plots, Random
+
+Random.seed!(123)
+R = 20
+ε = rand(Normal(), R)
+
+β_grid = range(-3, 3, length=1000)
+P_true = cdf.(Normal(), β_grid)
+P_sim = [mean(β .+ ε .> 0) for β in β_grid]
+h = 0.3
+P_smooth = [mean(cdf.(Normal(), (β .+ ε) ./ h)) for β in β_grid]
+
+plot(β_grid, P_true, label="True Φ(β)", linewidth=2.5, color=:black,
+     xlabel="β", ylabel="P(Y=1 | X=1)")
+plot!(β_grid, P_sim, label="Crude MC (R=$R)", linewidth=1.5,
+     color=:steelblue, alpha=0.8)
+plot!(β_grid, P_smooth, label="Kernel-smoothed (h=$h)", linewidth=2,
+     color=:firebrick, linestyle=:dash)
+```
+
+This problem is not specific to probit --- it arises whenever the simulated likelihood involves averaging indicator functions. Solutions include:
+
+1. **Kernel smoothing**: replace the indicator $\mathbf{1}\{\cdot>0\}$ with a smooth approximation such as $\Phi(\cdot/h)$ for a small bandwidth $h$ (the dashed red curve above).
+2. **Importance sampling / change of variables**: restructure the integral so that $\beta$ appears in smooth weights rather than inside an indicator. The GHK simulator for multivariate probit uses sequential conditioning to achieve this.
+3. **Derivative-free optimization**: use methods like Nelder-Mead that do not require gradients. This is simple but can be slow and unreliable in high dimensions.
+:::
 
 ## Method of Simulated Moments
 
@@ -154,7 +193,7 @@ end
 function terminal_values!(V,pars)
     (;σ,ψ,agrid) = pars
     for ia in axes(V,2), iϵ in axes(V,1)
-        V[iϵ,ia] = ψ * u(agrid[ia],σ)
+        V[iϵ,ia] = ψ > 0 ? ψ * u(max(agrid[ia], 1e-10), σ) : 0.0
     end
 end
 
@@ -234,7 +273,7 @@ function simulate_panel(A, pars, N_sim; seed=nothing)
 end
 
 # Solve and simulate
-A, pars = setup_and_solve((0.95, 2.0, 5.0))
+A, pars = setup_and_solve((0.95, 2.0, 0.0))
 sim = simulate_panel(A, pars, 1000; seed=123)
 ```
 
@@ -248,7 +287,7 @@ plot!(p1, 1:pars.T, mean(sim.consumption, dims=1)', label="Mean Consumption")
 plot!(p1, 1:pars.T, mean(sim.income, dims=1)', label="Mean Income")
 ```
 
-The hump-shaped asset profile and the smooth consumption path are consistent with the model's predictions: individuals accumulate assets during working years and draw them down toward the end of life, with the bequest motive preventing full decumulation.
+The hump-shaped asset profile and the smooth consumption path are consistent with the model's predictions: individuals accumulate assets during working years as a buffer against income risk and draw them down toward the end of life. With no bequest motive ($\psi=0$), assets are fully decumulated by the final period.
 
 :::
 :::
@@ -257,7 +296,7 @@ The hump-shaped asset profile and the smooth consumption path are consistent wit
 ## Example: Simulated Moments for the Savings Model
 :::{#exm-bootstrap_savings}
 
-Now let's use the simulation machinery to define a set of moments and construct an MSM estimator for the preference parameters $(\beta,\sigma,\psi)$. We take the income process parameters $(\rho,\sigma_{\eta})$ as given (estimated in @exm-md_income).
+Now let's use the simulation machinery to define a set of moments and construct an MSM estimator for the preference parameters $(\beta,\sigma)$, setting $\psi=0$ (no bequest motive). We take the income process parameters $(\rho,\sigma_{\eta})$ as given (estimated in @exm-md_income).
 
 Our target moments will be:
 
@@ -275,33 +314,86 @@ function simulated_moments(θ; N_sim=2000, seed=42)
     return vcat(m_assets, m_var_logc)
 end
 
-# "True" parameters and data moments
-θ_true = (0.95, 2.0, 5.0)
-m_data = simulated_moments(θ_true; N_sim=10_000, seed=1)
+# "True" parameters and data moments (ψ=0: no bequest motive)
+θ_true = (0.95, 2.0, 0.0)
+m_data = simulated_moments(θ_true; N_sim=2_000, seed=1)
 
-# MSM objective
+# MSM objective: estimate (β, σ) with ψ fixed at 0
 function msm_objective(x, m_data)
     β = 0.8 + 0.19 * (1 / (1 + exp(-x[1])))  # map to (0.8, 0.99)
     σ = exp(x[2])
-    ψ = exp(x[3])
-    θ = (β, σ, ψ)
-    m_sim = simulated_moments(θ)
+    θ = (β, σ, 0.0)
+    m_sim = simulated_moments(θ; N_sim=5_000)
     diff = m_data .- m_sim
     return diff' * diff
 end
 ```
 
-This estimator is computationally intensive --- each evaluation of the objective requires solving the dynamic programming problem and simulating the model. In practice, derivative-free optimization methods or finite-difference gradients are often used.
+This estimator is computationally intensive --- each evaluation of the objective requires solving the dynamic programming problem and simulating the model.
 
 ```{julia}
-#| eval: false
 using Optim
-x0 = [0.0, log(2.0), log(5.0)]
+x0 = [0.0, log(2.0)]
 res = optimize(x -> msm_objective(x, m_data), x0, NelderMead(),
-               Optim.Options(iterations=200, show_trace=true))
+               Optim.Options(iterations=200))
+x_hat = res.minimizer
+β_hat = 0.8 + 0.19 / (1 + exp(-x_hat[1]))
+σ_hat = exp(x_hat[2])
+println("MSM Estimates vs Truth:")
+println("  β: $(round(β_hat, digits=4))  (true: 0.95)")
+println("  σ: $(round(σ_hat, digits=4))  (true: 2.0)")
+println("  Objective value: $(round(res.minimum, digits=6))")
 ```
 
+Let's check the model fit by simulating at both the true and estimated parameters.
+
+```{julia}
+# Simulate at estimated and true parameters
+θ_hat_msm = (β_hat, σ_hat, 0.0)
+A_hat, pars_hat = setup_and_solve(θ_hat_msm)
+sim_hat = simulate_panel(A_hat, pars_hat, 5_000)
+
+A_true, pars_true = setup_and_solve(θ_true)
+sim_true = simulate_panel(A_true, pars_true, 2_000; seed=1)
+
+T = pars_true.T
+ages = 25 .+ (1:T)
+target_ages_actual = [30, 40, 50, 60]
+target_periods = target_ages_actual .- 24  # periods corresponding to target ages
+
+# Mean assets over the life cycle
+p1 = plot(ages, mean(sim_true.assets[:, 1:T], dims=1)', label="Data (true θ)",
+          linewidth=2, color=:black, xlabel="Age", ylabel="Mean Assets",
+          title="Mean Assets")
+plot!(p1, ages, mean(sim_hat.assets[:, 1:T], dims=1)', label="Estimated θ",
+      linewidth=2, color=:steelblue, linestyle=:dash)
+vline!(p1, target_ages_actual, color=:gray, alpha=0.3, linestyle=:dot, label=false)
+
+# Variance of log consumption over the life cycle
+var_logc_true = [var(log.(sim_true.consumption[:, t])) for t in 1:T]
+var_logc_hat = [var(log.(sim_hat.consumption[:, t])) for t in 1:T]
+
+p2 = plot(ages, var_logc_true, label="Data (true θ)",
+          linewidth=2, color=:black, xlabel="Age", ylabel="Var(log c)",
+          title="Variance of Log Consumption")
+plot!(p2, ages, var_logc_hat, label="Estimated θ",
+      linewidth=2, color=:steelblue, linestyle=:dash)
+vline!(p2, target_ages_actual, color=:gray, alpha=0.3, linestyle=:dot, label=false)
+
+plot(p1, p2, layout=(1,2), size=(800, 350))
+```
+
+The discrete jumps visible in the estimated profiles are a consequence of the discrete asset grid --- the policy function maps to grid points, so small parameter changes can cause the optimal grid point to jump (see @sec-msl-differentiability).
+
 :::
+:::
+
+:::{.callout-warning}
+## Non-Differentiability of Simulated Moments
+
+Notice that we used the **Nelder-Mead** algorithm above --- a derivative-free optimizer. This is not a coincidence. In the savings model, the policy function $A(\varepsilon,a,t)$ maps to a *discrete* asset grid, so the simulated consumption and asset paths are step functions of the parameters $\theta$. As $\theta$ changes continuously, the optimal grid point occasionally jumps, producing discontinuities in the simulated moments. This is the same non-differentiability problem discussed in @sec-msl-differentiability, now appearing in the MSM context.
+
+Gradient-based optimizers will fail here because the numerical gradient is zero almost everywhere and undefined at the jumps. Derivative-free methods like Nelder-Mead avoid this issue entirely. Alternatives include using a finer asset grid (which reduces the size of the jumps), interpolating the policy function between grid points to smooth the simulated moments, or using kernel-smoothed simulators.
 :::
 
 
@@ -532,56 +624,6 @@ Notice that bootstrapping panel data by resampling individuals is straightforwar
 :::
 
 
-:::{.callout-note icon="false" collapse="true"}
-## Example: Bootstrap for the Savings Model
-:::{#exm-bootstrap_savings_model}
-
-For the savings model, we use the **parametric bootstrap**. Since we are estimating by MSM using simulated data, the natural bootstrap procedure is:
-
-1. Estimate $\hat{\theta}$ by MSM.
-2. Simulate a "new" dataset from the model at $\hat{\theta}$ (this is the bootstrap sample).
-3. Re-estimate $\hat{\theta}^{b}$ from the bootstrap sample (using the same MSM procedure).
-4. Repeat to build the bootstrap distribution.
-
-Here is a sketch of the procedure. The key idea is that the "data moments" in each bootstrap replication come from a fresh simulation at the estimated $\hat{\theta}$, mimicking the sampling variability in the real data.
-
-```{julia}
-#| eval: false
-function parametric_bootstrap(θ_hat, B; N_data=1000, N_sim=2000)
-    θ_boot = zeros(B, 3)
-    for b in 1:B
-        # Step 1: Simulate "data" from model at θ̂ (with new random seed)
-        A, pars = setup_and_solve(θ_hat)
-        sim_data = simulate_panel(A, pars, N_data; seed=b)
-
-        # Step 2: Compute "data" moments from simulated data
-        target_ages = [6, 16, 26, 36]
-        m_boot = vcat(
-            [mean(sim_data.assets[:, t]) for t in target_ages],
-            [var(log.(sim_data.consumption[:, t])) for t in target_ages]
-        )
-
-        # Step 3: Re-estimate by MSM (matching m_boot instead of m_data)
-        x0 = [0.0, log(θ_hat[2]), log(θ_hat[3])]
-        res = optimize(x -> msm_objective(x, m_boot), x0, NelderMead(),
-                       Optim.Options(iterations=200))
-        x = res.minimizer
-        θ_boot[b,:] = [0.8 + 0.19/(1+exp(-x[1])), exp(x[2]), exp(x[3])]
-    end
-    return θ_boot
-end
-
-# Run bootstrap (computationally intensive!)
-# θ_boot = parametric_bootstrap(θ_hat, 100)
-# se_boot = std.(eachcol(θ_boot))
-```
-
-Each bootstrap replication requires solving the dynamic programming problem twice (once for the data simulation, once for each objective function evaluation during optimization). This makes the parametric bootstrap for structural models computationally expensive, but it is conceptually simple and automatically accounts for all sources of estimation uncertainty.
-
-:::
-:::
-
-
 ## Practical Considerations
 
 ### Simulation Noise and Smoothing
@@ -614,9 +656,9 @@ When using MSM or minimum distance with many moments, the optimal weighting matr
 :::{.callout-tip icon="false"}
 ## Exercise
 :::{#exr-savings_estimation}
-Estimate the preference parameters $(\beta,\sigma,\psi)$ of the [savings model](../models/savings.qmd) using the method of simulated moments. Take the income process parameters as given from @exm-md_income.
+Estimate the preference parameters $(\beta,\sigma)$ of the [savings model](../models/savings.qmd) (with $\psi=0$) using the method of simulated moments. Take the income process parameters as given from @exm-md_income.
 
-1. Choose a set of target moments from the PSID data (@exm-psid) that are informative about $(\beta,\sigma,\psi)$. Justify your choice based on the identification discussion in the [savings identification chapter](identification_savings.qmd).
+1. Choose a set of target moments from the PSID data (@exm-psid) that are informative about $(\beta,\sigma)$. Justify your choice based on the identification discussion in the [savings identification chapter](identification_savings.qmd).
 2. Implement the MSM estimator using the simulation code from @exm-simulate_savings.
 3. Report your estimates and plot the model fit for your chosen moments.
 4. Assess sensitivity: how do the estimates change when you use a different set of moments?
@@ -629,9 +671,10 @@ Estimate the preference parameters $(\beta,\sigma,\psi)$ of the [savings model](
 :::{#exr-savings_bootstrap}
 Continuing from @exr-savings_estimation:
 
-1. Implement a parametric bootstrap to compute standard errors for $(\hat{\beta},\hat{\sigma},\hat{\psi})$ following the approach in @exm-bootstrap_savings_model. Use $B=100$ bootstrap replications.
+1. Implement a bootstrap to compute standard errors for $(\hat{\beta},\hat{\sigma})$. Use the **same bootstrap samples** (resampled individuals from the PSID) that you used to construct confidence intervals for the income process parameters in @exm-bootstrap_income. For each bootstrap replication $b$, re-estimate the income process parameters $(\hat{\rho}^{b},\hat{\sigma}^{2b}_{\alpha},\hat{\sigma}^{2b}_{\eta})$ on the bootstrap sample, then re-estimate the savings model preference parameters $(\hat{\beta}^{b},\hat{\sigma}^{b})$ using those first-stage estimates. Use $B=100$ replications.
 2. Construct 95% confidence intervals for each parameter.
-3. Which parameter is most precisely estimated? Which is least? Does this match your intuition from the identification discussion?
+3. Explain why it is important to use the **same** bootstrap draws for both the income process and the savings model estimation, rather than bootstrapping each independently. What would go wrong if you used separate bootstrap samples?
+4. Which parameter is most precisely estimated? Which is least? Does this match your intuition from the identification discussion?
 :::
 :::
 
@@ -641,9 +684,9 @@ Continuing from @exr-savings_estimation:
 :::{#exr-income_diagonal}
 Return to the minimum distance estimation of the income process from @exm-md_income. Instead of using the identity weighting matrix, implement estimation with:
 
-1. The **diagonal** weighting matrix, where each moment is weighted by the inverse of the variance of the corresponding sample moment.
-2. The **optimal** weighting matrix from @exm-md_income_se.
+1. The **diagonal** weighting matrix, where each moment is weighted by the inverse of the variance of the corresponding sample moment. Use the **bootstrap** (resampling individuals as in @exm-bootstrap_income) to estimate the variance of each sample moment.
+2. The **optimal** weighting matrix, which uses the full variance-covariance matrix of the sample moments. Again, estimate this variance-covariance matrix using the bootstrap.
 
-Compare the estimates and standard errors across all three weighting schemes. How much does the choice of weighting matrix matter in practice?
+Compare the estimates and standard errors across all three weighting schemes (identity, diagonal, optimal). How much does the choice of weighting matrix matter in practice?
 :::
 :::
