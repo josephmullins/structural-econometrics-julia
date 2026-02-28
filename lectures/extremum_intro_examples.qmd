@@ -67,7 +67,7 @@ $$ l(X;\theta) = E \times \log\left(\int f_{W|W>w^*}(\log(W^{o})-\zeta)\phi(\zet
 
 where, according to our parametric specifications:
 
-$$ f_{W|W>w^*}(w) = \frac{\phi(w;\sigma_{W})}{1-\Phi(w^*/\sigma_{W})}.$$
+$$ f_{W|W>w^*}(w) = \frac{\phi(w;\sigma_{W})}{1-\Phi(\log(w^*)/\sigma_{W})}.$$
 
 $\phi(\cdot;\sigma)$ is the pdf of a normal with standard deviation $\sigma$ and $\Phi$ is the cdf of a standard normal.
 
