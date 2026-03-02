@@ -1,0 +1,317 @@
+---
+title: "Simulation Methods"
+subtitle: "Lecture Notes"
+format:
+  pdf:
+    documentclass: article
+    geometry:
+      - margin=1in
+    fontsize: 11pt
+    toc: false
+---
+
+# Overview
+
+- In many structural models, the likelihood or moment conditions **cannot be computed in closed form**
+  - High-dimensional integrals over unobserved heterogeneity, latent states, or expectations over future shocks
+  - Example: computing the likelihood of a consumption path in the savings model requires integrating over sequences of income shocks
+- **Simulation** provides a way forward when analytical evaluation is intractable
+- Motivating example: mean assets $\mathbb{E}[A_t]$ depends on the full history of income shocks $\varepsilon_1, \ldots, \varepsilon_{t-1}$
+  - With $K_\varepsilon$ grid points, must sum over $K_\varepsilon^{t-1}$ sequences---intractable for large $t$
+
+## Three Topics
+
+1. **Simulation-based estimators**: MSM and indirect inference---replace intractable analytical objects with simulation approximations
+2. **The bootstrap**: resampling-based inference when analytical standard errors are difficult
+3. **Applications** to our prototype models
+
+---
+
+# Integration by Simulation
+
+- Need to evaluate:
+  $$ f(y|\mathbf{x},\theta) = \int h(y|\mathbf{x},\theta,\mathbf{u})g(\mathbf{u})d\mathbf{u} $$
+  where $\mathbf{u}$ is a vector of unobservables with density $g$
+- Quadrature methods face the **curse of dimensionality** when $\mathbf{u}$ is high-dimensional
+- **Monte Carlo integration**: draw $\mathbf{u}^1, \ldots, \mathbf{u}^R$ from $g$ and compute:
+  $$ \hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_{r=1}^{R} h(y|\mathbf{x},\theta,\mathbf{u}^r) $$
+- Properties:
+  - **Unbiased**: $\mathbb{E}_{\mathbf{u}}[\hat{f}] = f$
+  - **Consistent**: $\hat{f} \rightarrow_p f$ as $R \rightarrow \infty$ by the LLN
+  - Convergence rate: $O(1/\sqrt{R})$ regardless of the dimension of $\mathbf{u}$---this is the key advantage over quadrature
+
+## Importance Sampling
+
+- Sometimes want to draw from an alternative density $w(\mathbf{u})$ instead of $g(\mathbf{u})$
+  - $g$ may be hard to sample from
+  - Draws from $w$ may reduce variance
+- Importance sampling estimator:
+  $$ \hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_{r=1}^{R} h(y|\mathbf{x},\theta,\mathbf{u}^r)\frac{g(\mathbf{u}^r)}{w(\mathbf{u}^r)}, \qquad \mathbf{u}^r \sim w $$
+- The ratio $g/w$ is the **importance weight**
+- Still unbiased and consistent
+
+### Variance Reduction
+
+- Variance depends on the variance of $h \cdot g/w$ under draws from $w$
+- If $w$ concentrates draws where the integrand $h \cdot g$ is large, fewer draws are "wasted" on low-contribution regions
+- Ideal importance density: proportional to $|h| \cdot g$---puts weight where it matters most
+- In practice: find a convenient $w$ that roughly approximates this shape
+
+### Example: Tail Probability
+
+- Estimating $P(Z > 3)$ where $Z \sim \mathcal{N}(0,1)$ (true value $\approx 0.00135$)
+- **Naive MC**: most draws contribute zero (event is rare)---highly variable, discrete
+- **Importance sampling** with $w = \mathcal{N}(3,1)$: concentrates draws in the tail
+- Result: both unbiased, but importance sampling achieves dramatic variance reduction
+
+### Differentiability
+
+- Importance sampling also helps make simulated integrals **differentiable** in $\theta$
+- When integrand involves indicators $\mathbf{1}\{\cdot\}$ (discrete choice models), crude MC gives a step function in $\theta$
+- Through change of variables, can move $\theta$-dependence from indicator into smooth importance weights
+- The **GHK simulator** for multivariate probit is a prominent example
+
+---
+
+# Maximum Simulated Likelihood
+
+- Replace the likelihood with its simulated analogue:
+  $$ \hat{\theta}_{MSL} = \arg\max_\theta \sum_{n=1}^{N} \log \hat{f}(y_n | \mathbf{x}_n, \theta) $$
+
+## Key Subtlety: Bias from the Logarithm
+
+- Because $\log$ is concave, Jensen's inequality gives:
+  $$ \mathbb{E}[\log \hat{f}] \leq \log \mathbb{E}[\hat{f}] = \log f $$
+- The simulated log-likelihood is **biased downward**
+- MSL is **inconsistent for fixed $R$**
+- Consistency requires both $N, R \rightarrow \infty$ with $\sqrt{N}/R \rightarrow 0$
+- **Contrast with MSM**: MSM is consistent for any fixed $R$
+
+## Asymptotic Distribution
+
+- Under regularity conditions and $\sqrt{N}/R \rightarrow 0$:
+  $$ \sqrt{N}(\hat{\theta}_{MSL} - \theta_0) \rightarrow_d \mathcal{N}(\mathbf{0},\ \mathcal{I}(\theta_0)^{-1}) $$
+- Same asymptotic distribution as infeasible MLE
+- Rule of thumb: use enough draws that results are insensitive to further increases
+
+## Differentiability of the Simulated Likelihood
+
+- **Problem**: when the model involves discrete outcomes, crude MC gives a step function in $\theta$
+  - Example: probit with $Y = \mathbf{1}\{X\beta + \varepsilon > 0\}$
+  - True probability $\Phi(X\beta)$ is smooth, but $\hat{P} = \frac{1}{R}\sum_r \mathbf{1}\{X\beta + \varepsilon^r > 0\}$ is a step function
+  - Derivative is zero almost everywhere---gradient-based optimization fails
+- **Solutions**:
+  1. **Kernel smoothing**: replace $\mathbf{1}\{\cdot > 0\}$ with $\Phi(\cdot / h)$ for small bandwidth $h$
+  2. **Importance sampling / change of variables**: move $\theta$ into smooth weights (GHK simulator)
+  3. **Derivative-free optimization**: Nelder-Mead (simple but slow/unreliable in high dimensions)
+
+---
+
+# Method of Simulated Moments
+
+- The simulation analogue of GMM
+- Moment conditions:
+  $$ \mathbb{E}[g(\mathbf{w}, \theta_0)] = \mathbb{E}\left[\int h(\mathbf{w}, \theta_0, \mathbf{u}) f(\mathbf{u}|\theta_0) d\mathbf{u}\right] = \mathbf{0} $$
+- Replace with simulated version:
+  $$ \hat{g}(\mathbf{w}_n, \theta) = \frac{1}{R}\sum_{r=1}^{R} \tilde{g}(\mathbf{w}_n, \mathbf{u}^r, \theta) $$
+  where $\mathbb{E}_{\mathbf{u}}[\tilde{g}] = g$
+- MSM estimator:
+  $$ \hat{\theta}_{MSM} = \arg\min_\theta\ \hat{\mathbf{g}}_N(\theta)'\mathbf{W}\hat{\mathbf{g}}_N(\theta), \qquad \hat{\mathbf{g}}_N(\theta) = \frac{1}{N}\sum_{n=1}^{N} \hat{g}(\mathbf{w}_n, \theta) $$
+
+## Common Special Case
+
+- In many structural applications, match **aggregate** statistics:
+  $$ \hat{\mathbf{g}}_N(\theta) = \hat{\mathbf{m}} - \tilde{\mathbf{m}}(\theta) $$
+- $\hat{\mathbf{m}}$: vector of sample statistics (means, variances, etc.)
+- $\tilde{\mathbf{m}}(\theta)$: corresponding vector from simulated data
+- This is the structure used for the savings model
+
+## Asymptotic Distribution
+
+- Under standard GMM regularity conditions with $R$ fixed:
+  $$ \sqrt{N}(\hat{\theta}_{MSM} - \theta_0) \rightarrow_d \mathcal{N}(\mathbf{0}, \Sigma_{MSM}) $$
+  where:
+  $$ \Sigma_{MSM} = (\nabla_\theta g_0 \mathbf{W} \nabla_\theta g_0')^{-1} \nabla_\theta g_0 \mathbf{W} \mathbb{E}[\hat{g}_0 \hat{g}_0'] \mathbf{W} \nabla_\theta g_0' (\nabla_\theta g_0 \mathbf{W} \nabla_\theta g_0')^{-1} $$
+
+## Key Properties
+
+1. **Consistency does not require $R \rightarrow \infty$**: because $\hat{g}$ is unbiased for $g$, sample moments converge at $\theta_0$ by LLN. Contrast with MSL.
+2. **Simulation adds variance**: $\mathbb{V}[\hat{g}] \geq \mathbb{V}[g]$, so MSM is less efficient than infeasible GMM. For frequency simulators, variance inflates by factor $(1 + 1/R)$.
+3. **If $\sqrt{N}/R \rightarrow 0$**: efficiency loss disappears and MSM achieves same asymptotic variance as GMM.
+
+## Savings Model Application
+
+- Estimate preference parameters $(\beta, \sigma)$ with $\psi = 0$ (no bequest motive)
+- Simulate life-cycle profiles: solve DP, draw income shocks, track assets/consumption
+- Target moments: mean assets and variance of log consumption at ages 30, 40, 50, 60
+- Use Nelder-Mead (derivative-free) because discrete asset grid makes simulated moments non-differentiable
+
+---
+
+# Indirect Inference
+
+- Fit an **auxiliary model** to both real data and simulated data, then find structural parameters that make the two sets of auxiliary estimates match
+
+## Setup
+
+- $\hat{\beta}_N$: auxiliary parameters estimated from data (e.g. OLS coefficients, reduced-form probit)
+  - Asymptotically normal: $\sqrt{N}(\hat{\beta}_N - \beta_0) \rightarrow_d \mathcal{N}(\mathbf{0}, \Omega)$
+- For each candidate $\theta$: simulate data, compute same statistic $\hat{\beta}^R(\theta)$
+- $\beta(\theta) = \text{plim}\ \hat{\beta}^R(\theta)$: pseudo-true auxiliary parameter implied by $\theta$
+- **Indirect inference estimator**:
+  $$ \hat{\theta}_{II} = \arg\min_\theta\ (\hat{\beta}_N - \hat{\beta}^R(\theta))'\mathbf{W}(\hat{\beta}_N - \hat{\beta}^R(\theta)) $$
+
+## Asymptotic Distribution
+
+- Under identification ($\theta_0$ uniquely solves $\beta(\theta) = \beta_0$) and $\sqrt{N}/R \rightarrow 0$:
+  $$ \sqrt{N}(\hat{\theta}_{II} - \theta_0) \rightarrow_d \mathcal{N}\left(\mathbf{0},\ (\nabla_\theta \beta_0 \mathbf{W} \nabla_\theta \beta_0')^{-1} \nabla_\theta \beta_0 \mathbf{W} \Omega \mathbf{W} \nabla_\theta \beta_0' (\nabla_\theta \beta_0 \mathbf{W} \nabla_\theta \beta_0')^{-1}\right) $$
+- Same sandwich structure as minimum distance---indirect inference **is** a simulated minimum distance estimator
+
+## Relationship to MSM
+
+- Indirect inference **nests MSM** as a special case
+  - If auxiliary model consists of sample moments, indirect inference reduces to MSM
+- The appeal: allows **richer auxiliary models** (regressions, multinomial choice) that capture complex data features
+
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\textbf{STOP FOR DISCUSSION}
+
+Choosing auxiliary statistics:
+\begin{itemize}
+\item A good auxiliary model should be \textbf{sensitive} to the structural parameters of interest
+\item Should capture the key features the structural model is designed to explain
+\item Should be computationally cheap (must be re-estimated on each simulated dataset)
+\item Think of auxiliary model as a \textbf{diagnostic}: if the structural model cannot match auxiliary estimates, it suggests the model is missing something important
+\end{itemize}
+}}
+\end{center}
+
+---
+
+# The Bootstrap
+
+- A fundamentally different use of simulation: not for evaluating objective functions, but for **inference**
+- Uses resampling to approximate the sampling distribution of an estimator
+
+## Motivation
+
+- When do we need the bootstrap?
+  1. Variance formula is difficult to derive (e.g. multi-step estimators)
+  2. Derivatives of the criterion function are hard or costly to compute
+  3. Estimation criterion is non-smooth in finite samples
+  4. Sample size too small for CLT approximation
+- The bootstrap addresses all of these by directly approximating the finite-sample distribution
+
+## Framework
+
+- Let $T_N = T_N(X_1, \ldots, X_N)$ be a statistic (e.g. $\hat{\theta}$ or $\sqrt{N}(\hat{\theta} - \theta_0)$)
+- Finite-sample distribution $G_N(\cdot, F_0)$ is typically unknown
+- **Bootstrap idea**: replace $F_0$ with estimate $\hat{F}_N$ and use $G_N(\cdot, \hat{F}_N)$
+
+### Two Main Approaches
+
+1. **Nonparametric bootstrap**: replace $F_0$ with the empirical distribution
+   - Bootstrap samples: $N$ observations drawn **with replacement** from original data
+   - More general, fewer assumptions
+
+2. **Parametric bootstrap**: replace $F_0$ with $F(\cdot, \hat{\theta}_N)$
+   - Bootstrap samples: **simulate** from the estimated model
+   - More efficient when model is correctly specified
+   - Natural for structural models (already have simulation machinery)
+
+## Procedure
+
+Given estimator $\hat{\theta}_N$:
+
+1. Draw bootstrap sample $\mathbf{X}^b$ (resample or simulate)
+2. Compute bootstrap estimate $\hat{\theta}_N^b = T_N(\mathbf{X}^b)$
+3. Repeat for $b = 1, \ldots, B$
+4. From the bootstrap distribution $\{\hat{\theta}_N^1, \ldots, \hat{\theta}_N^B\}$ compute:
+   - **Standard errors**: $\text{se}^*(\hat{\theta}) = \text{sd}(\hat{\theta}^1, \ldots, \hat{\theta}^B)$
+   - **Percentile CIs**: $[q_{\alpha/2},\ q_{1-\alpha/2}]$
+   - **Bootstrap-$t$ CIs**: based on distribution of $t^b = (\hat{\theta}^b - \hat{\theta}) / \text{se}(\hat{\theta}^b)$
+
+## When Does the Bootstrap Work?
+
+- Consistent when $T_N$ is asymptotically normal
+- Can do **better** than asymptotic normal approximation when statistic is **asymptotically pivotal** (distribution doesn't depend on unknowns)
+  - The $t$-statistic is a canonical example
+  - Bootstrap provides **higher-order refinement** over normal approximation
+
+## Replicating the Dependence Structure
+
+- Resampling must correctly replicate the data's dependence structure:
+  - **iid data**: sample with replacement
+  - **Panel data**: resample **entire individuals** (not individual observations) to preserve within-person correlation
+  - **Time series**: block bootstrap methods
+
+## Income Process Application
+
+- Apply bootstrap to the income process parameters estimated by minimum distance
+- Resample **persons** (not person-year observations) from the PSID panel
+- For each bootstrap sample: re-estimate $(\rho, \sigma^2_\alpha, \sigma^2_\eta)$
+- Automatically accounts for within-person dependence, heteroskedasticity, and complexity of the estimator
+- Compare bootstrap SEs to analytical SEs from the previous chapter
+
+---
+
+# Practical Considerations
+
+## Simulation Noise and Smoothing
+
+- **Always fix the random seed** when evaluating the simulated objective across different $\theta$ values
+- With fixed draws: simulated objective is a smooth function of $\theta$ (if model is smooth)
+- With re-drawn draws: objective becomes noisy, optimization may fail or converge incorrectly
+
+## Simulation Noise and Standard Errors
+
+- Must think carefully about seeds when using bootstrap for inference
+- If $R$ is comparable to $N$: simulation error is a non-negligible variance component
+- **Change the initial seed** in each bootstrap trial
+- Even if $R \gg N$: good practice and costless to incorporate simulation error
+
+## How Many Draws?
+
+- **MSM**: consistency holds for any fixed $R$; efficiency improves with $R$
+  - Start moderate, increase and check stability
+- **MSL**: bias from $\log$ of simulated probabilities is $O(1/R)$
+  - $R$ should be large enough that bias is negligible relative to standard error
+
+## Choosing Moments for MSM
+
+1. **Identification**: moments should be informative about parameters
+2. **Parsimony**: more moments improve efficiency in principle but increase cost and can lead to poorly conditioned weighting matrices
+3. **Model fit**: if model cannot match a moment, including it distorts other estimates
+
+## Diagonal Weighting Matrices
+
+- Optimal $\mathbf{W}^* = \hat{S}^{-1}$ can be poorly estimated with many moments
+- Practical alternative: **diagonal** weighting matrix (inverse variance of each moment, ignoring cross-moment covariances)
+- Sacrifices some efficiency but much more stable in practice
+
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\textbf{STOP FOR DISCUSSION}
+
+\begin{itemize}
+\item Why is it critical to fix the simulation seed \textit{during} optimization but change it \textit{across} bootstrap replications?
+\item What would happen if you failed to fix the seed inside the optimization routine?
+\end{itemize}
+}}
+\end{center}
+
+---
+
+# Non-Differentiability of Simulated Moments
+
+- In the savings model, the policy function maps to a **discrete** asset grid
+- Simulated consumption and asset paths are step functions of $\theta$
+- As $\theta$ changes continuously, optimal grid point occasionally jumps $\Rightarrow$ discontinuities in simulated moments
+- Same non-differentiability problem as in MSL with discrete outcomes
+- **Gradient-based optimizers fail**: numerical gradient is zero almost everywhere
+- **Solutions**:
+  - Derivative-free methods (Nelder-Mead)
+  - Finer asset grid (reduces jump size)
+  - Interpolating policy function between grid points
+  - Kernel-smoothed simulators
