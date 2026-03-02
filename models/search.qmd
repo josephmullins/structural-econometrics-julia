@@ -54,7 +54,7 @@ $$ P[t_{U}=t] = h(1-h)^{t} $$
 
 To solve the reservation wage equation numerically, we need to evaluate the integral on the right-hand side and find the value of $w^*$ that satisfies the equation. This requires two key numerical methods: quadrature (for integration) and root-finding.
 
-### Gauss-Legendre Quadrature
+### Gauss-Legendre Quadrature {#sec-quadrature}
 
 When integrating numerically, we approximate the integral using a weighted sum at specific evaluation points (nodes):
 

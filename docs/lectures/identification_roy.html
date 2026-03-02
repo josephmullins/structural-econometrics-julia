@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.539">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Structural Econometrics with Julia - 7&nbsp; The Generalized Roy Model</title>
+<title>7&nbsp; The Generalized Roy Model – Structural Econometrics with Julia</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -33,7 +33,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -91,10 +91,10 @@ div.csl-indent {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-626149efe8f5d16e1d391ba177679bf0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -126,7 +126,7 @@ div.csl-indent {
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -164,13 +164,13 @@ window.Quarto = {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../lectures/identification.html">Identification and Credible Inference</a></li><li class="breadcrumb-item"><a href="../lectures/identification_roy.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The Generalized Roy Model</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -202,7 +202,7 @@ window.Quarto = {
       <div class="sidebar-item-container"> 
             <a href="../models.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Five Prototype Models</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -249,7 +249,7 @@ window.Quarto = {
       <div class="sidebar-item-container"> 
             <a href="../lectures/identification.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Identification and Credible Inference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -290,7 +290,7 @@ window.Quarto = {
       <div class="sidebar-item-container"> 
             <a href="../lectures/extremum-estimators.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Extremum Estimators</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -310,8 +310,21 @@ window.Quarto = {
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
-      <span class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Simulation Methods</span></span>
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Simulation Methods</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/simulation-methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Simulation Methods</span></span></a>
+  </div>
+</li>
+      </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <span class="sidebar-item-text sidebar-link text-start">
@@ -325,9 +338,9 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
  <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -430,7 +443,7 @@ V \\ U_0 \\ U_1
 \]</span> Under the same rank conditions for <span class="math inline">\(X\)</span>, both <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are identified due to. This also means that <span class="math inline">\(ATE(X) = X(\beta_1 - \beta_0)\)</span> is identified for all <span class="math inline">\(X\)</span>.</p>
 <p>Although we cannot identify the full distribution of treatment effects, this also gives us the average treatment effect among individuals with treatment propensity <span class="math inline">\(V\)</span>: <span class="math display">\[\mathbb{E}[Y_0-Y_0|X,V] = X(\beta_1-\beta_0) + \underbrace{(\sigma_{V1}-\sigma_{V0})V}_{\mathbb{E}[U_1-U_0|V]}\]</span> We’ll come back to this object in the next section.</p>
 <p>Notice that identification holds here even <em>without</em> an excluded variable <span class="math inline">\(Z\)</span>. It follows from the assumption of linearity and normality of the error terms, which yield a particular parametric decomposition of the conditional expectation that can be identified.</p>
-<p>This is an example of <strong>identification by functional form</strong>: identification depends crucially on these particular functional form assumptions. Notice that without linearity in <span class="math inline">\(\mu_{d}\)</span>, it is not possible to separately identify <span class="math inline">\(\mu_{d}\)</span> from the selection correction. Would you say that this is a very credible approach to identifying the key causal parameters in the model? <span class="citation" data-cites="Lewbel">Lewbel (<a href="#ref-Lewbel" role="doc-biblioref">2019</a>)</span> provides a broad and satisfying discussion of these issues.</p>
+<p>This is an example of <strong>identification by functional form</strong>: identification depends crucially on these particular functional form assumptions. Notice that without linearity in <span class="math inline">\(\mu_{d}\)</span>, it is not possible to separately identify <span class="math inline">\(\mu_{d}\)</span> from the selection correction. Would you say that this is a very credible approach to identifying the key causal parameters in the model? <span class="citation" data-cites="Lewbel">Lewbel (<a href="../references.html#ref-Lewbel" role="doc-biblioref">2019</a>)</span> provides a broad and satisfying discussion of these issues.</p>
 </section>
 <section id="identification-with-exclusion-restrictions" class="level2" data-number="7.3">
 <h2 data-number="7.3" class="anchored" data-anchor-id="identification-with-exclusion-restrictions"><span class="header-section-number">7.3</span> Identification with Exclusion Restrictions</h2>
@@ -448,10 +461,10 @@ V \\ U_0 \\ U_1
 &amp; \mathbb{E}[Y_1 - Y_0 | V = p] \\
 &amp; MTE(p)
 \end{align}\]</span></p>
-<p><span class="citation" data-cites="HeckmanVytlacil2005">Heckman and Vytlacil (<a href="#ref-HeckmanVytlacil2005" role="doc-biblioref">2005</a>)</span> call this derivative <em>local instrumental variables</em> approach and define the estimand, <span class="math inline">\(MTE(p)\)</span> as the <strong>marginal treatment effect</strong>. It is the average treatment effect among individuals with a propensity <span class="math inline">\(1-p\)</span> to take the treatment. They show that, commonly used estimators (instrumental variables, difference-in-differences) are often weighted averages of this marginal treatment effect, and that the marginal treatment effect is a useful building block for.</p>
+<p><span class="citation" data-cites="HeckmanVytlacil2005">Heckman and Vytlacil (<a href="../references.html#ref-HeckmanVytlacil2005" role="doc-biblioref">2005</a>)</span> call this derivative <em>local instrumental variables</em> approach and define the estimand, <span class="math inline">\(MTE(p)\)</span> as the <strong>marginal treatment effect</strong>. It is the average treatment effect among individuals with a propensity <span class="math inline">\(1-p\)</span> to take the treatment. They show that, commonly used estimators (instrumental variables, difference-in-differences) are often weighted averages of this marginal treatment effect, and that the marginal treatment effect is a useful building block for.</p>
 <p>Note that under support conditions on <span class="math inline">\(Z\)</span>, as the support of <span class="math inline">\(P(X,Z)\)</span> approaches the unit interval <span class="math inline">\([0,1]\)</span>, the average treatment effect <span class="math inline">\(ATE(X) = \mu_{1}(X)-\mu_{0}(X)\)</span> is also identified.</p>
 <p><strong>Credibility</strong> Whether or not you think that this approach to identifying treatment effects is more or less credible than using functional form restrictions may depend on how valid you think the exclusion and independence restrictions are. However, assuming that we have access to a “good” instrument, it should be clear that this approach is preferable.</p>
-<p>In practice, even when we have access to an instrument, the data requirements for fully non-parametric estimation can be overly demanding. A reasonable compromise is to illustrate the conditions under which your instrument provides nonparametric identification, then introduce parametric assumptions that can interpolate this plausible variation. This is a way to establish that identification of your parameters of interest in not purely driven by functional form restrictions. See <span class="citation" data-cites="Cunha2010">Cunha, Heckman, and Schennach (<a href="#ref-Cunha2010" role="doc-biblioref">2010</a>)</span> and <span class="citation" data-cites="Carneiro2011">Carneiro, Heckman, and Vytlacil (<a href="#ref-Carneiro2011" role="doc-biblioref">2011</a>)</span> for two examples of this kind of approach.</p>
+<p>In practice, even when we have access to an instrument, the data requirements for fully non-parametric estimation can be overly demanding. A reasonable compromise is to illustrate the conditions under which your instrument provides nonparametric identification, then introduce parametric assumptions that can interpolate this plausible variation. This is a way to establish that identification of your parameters of interest in not purely driven by functional form restrictions. See <span class="citation" data-cites="Cunha2010">Cunha, Heckman, and Schennach (<a href="../references.html#ref-Cunha2010" role="doc-biblioref">2010</a>)</span> and <span class="citation" data-cites="Carneiro2011">Carneiro, Heckman, and Vytlacil (<a href="../references.html#ref-Carneiro2011" role="doc-biblioref">2011</a>)</span> for two examples of this kind of approach.</p>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -593,7 +606,7 @@ Exercise
 </div>
 <div class="callout-body-container callout-body">
 <div id="exr-id_functional_form" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercise 7.1</strong></span> Using Example <a href="#exm-roy_estimation" class="quarto-xref">Example&nbsp;<span class="quarto-unresolved-ref">exm-roy_estimation</span></a>, try setting <span class="math inline">\(\gamma_{3} = 0\)</span> and verify that identification by functional form works in practice: the model can still be estimated using the parametric selection correction.</p>
+<p><span class="theorem-title"><strong>Exercise 7.1</strong></span> Using Example <a href="#exm-roy_estimation" class="quarto-xref">Example&nbsp;<span>7.1</span></a>, try setting <span class="math inline">\(\gamma_{3} = 0\)</span> and verify that identification by functional form works in practice: the model can still be estimated using the parametric selection correction.</p>
 </div>
 </div>
 </div>
@@ -672,7 +685,7 @@ H = \mathbf{1}\{\beta_0 + \beta_1\log(W) + \zeta &gt;0\}
 </section>
 <section id="monotonicity-and-potential-outcomes" class="level2" data-number="7.4">
 <h2 data-number="7.4" class="anchored" data-anchor-id="monotonicity-and-potential-outcomes"><span class="header-section-number">7.4</span> Monotonicity and Potential Outcomes</h2>
-<p>Recall that the generalized roy model embeds the <strong>potential outcomes framework</strong> (this is the model you get if you throw away the selection equation). <span class="citation" data-cites="ImbensAngrist">Imbens and Angrist (<a href="#ref-ImbensAngrist" role="doc-biblioref">1994</a>)</span> consider what can be estimated from two stage least squares when you have access to an instrument <span class="math inline">\(Z\)</span> and heterogeneous potential outcomes. To formalize their setup, assume that individuals can be indexed in some measurable space <span class="math inline">\(\omega\in\Omega\)</span>, so that we write the model as a triple: <span class="math inline">\((Y_1(\omega),Y_0(\omega),D_{Z}(\omega))\)</span> where <span class="math inline">\(D_{Z}(\omega)\in\{0,1\}\)</span> indicates the choice of an individual of type <span class="math inline">\(\omega\)</span> when the instrument takes a value <span class="math inline">\(Z\)</span>.</p>
+<p>Recall that the generalized roy model embeds the <strong>potential outcomes framework</strong> (this is the model you get if you throw away the selection equation). <span class="citation" data-cites="ImbensAngrist">Imbens and Angrist (<a href="../references.html#ref-ImbensAngrist" role="doc-biblioref">1994</a>)</span> consider what can be estimated from two stage least squares when you have access to an instrument <span class="math inline">\(Z\)</span> and heterogeneous potential outcomes. To formalize their setup, assume that individuals can be indexed in some measurable space <span class="math inline">\(\omega\in\Omega\)</span>, so that we write the model as a triple: <span class="math inline">\((Y_1(\omega),Y_0(\omega),D_{Z}(\omega))\)</span> where <span class="math inline">\(D_{Z}(\omega)\in\{0,1\}\)</span> indicates the choice of an individual of type <span class="math inline">\(\omega\)</span> when the instrument takes a value <span class="math inline">\(Z\)</span>.</p>
 <p>They combine four assumptions:</p>
 <ol type="1">
 <li>Exclusion: <span class="math inline">\(Y_{D}(\omega,Z) = Y_{D}(\omega)\)</span> for <span class="math inline">\(D\in\{0,1\}\)</span></li>
@@ -705,11 +718,11 @@ Exercise
 </div>
 </div>
 </div>
-<p><span class="citation" data-cites="ImbensAngrist">Imbens and Angrist (<a href="#ref-ImbensAngrist" role="doc-biblioref">1994</a>)</span> call this object the <em>Local Average Treatment Effect</em>. They show that for multi-valued instruments, 2SLS produces a weighted average of these LATES for difference complier groups.</p>
+<p><span class="citation" data-cites="ImbensAngrist">Imbens and Angrist (<a href="../references.html#ref-ImbensAngrist" role="doc-biblioref">1994</a>)</span> call this object the <em>Local Average Treatment Effect</em>. They show that for multi-valued instruments, 2SLS produces a weighted average of these LATES for difference complier groups.</p>
 <p>This interpretation of IV estimators is immensely widely used, so you should know the definition and the assumptions under which it works.</p>
 <section id="relationship-to-the-generalized-roy-model" class="level3" data-number="7.4.1">
 <h3 data-number="7.4.1" class="anchored" data-anchor-id="relationship-to-the-generalized-roy-model"><span class="header-section-number">7.4.1</span> Relationship to the Generalized Roy Model</h3>
-<p>There is a deeper relationship between the monotonicity assumption and the Generalized Roy Model. <span class="citation" data-cites="Vytlacil2002">Vytlacil (<a href="#ref-Vytlacil2002" role="doc-biblioref">2002</a>)</span> shows that the monotonicity assumption is <strong>equivalent</strong> to a latent index model representation. One direction of this proof is easy, since it is simple to verify that the latent index model: <span class="math display">\[D = \mathbf{1}\{P(Z)-V \geq 0\}\]</span> obeys monotonicity. Going the other way, it is relatively intuitive to see that one can construct a mapping from <span class="math inline">\(\Omega\)</span> to <span class="math inline">\([0,1]\)</span> such that: <span class="math display">\[ D_{Z}(\omega) = \mathbf{1}\{P(Z)-V(\omega) \geq 0\}. \]</span></p>
+<p>There is a deeper relationship between the monotonicity assumption and the Generalized Roy Model. <span class="citation" data-cites="Vytlacil2002">Vytlacil (<a href="../references.html#ref-Vytlacil2002" role="doc-biblioref">2002</a>)</span> shows that the monotonicity assumption is <strong>equivalent</strong> to a latent index model representation. One direction of this proof is easy, since it is simple to verify that the latent index model: <span class="math display">\[D = \mathbf{1}\{P(Z)-V \geq 0\}\]</span> obeys monotonicity. Going the other way, it is relatively intuitive to see that one can construct a mapping from <span class="math inline">\(\Omega\)</span> to <span class="math inline">\([0,1]\)</span> such that: <span class="math display">\[ D_{Z}(\omega) = \mathbf{1}\{P(Z)-V(\omega) \geq 0\}. \]</span></p>
 <div class="callout callout-style-default callout-tip no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -727,7 +740,7 @@ Exercise
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
 <div id="ref-Carneiro2011" class="csl-entry" role="listitem">
 Carneiro, P., J. J. Heckman, and E. J. Vytlacil. 2011. <span>“Estimating Marginal Returns to Education.”</span> <em>American Economic Review</em> 101 (October): 2754–81. <a href="http://www.nber.org/papers/w16474">http://www.nber.org/papers/w16474</a>.
 </div>
@@ -786,18 +799,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -829,7 +831,45 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -864,7 +904,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
@@ -912,7 +956,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      return note.innerHTML;
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
     }
   }
   for (var i=0; i<xrefs.length; i++) {
@@ -1135,12 +1183,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../lectures/identification.html" class="pagination-link  aria-label=" identification="" and="" credible="" inference"="">
+      <a href="../lectures/identification.html" class="pagination-link" aria-label="Identification and Credible Inference">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Identification and Credible Inference</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/identification_search.html" class="pagination-link" aria-label="<span class='chapter-number'>8</span>&nbsp; <span class='chapter-title'>The Search Model</span>">
+      <a href="../lectures/identification_search.html" class="pagination-link" aria-label="The Search Model">
         <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">The Search Model</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>

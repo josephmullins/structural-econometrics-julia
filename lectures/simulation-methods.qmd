@@ -1,16 +1,27 @@
 # Simulation Methods
 
-In many structural models, the likelihood or moment conditions cannot be computed in closed form because they involve high-dimensional integrals over unobserved heterogeneity, latent states, or expectations over future shocks. The savings model is a good example: even if we knew the true parameters, computing the likelihood of an observed consumption path requires integrating over sequences of income shocks. In these settings, **simulation** provides a way forward.
+In many structural models, the likelihood or moment conditions cannot be computed in closed form because they involve high-dimensional integrals over unobserved heterogeneity, latent states, or expectations over future shocks. The [savings model](../models/savings.qmd) is a good example: even if we knew the true parameters, computing the likelihood of an observed consumption path requires integrating over sequences of income shocks. In these settings, **simulation** provides a way forward.
+
+:::{.callout-note icon="false" collapse="true"}
+## Example: Calculating Mean Assets
+:::{#exm-savings-moments}
+Suppose you are estimating the savings model by matching mean assets at different ages over the life-cycle. Note that $A_{t}$ depends on the sequence of realizations of the income shock $\varepsilon_{s}$ for all perios $s<t$. Assuming a discrete approximation to the income process, the numerical equivalent to the moment is:
+
+$$ \mathbb{E}[A_{t}] = \sum_{\varepsilon_{1}^{t-1}\in\mathcal{E}^{t-1}}\pi(\varepsilon_1)\prod_{s=2}^{t=1}\pi(\varepsilon_{s}|\varepsilon_{s-1})A^*(\varepsilon_1,\varepsilon_2,...,\varepsilon_{t-1}) $$ 
+
+where $A^*$ indicates accumulated savings for the optimal savings policy under a particular guess of the model's parameters. Notice that if we assume $K_\varepsilon$ grid points for $\varepsilon$, the number of sequences $\varepsilon_{1}^{t-1}$ that we must sum over is $K_{\varepsilon}^{t-1}$. For larger $t$, this will be intractably large.
+:::
+:::
 
 This chapter covers three topics. First, we discuss **simulation-based estimators** --- the method of simulated moments (MSM) and indirect inference --- which replace intractable analytical objects with simulation approximations. Second, we introduce the **bootstrap**, a general resampling-based approach to inference that is particularly useful when analytical standard errors are difficult to derive. Third, we bring these tools together with our prototype models.
 
 ## Integration by Simulation
 
-At the heart of simulation-based estimation is the problem of computing integrals. Suppose we need to evaluate:
+At the heart of simulation-based estimation is the problem of computing integrals and high-dimensional sums. Suppose we need to evaluate:
 
 $$f(y|\mathbf{x},\theta) = \int h(y|\mathbf{x},\theta,\mathbf{u})g(\mathbf{u})d\mathbf{u}$$
 
-where $\mathbf{u}$ is a vector of unobservables with density $g$. If the dimension of $\mathbf{u}$ is large or $h$ does not admit a closed-form integral, we can approximate by **Monte Carlo integration**: draw $\mathbf{u}^{1},\ldots,\mathbf{u}^{R}$ from $g$ and compute:
+where $\mathbf{u}$ is a vector of unobservables with density $g$. If we want to evaluate this integral with quadrature methods (@sec-quadrature) then we face a **curse of dimensionality**. When the number of dimensions in $\mathbf{u}$ is large then the problem is simply intractable. One solution is to approximate by **Monte Carlo integration**: draw $\mathbf{u}^{1},\ldots,\mathbf{u}^{R}$ from $g$ and compute:
 
 $$\hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_{r=1}^{R}h(y|\mathbf{x},\theta,\mathbf{u}^{r})$$
 
@@ -25,6 +36,63 @@ $$\hat{f}(y|\mathbf{x},\theta) = \frac{1}{R}\sum_{r=1}^{R}h(y|\mathbf{x},\theta,
 This is still unbiased and consistent. The ratio $g/w$ is called the **importance weight**.
 
 **Variance reduction.** Why can the choice of $w$ reduce variance? The variance of the importance-sampling estimator depends on the variance of $h \cdot g/w$ under draws from $w$. Intuitively, if $w$ concentrates draws in regions where the integrand $h \cdot g$ is large, the estimator "wastes" fewer draws on regions that contribute little to the integral, reducing variance. The ideal importance density is proportional to $|h| \cdot g$, which puts the most weight exactly where it matters most. In practice, one looks for a convenient $w$ that roughly approximates this shape.
+
+:::{.callout-note icon="false" collapse="true"}
+## Example: Variance Reduction via Importance Sampling
+:::{#exm-importance-sampling-variance}
+
+To illustrate, consider estimating a tail probability: $P(Z > 3)$ where $Z\sim\mathcal{N}(0,1)$. The true value is approximately $0.00135$.
+
+**Naive Monte Carlo** draws $Z^{1},\ldots,Z^{R}\sim\mathcal{N}(0,1)$ and computes $\hat{p}=\frac{1}{R}\sum_{r}\mathbf{1}\{Z^{r}>3\}$. Because the event $\{Z>3\}$ is rare, most draws contribute zero to the sum --- the estimator "wastes" draws in the center of the distribution where $\mathbf{1}\{Z>3\}\cdot\phi(Z)$ is negligible.
+
+**Importance sampling** instead draws from $w=\mathcal{N}(3,1)$, which concentrates mass in the tail where the integrand is large. The estimator becomes:
+$$\hat{p}_{IS}=\frac{1}{R}\sum_{r}\mathbf{1}\{Z^{r}>3\}\frac{\phi(Z^{r})}{\phi_{w}(Z^{r})},\qquad Z^{r}\sim\mathcal{N}(3,1)$$
+
+We compare both estimators across 2,000 independent replications, each using $R=2{,}000$ draws.
+
+```{julia}
+using Distributions, Random, Plots, Statistics
+
+Random.seed!(42)
+c = 3.0
+p_true = 1 - cdf(Normal(), c)
+
+R = 2000; n_reps = 2000
+g = Normal(0, 1)      # target distribution
+w = Normal(c, 1)       # importance distribution (shifted to the tail)
+
+# Naive MC: draw from g, average the indicators
+naive_estimates = [mean(rand(g, R) .> c) for _ in 1:n_reps]
+
+# Importance sampling: draw from w, reweight
+is_estimates = map(1:n_reps) do _
+    z = rand(w, R)
+    weights = pdf.(g, z) ./ pdf.(w, z)
+    mean((z .> c) .* weights)
+end
+
+println("True probability: P(Z > $c) = $(round(p_true, sigdigits=5))")
+println("Naive MC:       mean = $(round(mean(naive_estimates), sigdigits=5)),  std = $(round(std(naive_estimates), sigdigits=3))")
+println("Importance MC:  mean = $(round(mean(is_estimates), sigdigits=5)),  std = $(round(std(is_estimates), sigdigits=3))")
+println("Variance ratio (naive / IS): $(round(var(naive_estimates) / var(is_estimates), digits=1))×")
+```
+
+```{julia}
+p1 = histogram(naive_estimates, normalize=:pdf, alpha=0.6, label=false,
+               color=:steelblue, xlabel="Estimate of P(Z > $c)", title="Naive MC")
+vline!(p1, [p_true], color=:black, linewidth=2, linestyle=:dash, label="True value")
+
+p2 = histogram(is_estimates, normalize=:pdf, alpha=0.6, label=false,
+               color=:firebrick, xlabel="Estimate of P(Z > $c)", title="Importance Sampling")
+vline!(p2, [p_true], color=:black, linewidth=2, linestyle=:dash, label="True value")
+
+plot(p1, p2, layout=(1,2), size=(800, 350))
+```
+
+The contrast is stark. The naive estimator is highly discrete --- it can only take values that are multiples of $1/R$ --- and its distribution is spread widely around the truth. The importance sampling estimator is continuous (because the importance weights are continuous) and tightly concentrated. Both are unbiased, but importance sampling achieves a dramatic reduction in variance by directing draws to the region that matters.
+
+:::
+:::
 
 **Differentiability.** Importance sampling also plays a role in making simulated integrals *differentiable* with respect to the parameters $\theta$. When the integrand involves indicator functions --- as in discrete choice models where $h(y|\mathbf{x},\theta,\mathbf{u})=\mathbf{1}\{\cdot\}$ --- the crude Monte Carlo approximation is a step function in $\theta$, which creates problems for gradient-based optimization. Through a change of variables, it is sometimes possible to move the dependence on $\theta$ out of the indicator and into smooth importance weights, yielding a simulated integral that is differentiable in $\theta$. The GHK simulator for multivariate probit models is a prominent example of this strategy (see @sec-msl-differentiability below).
 
@@ -50,9 +118,9 @@ $$\sqrt{N}(\hat{\theta}_{MSL}-\theta_{0})\rightarrow_{d}\mathcal{N}(\mathbf{0},\
 
 In practice, one should use enough draws that the simulation error is small relative to the sampling variability. A common rule of thumb is to set $R$ large enough that results are insensitive to further increases.
 
-:::{.callout-warning}
-## Differentiability of the Simulated Likelihood {#sec-msl-differentiability}
+### Differentiability of the Simulated Likelihood {#sec-msl-differentiability}
 
+:::{.callout-warning}
 A separate challenge with MSL arises when the model involves discrete outcomes. Consider a simple probit: $Y=\mathbf{1}\{X\beta+\varepsilon>0\}$ with $\varepsilon\sim\mathcal{N}(0,1)$. The true choice probability $\Phi(X\beta)$ is a smooth function of $\beta$. But if we approximate it by crude Monte Carlo --- drawing $\varepsilon^{1},\ldots,\varepsilon^{R}\sim\mathcal{N}(0,1)$ and computing $\hat{P}=\frac{1}{R}\sum_{r}\mathbf{1}\{X\beta+\varepsilon^{r}>0\}$ --- the result is a **step function** in $\beta$. Each indicator $\mathbf{1}\{X\beta+\varepsilon^{r}>0\}$ switches from 0 to 1 at $\beta=-\varepsilon^{r}/X$, so $\hat{P}$ jumps at finitely many points and is flat everywhere else. Its derivative is zero almost everywhere, making gradient-based optimization of the simulated log-likelihood impossible.
 
 The figure below illustrates this for $X=1$ and $R=20$ draws. The true probability $\Phi(\beta)$ is smooth, but the simulated probability is a step function that jumps at each $\beta=-\varepsilon^{r}$. The kernel-smoothed simulator replaces the indicator with $\Phi(\cdot/h)$, restoring differentiability at the cost of a small bias.
@@ -388,13 +456,20 @@ The discrete jumps visible in the estimated profiles are a consequence of the di
 :::
 :::
 
-:::{.callout-warning}
+:::{.callout-warning icon="false"}
 ## Non-Differentiability of Simulated Moments
 
 Notice that we used the **Nelder-Mead** algorithm above --- a derivative-free optimizer. This is not a coincidence. In the savings model, the policy function $A(\varepsilon,a,t)$ maps to a *discrete* asset grid, so the simulated consumption and asset paths are step functions of the parameters $\theta$. As $\theta$ changes continuously, the optimal grid point occasionally jumps, producing discontinuities in the simulated moments. This is the same non-differentiability problem discussed in @sec-msl-differentiability, now appearing in the MSM context.
 
 Gradient-based optimizers will fail here because the numerical gradient is zero almost everywhere and undefined at the jumps. Derivative-free methods like Nelder-Mead avoid this issue entirely. Alternatives include using a finer asset grid (which reduces the size of the jumps), interpolating the policy function between grid points to smooth the simulated moments, or using kernel-smoothed simulators.
 :::
+
+:::{.callout-warning icon="false"}
+## Fixing Simulation Error
+
+Notice in @exm-bootstrap_savings that we fixed the seed of the simulation when we call the function `simulate_panel`. What do you think would happen if we failed to do this inside our optimization routine?
+:::
+
 
 
 ## Indirect Inference
@@ -629,6 +704,10 @@ Notice that bootstrapping panel data by resampling individuals is straightforwar
 ### Simulation Noise and Smoothing
 
 When simulation draws are held fixed across evaluations of the objective function, the simulated objective is a smooth function of $\theta$ (assuming the model itself is smooth in $\theta$). This means standard gradient-based optimizers can be used. If simulation draws are re-drawn at each evaluation, the objective becomes noisy and optimization may fail or converge to the wrong point. **Always fix the random seed** when evaluating the simulated objective across different $\theta$ values.
+
+### Simulation Noise and Standard Errors
+
+Although it is critical to fix the seed for randomization when implementing these methods, you have to think carefully about how you then set the seed if you are using bootstrap methods for inference. If the number of simulations $R$ is comparable to the number of observations, our theory tells us that simulation error will be a non-negligible component of the variance of the estimator. To accommodate this, you shouild ensure that you **change the initial seed** in each bootstrap trial. Even if you think simulation error is negligible compared to sampling error (i.e. $R>>N$), it is still good practice and costs nothing to incorporate it. 
 
 ### How Many Draws?
 
