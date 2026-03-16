@@ -20,7 +20,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -69,6 +123,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -284,8 +367,43 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#motivating-examples" id="toc-motivating-examples" class="nav-link active" data-scroll-target="#motivating-examples">Motivating Examples</a>
+  <ul class="collapse">
+  <li><a href="#example-1-welfare-program-participation-and-discrete-labor-supply" id="toc-example-1-welfare-program-participation-and-discrete-labor-supply" class="nav-link" data-scroll-target="#example-1-welfare-program-participation-and-discrete-labor-supply">Example 1: Welfare Program Participation and Discrete Labor Supply</a></li>
+  <li><a href="#example-2-automobile-choice" id="toc-example-2-automobile-choice" class="nav-link" data-scroll-target="#example-2-automobile-choice">Example 2: Automobile Choice</a></li>
+  </ul></li>
+  <li><a href="#the-random-utility-model" id="toc-the-random-utility-model" class="nav-link" data-scroll-target="#the-random-utility-model">The Random Utility Model</a>
+  <ul class="collapse">
+  <li><a href="#multinomial-logit" id="toc-multinomial-logit" class="nav-link" data-scroll-target="#multinomial-logit">Multinomial Logit</a></li>
+  <li><a href="#multinomial-probit" id="toc-multinomial-probit" class="nav-link" data-scroll-target="#multinomial-probit">Multinomial Probit</a></li>
+  </ul></li>
+  <li><a href="#the-generalized-extreme-value-gev-family" id="toc-the-generalized-extreme-value-gev-family" class="nav-link" data-scroll-target="#the-generalized-extreme-value-gev-family">The Generalized Extreme Value (GEV) Family</a>
+  <ul class="collapse">
+  <li><a href="#multinomial-logit-1" id="toc-multinomial-logit-1" class="nav-link" data-scroll-target="#multinomial-logit-1">Multinomial Logit</a></li>
+  <li><a href="#nested-logit" id="toc-nested-logit" class="nav-link" data-scroll-target="#nested-logit">Nested Logit</a></li>
+  <li><a href="#sec-cross-nested" id="toc-sec-cross-nested" class="nav-link" data-scroll-target="#sec-cross-nested">Cross-Nested Logit</a></li>
+  <li><a href="#paired-combinatorial-logit" id="toc-paired-combinatorial-logit" class="nav-link" data-scroll-target="#paired-combinatorial-logit">Paired Combinatorial Logit</a></li>
+  </ul></li>
+  <li><a href="#the-williams-daly-zachary-theorem" id="toc-the-williams-daly-zachary-theorem" class="nav-link" data-scroll-target="#the-williams-daly-zachary-theorem">The Williams-Daly-Zachary Theorem</a></li>
+  <li><a href="#mixed-multinomial-logit" id="toc-mixed-multinomial-logit" class="nav-link" data-scroll-target="#mixed-multinomial-logit">Mixed Multinomial Logit</a>
+  <ul class="collapse">
+  <li><a href="#specification" id="toc-specification" class="nav-link" data-scroll-target="#specification">Specification</a></li>
+  <li><a href="#why-mixed-logit-is-so-flexible" id="toc-why-mixed-logit-is-so-flexible" class="nav-link" data-scroll-target="#why-mixed-logit-is-so-flexible">Why Mixed Logit Is So Flexible</a></li>
+  <li><a href="#latent-class-models" id="toc-latent-class-models" class="nav-link" data-scroll-target="#latent-class-models">Latent Class Models</a></li>
+  </ul></li>
+  <li><a href="#estimation" id="toc-estimation" class="nav-link" data-scroll-target="#estimation">Estimation</a>
+  <ul class="collapse">
+  <li><a href="#maximum-likelihood-for-the-mnl" id="toc-maximum-likelihood-for-the-mnl" class="nav-link" data-scroll-target="#maximum-likelihood-for-the-mnl">Maximum Likelihood for the MNL</a></li>
+  <li><a href="#sec-mmnl-estimation" id="toc-sec-mmnl-estimation" class="nav-link" data-scroll-target="#sec-mmnl-estimation">Simulated Maximum Likelihood for Mixed Logit</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -309,8 +427,589 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<p>Many important economic decisions are fundamentally discrete: whether to participate in a welfare program, what occupation to work in, which car to buy, where to live. In each case, an individual selects one option from a finite set of alternatives. This chapter introduces the econometric framework for modeling these decisions, based on the foundational model of <strong>Random Utility Maximization</strong> (RUM) of <span class="citation" data-cites="McFadden1974">McFadden (<a href="../references.html#ref-McFadden1974" role="doc-biblioref">1974</a>)</span>, building toward flexible specifications that can approximate arbitrary patterns of substitution across alternatives.</p>
+<section id="motivating-examples" class="level2">
+<h2 class="anchored" data-anchor-id="motivating-examples">Motivating Examples</h2>
+<p>Before introducing the general framework, let’s consider two examples that illustrate the range of discrete choice problems.</p>
+<section id="example-1-welfare-program-participation-and-discrete-labor-supply" class="level3">
+<h3 class="anchored" data-anchor-id="example-1-welfare-program-participation-and-discrete-labor-supply">Example 1: Welfare Program Participation and Discrete Labor Supply</h3>
+<p>Consider an individual deciding whether to participate in a welfare program and how much to work. The individual chooses among six combinations of program participation <span class="math inline">\((P\in\{0,1\})\)</span> and hours (<span class="math inline">\(H\in\{0,1,2\}\)</span>, corresponding to no work, part-time work, and full-time work). Let <span class="math inline">\(j = P*2 + H\)</span> indicate each of the 6 combinations of discrete choice.</p>
+<p>Let <span class="math inline">\(W\)</span> denote the wage, <span class="math inline">\(b\)</span> the welfare benefit, and <span class="math inline">\(c\)</span> the cost of program participation (stigma, compliance). The utility from each option depends on consumption, the disutility of labor, and a preference shock:</p>
+<p><span class="math display">\[ U_{j} = u(Y+bP_{j} + 20 W H_{j}) - \alpha_0 P_{j} - \alpha_1 H_{j} + \varepsilon_{j} \]</span></p>
+<p>where <span class="math inline">\(Y\)</span> is non-labor income and <span class="math inline">\((\varepsilon_0,\ldots,\varepsilon_5)\)</span> capture unobserved preference heterogeneity. The individual selects the option that maximizes utility. This is a <strong>multinomial</strong> choice problem with alternatives that differ in attributes determined partly by the individual’s characteristics (wages, non-labor income).</p>
+</section>
+<section id="example-2-automobile-choice" class="level3">
+<h3 class="anchored" data-anchor-id="example-2-automobile-choice">Example 2: Automobile Choice</h3>
+<p>A consumer chooses one car from <span class="math inline">\(J\)</span> models available on the market. Each model <span class="math inline">\(j\)</span> has a price <span class="math inline">\(p_j\)</span>, fuel efficiency <span class="math inline">\(x_{j1}\)</span>, horsepower <span class="math inline">\(x_{j2}\)</span>, and other attributes. Consumer <span class="math inline">\(n\)</span>’s utility from car <span class="math inline">\(j\)</span> is:</p>
+<p><span class="math display">\[U_{nj} = \alpha_n(y_n - p_j) + \mathbf{x}_{j}\boldsymbol{\beta}_n + \varepsilon_{nj}\]</span></p>
+<p>where <span class="math inline">\(y_n\)</span> is income and <span class="math inline">\((\alpha_n,\boldsymbol{\beta}_n)\)</span> are taste parameters that may vary across consumers. The consumer chooses the car <span class="math inline">\(j\)</span> that maximizes <span class="math inline">\(U_{nj}\)</span>.</p>
+<p>This is a <strong>differentiated products</strong> demand problem. Unlike the labor supply example, the alternatives are defined by product attributes rather than individual characteristics. The number of alternatives <span class="math inline">\(J\)</span> can be large (hundreds of car models), and the key econometric challenge is modeling realistic substitution patterns: when the price of a Honda Civic increases, consumers are more likely to substitute toward other compact cars than toward a luxury SUV.</p>
+<p>These two examples illustrate a common structure: individuals choose the option that maximizes utility, where utility depends on observed attributes, individual characteristics, and unobservable preference shocks. The <strong>Random Utility Model</strong> provides a unifying framework.</p>
+</section>
+</section>
+<section id="the-random-utility-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-random-utility-model">The Random Utility Model</h2>
+<p><span class="citation" data-cites="McFadden1974">McFadden (<a href="../references.html#ref-McFadden1974" role="doc-biblioref">1974</a>)</span> formalized the connection between individual utility maximization and the probabilistic models used to analyze discrete choice data. The key insight is that from the econometrician’s perspective, utility contains an unobserved component, so the choice outcome is random even though the individual is choosing deterministically.</p>
+<div id="def-rum" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1 (Random Utility Model)</strong></span> A <strong>Random Utility Model (RUM)</strong> specifies that individual <span class="math inline">\(n\)</span> faces a choice set <span class="math inline">\(\mathcal{J}_n = \{1,\ldots,J\}\)</span> and assigns utility:</p>
+<p><span class="math display">\[U_{nj} = V_{nj} + \varepsilon_{nj},\qquad j\in\mathcal{J}_n\]</span></p>
+<p>where <span class="math inline">\(V_{nj}\)</span> is the <strong>representative utility</strong> (a function of observed attributes and parameters) and <span class="math inline">\(\varepsilon_{nj}\)</span> is a random term reflecting unobserved factors. The individual chooses alternative <span class="math inline">\(j\)</span> if:</p>
+<p><span class="math display">\[U_{nj} &gt; U_{nk}\qquad\text{for all } k\neq j\]</span></p>
+</div>
+<p>The choice probability for alternative <span class="math inline">\(j\)</span> is:</p>
+<p><span class="math display">\[P_{nj} = \Pr(U_{nj} &gt; U_{nk}\ \forall\ k\neq j) = \Pr(\varepsilon_{nk} - \varepsilon_{nj} &lt; V_{nj} - V_{nk}\ \forall\ k\neq j)\]</span></p>
+<p>This is a <span class="math inline">\((J-1)\)</span>-dimensional integral over the distribution of the error differences. Different assumptions on the joint distribution of <span class="math inline">\((\varepsilon_{n1},\ldots,\varepsilon_{nJ})\)</span> lead to different choice models with different substitution patterns.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Normalization
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Notice that observed choices are invariant to any changes in the joint location and scale of the random vector <span class="math inline">\(U_{n}\)</span>. In practice, we must normalize both: fix the utility of one alternative to pin down the location (e.g.&nbsp;<span class="math inline">\(V_{n0}=0\)</span>), and fix the variance of the errors to pin down the scale (e.g.&nbsp;<span class="math inline">\(\text{Var}(\varepsilon_j)=\pi^2/6\)</span> in the logit, or <span class="math inline">\(\text{Var}(\varepsilon_j)=1\)</span> in the probit).</p>
+</div>
+</div>
+<p>Before going deeper, let’s cover two of the most standard models of discrete choice, generated by alternative assumptions on the distribution of <span class="math inline">\(\varepsilon\)</span>.</p>
+<section id="multinomial-logit" class="level3">
+<h3 class="anchored" data-anchor-id="multinomial-logit">Multinomial Logit</h3>
+<p>The <strong>multinomial logit (MNL)</strong> model arises when the errors <span class="math inline">\(\varepsilon_{nj}\)</span> are iid draws from a Type I Extreme Value (Gumbel) distribution with CDF <span class="math inline">\(F(\varepsilon) = e^{-e^{-\varepsilon}}\)</span>. Extreme Value distributions are class of random variables that, by construction, yield tractable distributions for their maximum value. Hence, this distribution yields parsimonious choice probabilities:</p>
+<p><span class="math display">\[P_{nj} = \frac{e^{V_{nj}}}{\sum_{k=1}^{J}e^{V_{nk}}}\]</span></p>
+<p>The MNL model is elegant and easy to estimate, but it has a well-known limitation: the <strong>independence of irrelevant alternatives (IIA)</strong> property.</p>
+<div class="callout callout-style-default callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Independence of Irrelevant Alternatives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The MNL model implies that the odds ratio between any two alternatives is independent of all other alternatives:</p>
+<p><span class="math display">\[\frac{P_{nj}}{P_{nk}} = \frac{e^{V_{nj}}}{e^{V_{nk}}} = e^{V_{nj}-V_{nk}}\]</span></p>
+<p>This ratio depends only on alternatives <span class="math inline">\(j\)</span> and <span class="math inline">\(k\)</span> — it does not change when other alternatives are added, removed, or modified. This means that if a new alternative enters the choice set, it draws proportionally from all existing alternatives. In the automobile example, this would imply that a new compact car draws equally (in proportional terms) from other compact cars and from luxury SUVs — a clearly unrealistic restriction.</p>
+<p>The classic illustration is the “red bus / blue bus” problem: if commuters choose between a car and a red bus, the MNL predicts equal odds. Adding a blue bus (identical to the red bus) should not affect the odds of choosing the car, but the MNL predicts that <span class="math inline">\(P(\text{car})\)</span> falls from <span class="math inline">\(1/2\)</span> to <span class="math inline">\(1/3\)</span>.</p>
+<p>The IIA property is a direct consequence of the iid assumption on the errors. It is also the primary motivation for the richer GEV models below.</p>
+</div>
+</div>
+</section>
+<section id="multinomial-probit" class="level3">
+<h3 class="anchored" data-anchor-id="multinomial-probit">Multinomial Probit</h3>
+<p>An alternative to the extreme value distribution is to assume that the errors are jointly normal: <span class="math inline">\((\varepsilon_{n1},\ldots,\varepsilon_{nJ})\sim\mathcal{N}(\mathbf{0},\boldsymbol{\Sigma})\)</span>. This is the <strong>multinomial probit (MNP)</strong> model. The choice probabilities are:</p>
+<p><span class="math display">\[P_{nj} = \Pr(\varepsilon_{nk}-\varepsilon_{nj} &lt; V_{nj}-V_{nk}\ \forall\ k\neq j) = \int_{\mathcal{R}_j}\phi_{J-1}(\boldsymbol{\eta};\tilde{\boldsymbol{\Sigma}})d\boldsymbol{\eta}\]</span></p>
+<p>where <span class="math inline">\(\boldsymbol{\eta}\)</span> is the <span class="math inline">\((J-1)\)</span>-vector of utility differences, <span class="math inline">\(\tilde{\boldsymbol{\Sigma}}\)</span> is the covariance matrix of these differences, and <span class="math inline">\(\phi_{J-1}\)</span> is the <span class="math inline">\((J-1)\)</span>-dimensional normal density.</p>
+<p>The key advantage of the MNP over the MNL is flexibility: by specifying the covariance matrix <span class="math inline">\(\boldsymbol{\Sigma}\)</span>, the analyst can encode arbitrary patterns of correlation among alternatives. Two alternatives whose error terms are positively correlated will be closer substitutes — exactly the kind of structure that the IIA property of the MNL rules out. The key disadvantage is that the choice probabilities require evaluating a <span class="math inline">\((J-1)\)</span>-dimensional normal integral, which has no closed form for <span class="math inline">\(J&gt;3\)</span>.</p>
+<section id="the-ghk-simulator" class="level4">
+<h4 class="anchored" data-anchor-id="the-ghk-simulator">The GHK Simulator</h4>
+<p>For maximum simulated likelihood estimation of the MNP, we need a simulator for the multivariate normal rectangle probability <span class="math inline">\(P_{nj}\)</span>. The <strong>GHK simulator</strong> (Geweke, Hajivassiliou, Keane) provides an efficient solution by exploiting the Cholesky decomposition of <span class="math inline">\(\tilde{\boldsymbol{\Sigma}}\)</span>.</p>
+<p>Write <span class="math inline">\(\tilde{\boldsymbol{\Sigma}} = LL'\)</span> where <span class="math inline">\(L\)</span> is lower triangular. The idea is to decompose the <span class="math inline">\((J-1)\)</span>-dimensional integral into a product of one-dimensional conditional probabilities using the recursive structure of the Cholesky factorization. Defining <span class="math inline">\(\eta_k = \sum_{\ell\leq k}L_{k\ell}\nu_\ell\)</span> where <span class="math inline">\(\nu_\ell\sim\mathcal{N}(0,1)\)</span> independently:</p>
+<p><span class="math display">\[P_{nj} = \prod_{k=1}^{J-1}\Pr\left(\nu_k &lt; \frac{b_k - \sum_{\ell&lt;k}L_{k\ell}\nu_\ell}{L_{kk}}\ \Big|\ \nu_1,\ldots,\nu_{k-1}\right)\]</span></p>
+<p>where <span class="math inline">\(b_k\)</span> is the upper bound for the <span class="math inline">\(k\)</span>-th utility difference. Each factor is a univariate normal CDF, which is smooth and easy to compute. To simulate, we sequentially draw <span class="math inline">\(\nu_k\)</span> from truncated normals and compute the product of acceptance probabilities:</p>
+<p><span class="math display">\[\hat{P}_{nj} = \prod_{k=1}^{J-1}\Phi\!\left(\frac{b_k - \sum_{\ell&lt;k}L_{k\ell}\nu_\ell^{(r)}}{L_{kk}}\right)\]</span></p>
+<p>The GHK simulator has two crucial properties compared to a crude frequency simulator (which would simply draw <span class="math inline">\(\boldsymbol{\varepsilon}\sim\mathcal{N}(\mathbf{0},\boldsymbol{\Sigma})\)</span> and check if <span class="math inline">\(j\)</span> is the utility-maximizing choice):</p>
+<ol type="1">
+<li><strong>Smoothness.</strong> The GHK probability <span class="math inline">\(\hat{P}_{nj}\)</span> is a product of normal CDFs, which is a <em>smooth</em> function of the parameters. This avoids the non-differentiability problem that plagues crude frequency simulators (see the <a href="../lectures/simulation-methods.html">simulation chapter</a>), enabling gradient-based optimization of the simulated log-likelihood.</li>
+<li><strong>Efficiency.</strong> By conditioning sequentially, the GHK avoids “wasting” draws in regions of the distribution that are inconsistent with the observed choice, dramatically reducing variance.</li>
+</ol>
+</section>
+</section>
+</section>
+<section id="the-generalized-extreme-value-gev-family" class="level2">
+<h2 class="anchored" data-anchor-id="the-generalized-extreme-value-gev-family">The Generalized Extreme Value (GEV) Family</h2>
+<p>The two benchmarks covered so far leave us to make a tough choice between computational tractability and empirical flexibility.</p>
+<p><span class="citation" data-cites="McFadden1978">McFadden (<a href="../references.html#ref-McFadden1978" role="doc-biblioref">1978</a>)</span> introduced a powerful class of models — the <strong>Generalized Extreme Value (GEV)</strong> family — that generate RUM-consistent choice probabilities in closed form and allow for much greater flexibility in substitution patterns. The key is a generating function that encodes the correlation structure among alternatives.</p>
+<div id="def-gev" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2 (GEV Generating Function)</strong></span> A function <span class="math inline">\(G(y_1,\ldots,y_J)\)</span> is a <strong>GEV generating function</strong> if it satisfies:</p>
+<ol type="1">
+<li><span class="math inline">\(G\geq 0\)</span></li>
+<li><span class="math inline">\(G\)</span> is homogeneous of degree 1: <span class="math inline">\(G(\alpha y_1,\ldots,\alpha y_J) = \alpha G(y_1,\ldots,y_J)\)</span> for <span class="math inline">\(\alpha &gt; 0\)</span></li>
+<li><span class="math inline">\(G\rightarrow\infty\)</span> as <span class="math inline">\(y_j\rightarrow\infty\)</span> for any <span class="math inline">\(j\)</span></li>
+<li>The mixed partial derivatives satisfy: <span class="math inline">\(\frac{\partial^{k}G}{\partial y_{j_1}\cdots\partial y_{j_k}}\geq 0\)</span> if <span class="math inline">\(k\)</span> is odd and <span class="math inline">\(\leq 0\)</span> if <span class="math inline">\(k\)</span> is even, for any distinct <span class="math inline">\(j_1,\ldots,j_k\)</span></li>
+</ol>
+</div>
+<p>Given a GEV generating function <span class="math inline">\(G\)</span>, the choice probabilities take the form:</p>
+<p><span class="math display">\[P_{nj} = \frac{y_j G_j(y_1,\ldots,y_J)}{G(y_1,\ldots,y_J)}\]</span></p>
+<p>where <span class="math inline">\(y_j = e^{V_{nj}}\)</span> and <span class="math inline">\(G_j = \partial G / \partial y_j\)</span>. <span class="citation" data-cites="McFadden1978">McFadden (<a href="../references.html#ref-McFadden1978" role="doc-biblioref">1978</a>)</span> showed that these probabilities are consistent with a RUM where the errors <span class="math inline">\((\varepsilon_{n1},\ldots,\varepsilon_{nJ})\)</span> follow a multivariate extreme value distribution. Importantly, each choice of <span class="math inline">\(G\)</span> defines a different correlation structure and therefore different substitution patterns.</p>
+<p>Moreover, the expected maximum utility — a key object for welfare analysis — takes a remarkably simple form in terms of <span class="math inline">\(G\)</span>:</p>
+<p><span class="math display">\[\mathbb{E}\left[\max_{j\in\mathcal{J}} U_{nj}\right] = \log G(e^{V_{n1}},\ldots,e^{V_{nJ}}) + C\]</span></p>
+<p>where <span class="math inline">\(C\)</span> is Euler’s constant (<span class="math inline">\(\approx 0.5772\)</span>). This result, due to <span class="citation" data-cites="Williams1977">Williams (<a href="../references.html#ref-Williams1977" role="doc-biblioref">1977</a>)</span> and <span class="citation" data-cites="DalyZachary1978">Daly and Zachary (<a href="../references.html#ref-DalyZachary1978" role="doc-biblioref">1978</a>)</span>, is discussed further in the section on the Williams-Daly-Zachary theorem below.</p>
+<p>Let us work through the most important special cases.</p>
+<section id="multinomial-logit-1" class="level3">
+<h3 class="anchored" data-anchor-id="multinomial-logit-1">Multinomial Logit</h3>
+<p>The simplest GEV model sets <span class="math inline">\(G(y_1,\ldots,y_J) = \sum_{j=1}^{J}y_j\)</span>. Since <span class="math inline">\(G_j = 1\)</span>, the choice probabilities are:</p>
+<p><span class="math display">\[P_{nj} = \frac{e^{V_{nj}}}{\sum_{k=1}^{J}e^{V_{nk}}}\]</span></p>
+<p>and we arrive back at the MNL model.</p>
+</section>
+<section id="nested-logit" class="level3">
+<h3 class="anchored" data-anchor-id="nested-logit">Nested Logit</h3>
+<p>The <strong>nested logit</strong> model relaxes IIA by grouping alternatives into <strong>nests</strong> that share a common unobserved component. Alternatives within the same nest are closer substitutes than alternatives in different nests.</p>
+<p>Suppose the <span class="math inline">\(J\)</span> alternatives are partitioned into <span class="math inline">\(M\)</span> nests <span class="math inline">\(B_1,\ldots,B_M\)</span>. The GEV generating function is:</p>
+<p><span class="math display">\[G(y_1,\ldots,y_J) = \sum_{m=1}^{M}\left(\sum_{j\in B_m}y_j^{1/\lambda_m}\right)^{\lambda_m}\]</span></p>
+<p>where <span class="math inline">\(\lambda_m\in(0,1]\)</span> is a <strong>dissimilarity parameter</strong> that governs the degree of correlation within nest <span class="math inline">\(m\)</span>. When <span class="math inline">\(\lambda_m = 1\)</span> for all <span class="math inline">\(m\)</span>, the model reduces to the MNL. As <span class="math inline">\(\lambda_m\rightarrow 0\)</span>, alternatives within nest <span class="math inline">\(m\)</span> become perfect substitutes.</p>
+<p>The choice probabilities have a convenient sequential structure. Define:</p>
+<p><span class="math display">\[I_m = \log\sum_{j\in B_m}e^{V_{nj}/\lambda_m}\]</span></p>
+<p>This is the <strong>inclusive value</strong> (or log-sum) of nest <span class="math inline">\(m\)</span>. The probability of choosing alternative <span class="math inline">\(j\)</span> in nest <span class="math inline">\(m\)</span> can be decomposed as:</p>
+<p><span class="math display">\[P_{nj} = P(j|m)\cdot P(m)\]</span></p>
+<p>where:</p>
+<p><span class="math display">\[\begin{align}
+P(j|m) &amp;= \frac{e^{V_{nj}/\lambda_m}}{\sum_{k\in B_m}e^{V_{nk}/\lambda_m}} \\
+P(m) &amp;= \frac{e^{\lambda_m I_m}}{\sum_{\ell=1}^{M}e^{\lambda_\ell I_\ell}}
+\end{align}\]</span></p>
+<p>The first term is a standard logit within the nest; the second is a logit over nests using the inclusive values. IIA holds within each nest but not across nests: when an alternative becomes more attractive, it draws disproportionately from alternatives in the same nest.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Nested Logit for Automobile Choice
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="exm-nested-logit" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1</strong></span> Consider the automobile choice problem from Example 2. Suppose there are six models available, which we group into three nests by body type: compact (<span class="math inline">\(B_1 = \{\text{Civic}, \text{Corolla}\}\)</span>), midsize (<span class="math inline">\(B_2 = \{\text{Camry}, \text{Accord}\}\)</span>), and luxury (<span class="math inline">\(B_3 = \{\text{BMW 3}, \text{Audi A4}\}\)</span>).</p>
+<p>Under the MNL, if the price of the Civic increases, consumers substitute toward <em>all</em> other cars proportionally. A Corolla and a BMW gain the same proportional increase in market share — clearly unrealistic. The nested logit corrects this: with dissimilarity parameters <span class="math inline">\(\lambda_m &lt; 1\)</span> within each nest, a price increase for the Civic causes substitution primarily toward the Corolla (its nest-mate in the compact segment). The extent of within-nest substitution is governed by <span class="math inline">\(\lambda_m\)</span>: smaller values imply that models within a segment are closer substitutes.</p>
+<p>To see this concretely, consider the cross-elasticity of demand. In the MNL, the cross-elasticity of <span class="math inline">\(P_k\)</span> with respect to a change in <span class="math inline">\(V_j\)</span> is <span class="math inline">\(-P_j \cdot \partial V_j / \partial x\)</span>, the same for all <span class="math inline">\(k\neq j\)</span>. In the nested logit, if <span class="math inline">\(j\)</span> and <span class="math inline">\(k\)</span> are in the same nest <span class="math inline">\(m\)</span>:</p>
+<p><span class="math display">\[\frac{\partial P_k}{\partial V_j} = -P_k\left(\frac{1}{\lambda_m}P(j|m) + \left(1-\frac{1}{\lambda_m}\right)P_j\right)\]</span></p>
+<p>while if <span class="math inline">\(k\)</span> is in a different nest, the cross-elasticity is simply <span class="math inline">\(-P_k P_j\)</span>, just as in the MNL. Since <span class="math inline">\(\lambda_m \leq 1\)</span>, within-nest cross-elasticities are larger: a price change in the Civic has a bigger effect on the Corolla than on the BMW.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-cross-nested" class="level3">
+<h3 class="anchored" data-anchor-id="sec-cross-nested">Cross-Nested Logit</h3>
+<p>The nested logit requires each alternative to belong to exactly one nest. The <strong>cross-nested logit</strong> (<span class="citation" data-cites="Vovsha1997">Vovsha (<a href="../references.html#ref-Vovsha1997" role="doc-biblioref">1997</a>)</span>) relaxes this by allowing alternatives to belong to multiple nests with different degrees of membership. The generating function is:</p>
+<p><span class="math display">\[G(y_1,\ldots,y_J) = \sum_{m=1}^{M}\left(\sum_{j=1}^{J}\alpha_{jm}y_j^{1/\lambda_m}\right)^{\lambda_m}\]</span></p>
+<p>where <span class="math inline">\(\alpha_{jm}\geq 0\)</span> is the <strong>allocation parameter</strong> indicating the degree to which alternative <span class="math inline">\(j\)</span> belongs to nest <span class="math inline">\(m\)</span>, and <span class="math inline">\(\lambda_m \in (0,1]\)</span> is the dissimilarity parameter for nest <span class="math inline">\(m\)</span>. For each <span class="math inline">\(j\)</span>, we require <span class="math inline">\(\sum_{m}\alpha_{jm} &gt; 0\)</span> (every alternative belongs to at least one nest). The nested logit is the special case where each <span class="math inline">\(\alpha_{jm}\in\{0,1\}\)</span> and each alternative has exactly one non-zero allocation.</p>
+<p>Applying the GEV choice probability formula <span class="math inline">\(P_j = \frac{e^{V_j} G_j(e^{V_1},\ldots,e^{V_J})}{G(e^{V_1},\ldots,e^{V_J})}\)</span> to this generating function yields the cross-nested logit choice probabilities:</p>
+<p><span class="math display">\[P_j = \sum_{m=1}^{M} \underbrace{\frac{G_m^{\lambda_m / \lambda_m}}{\sum_{m'=1}^{M} G_{m'}^{\lambda_{m'}/\lambda_{m'}}}}_{\text{(not quite)}} \]</span></p>
+<p>More precisely, differentiating <span class="math inline">\(G\)</span> with respect to <span class="math inline">\(y_j\)</span>:</p>
+<p><span class="math display">\[G_j \equiv \frac{\partial G}{\partial y_j} = \sum_{m=1}^{M} \alpha_{jm}\, y_j^{1/\lambda_m - 1} \left(\sum_{k=1}^{J}\alpha_{km}y_k^{1/\lambda_m}\right)^{\lambda_m - 1}\]</span></p>
+<p>Evaluating at <span class="math inline">\(y_k = e^{V_k}\)</span> and defining the inclusive value of nest <span class="math inline">\(m\)</span> as <span class="math inline">\(G_m \equiv \sum_{k=1}^{J}\alpha_{km}e^{V_k/\lambda_m}\)</span>, the choice probability becomes:</p>
+<p><span id="eq-cnl-prob"><span class="math display">\[\boxed{P_j = \frac{\displaystyle\sum_{m=1}^{M}\alpha_{jm}\, e^{V_j/\lambda_m}\, G_m^{\lambda_m - 1}}{\displaystyle\sum_{m'=1}^{M} G_{m'}^{\lambda_{m'}}}} \tag{1}\]</span></span></p>
+<p>Defining the within-nest conditional share <span class="math inline">\(s_{j|m} = \alpha_{jm}e^{V_j/\lambda_m}/G_m\)</span> and the nest probability <span class="math inline">\(\pi_m = G_m^{\lambda_m}/D\)</span> where <span class="math inline">\(D = \sum_{m'}G_{m'}^{\lambda_{m'}}\)</span>, this can be decomposed as:</p>
+<p><span class="math display">\[P_j = \sum_{m=1}^{M} \pi_m \, s_{j|m}\]</span></p>
+<p>This is useful when alternatives share attributes along multiple dimensions. For example, a hybrid SUV shares features with both the “SUV” nest (body type) and the “hybrid” nest (fuel type).</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Cross-Nested Logit for Program Participation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="exm-cnl-participation" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2</strong></span> Returning to the welfare program participation example, recall that there are six alternatives: all combinations of program participation (<span class="math inline">\(P\in\{0,1\}\)</span>) and hours (<span class="math inline">\(H\in\{0,1,2\}\)</span>). The nested logit forces each alternative into a single nest, but the natural substitution patterns here run along <em>multiple</em> dimensions: program participation, the extensive margin of labor supply, and the intensive margin. The cross-nested logit handles this naturally.</p>
+<p>Define four nests capturing these dimensions:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: center;">Nest 1: No program</th>
+<th style="text-align: center;">Nest 2: Program</th>
+<th style="text-align: center;">Nest 3: Work</th>
+<th style="text-align: center;">Nest 4: Full-time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(j=0\)</span>: <span class="math inline">\((H=0,P=0)\)</span></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(j=1\)</span>: <span class="math inline">\((H=1,P=0)\)</span></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(j=2\)</span>: <span class="math inline">\((H=2,P=0)\)</span></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(j=3\)</span>: <span class="math inline">\((H=0,P=1)\)</span></td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(j=4\)</span>: <span class="math inline">\((H=1,P=1)\)</span></td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(j=5\)</span>: <span class="math inline">\((H=2,P=1)\)</span></td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<p>The key feature of this structure is that the working alternatives (<span class="math inline">\(j=1,4\)</span>) belong to <em>both</em> their participation nest and the work nest, while full-time alternatives (<span class="math inline">\(j=2,5\)</span>) belong to both their participation nest and the full-time nest. The not-working alternatives (<span class="math inline">\(j=0,3\)</span>) each belong only to their participation nest. This allows the model to capture substitution along the participation dimension (between <span class="math inline">\(j=0,1,2\)</span> and <span class="math inline">\(j=3,4,5\)</span>), the extensive margin (between <span class="math inline">\(H=0\)</span> and <span class="math inline">\(H&gt;0\)</span>), and the intensive margin (between <span class="math inline">\(H=1\)</span> and <span class="math inline">\(H=2\)</span>), each governed by a separate dissimilarity parameter.</p>
+<p>Write the dissimilarity parameters as <span class="math inline">\(\lambda_P\)</span> for the two participation nests (shared for symmetry), <span class="math inline">\(\lambda_E\)</span> for the work (extensive margin) nest, and <span class="math inline">\(\lambda_I\)</span> for the full-time (intensive margin) nest. The four inclusive values are: <span class="math display">\[\begin{align}
+G_1 &amp;= e^{V_0/\lambda_P} + e^{V_1/\lambda_P} + e^{V_2/\lambda_P} \\
+G_2 &amp;= e^{V_3/\lambda_P} + e^{V_4/\lambda_P} + e^{V_5/\lambda_P} \\
+G_3 &amp;= e^{V_1/\lambda_E} + e^{V_4/\lambda_E} \\
+G_4 &amp;= e^{V_2/\lambda_I} + e^{V_5/\lambda_I}
+\end{align}\]</span></p>
+<p>and the denominator is <span class="math inline">\(D = G_1^{\lambda_P} + G_2^{\lambda_P} + G_3^{\lambda_E} + G_4^{\lambda_I}\)</span>.</p>
+<p>To derive own-derivatives <span class="math inline">\(\partial P_j / \partial V_j\)</span>, differentiate <a href="#eq-cnl-prob" class="quarto-xref">Equation&nbsp;<span>1</span></a>. The numerator is <span class="math inline">\(N_j = \sum_m \alpha_{jm} e^{V_j/\lambda_m} G_m^{\lambda_m - 1}\)</span>, so: <span class="math display">\[\frac{\partial N_j}{\partial V_j} = \sum_m \frac{\alpha_{jm}\,e^{V_j/\lambda_m}\,G_m^{\lambda_m - 1}}{\lambda_m}\left(1 + (\lambda_m - 1)s_{j|m}\right)\]</span> Since <span class="math inline">\(\partial D / \partial V_j = N_j = P_j D\)</span>, the quotient rule gives: <span id="eq-cnl-deriv"><span class="math display">\[\frac{\partial P_j}{\partial V_j} = \sum_m \frac{\pi_m\, s_{j|m}}{\lambda_m}\left(1 + (\lambda_m - 1)s_{j|m}\right) - P_j^2 \tag{2}\]</span></span></p>
+<p>Now apply this to the three alternatives with <span class="math inline">\(P=1\)</span>.</p>
+<p><strong><span class="math inline">\(j=3\)</span>: participate, don’t work</strong> (<span class="math inline">\(\alpha_{3,2}=1\)</span> only). Since <span class="math inline">\(P_3 = \pi_2 s_{3|2}\)</span>: <span class="math display">\[\frac{\partial P_3}{\partial V_3} = \frac{\pi_2\, s_{3|2}}{\lambda_P}\left(1 + (\lambda_P - 1)s_{3|2}\right) - P_3^2 = \frac{P_3}{\lambda_P}\left(1 + (\lambda_P - 1)s_{3|2}\right) - P_3^2\]</span></p>
+<p>The responsiveness of the “participate but don’t work” alternative is governed entirely by <span class="math inline">\(\lambda_P\)</span>, since this alternative belongs only to the program nest.</p>
+<p><strong><span class="math inline">\(j=4\)</span>: participate, work part-time</strong> (<span class="math inline">\(\alpha_{4,2}=1\)</span>, <span class="math inline">\(\alpha_{4,3}=1\)</span>). Since <span class="math inline">\(P_4 = \pi_2 s_{4|2} + \pi_3 s_{4|3}\)</span>: <span class="math display">\[\frac{\partial P_4}{\partial V_4} = \frac{\pi_2\, s_{4|2}}{\lambda_P}\left(1 + (\lambda_P - 1)s_{4|2}\right) + \frac{\pi_3\, s_{4|3}}{\lambda_E}\left(1 + (\lambda_E - 1)s_{4|3}\right) - P_4^2\]</span></p>
+<p>The own-derivative has <em>two</em> channels: substitution within the program nest (governed by <span class="math inline">\(\lambda_P\)</span>) and substitution within the work nest (governed by <span class="math inline">\(\lambda_E\)</span>). A lower <span class="math inline">\(\lambda_E\)</span> amplifies the responsiveness of <span class="math inline">\(P_4\)</span> to changes in <span class="math inline">\(V_4\)</span> through the extensive margin channel, while <span class="math inline">\(\lambda_P\)</span> controls the participation channel.</p>
+<p><strong><span class="math inline">\(j=5\)</span>: participate, work full-time</strong> (<span class="math inline">\(\alpha_{5,2}=1\)</span>, <span class="math inline">\(\alpha_{5,4}=1\)</span>): <span class="math display">\[\frac{\partial P_5}{\partial V_5} = \frac{\pi_2\, s_{5|2}}{\lambda_P}\left(1 + (\lambda_P - 1)s_{5|2}\right) + \frac{\pi_4\, s_{5|4}}{\lambda_I}\left(1 + (\lambda_I - 1)s_{5|4}\right) - P_5^2\]</span></p>
+<p>The structure is the same as for <span class="math inline">\(j=4\)</span>, but the intensive margin dissimilarity <span class="math inline">\(\lambda_I\)</span> replaces <span class="math inline">\(\lambda_E\)</span>. If <span class="math inline">\(\lambda_I &lt; \lambda_E\)</span>, then the full-time/part-time margin is more responsive than the extensive margin, holding nest shares fixed—working full-time is “closer” to not working full-time (in terms of correlation of unobservables) than working is to not working. This allows the model to accommodate, for instance, settings where it is relatively easy to switch between part-time and full-time (low <span class="math inline">\(\lambda_I\)</span>), harder to enter or exit the labor force (moderate <span class="math inline">\(\lambda_E\)</span>), and hardest to change program participation status (high <span class="math inline">\(\lambda_P\)</span>).</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="paired-combinatorial-logit" class="level3">
+<h3 class="anchored" data-anchor-id="paired-combinatorial-logit">Paired Combinatorial Logit</h3>
+<p>The <strong>paired combinatorial logit</strong> (<span class="citation" data-cites="Koppelman2006">Koppelman and Wen (<a href="../references.html#ref-Koppelman2006" role="doc-biblioref">2000</a>)</span>) takes a different approach: instead of grouping alternatives into nests, it defines a “nest” for every <em>pair</em> of alternatives. The generating function is:</p>
+<p><span class="math display">\[G(y_1,\ldots,y_J) = \sum_{j=1}^{J}\sum_{k=j+1}^{J}\left(y_j^{1/\lambda_{jk}} + y_k^{1/\lambda_{jk}}\right)^{\lambda_{jk}}\]</span></p>
+<p>where <span class="math inline">\(\lambda_{jk}\in(0,1]\)</span> governs the correlation between alternatives <span class="math inline">\(j\)</span> and <span class="math inline">\(k\)</span>. This model allows for a rich, pairwise correlation structure without requiring the analyst to specify a nesting structure <em>a priori</em>. The cost is a large number of parameters: <span class="math inline">\(J(J-1)/2\)</span> dissimilarity parameters, which may need to be restricted for tractability.</p>
+</section>
+</section>
+<section id="the-williams-daly-zachary-theorem" class="level2">
+<h2 class="anchored" data-anchor-id="the-williams-daly-zachary-theorem">The Williams-Daly-Zachary Theorem</h2>
+<p>We have already noted that the expected maximum utility in a GEV model takes a simple form in terms of the generating function <span class="math inline">\(G\)</span>. The <strong>Williams-Daly-Zachary (WDZ) theorem</strong> (<span class="citation" data-cites="Williams1977">Williams (<a href="../references.html#ref-Williams1977" role="doc-biblioref">1977</a>)</span>; <span class="citation" data-cites="DalyZachary1978">Daly and Zachary (<a href="../references.html#ref-DalyZachary1978" role="doc-biblioref">1978</a>)</span>) establishes a deeper result: for <em>any</em> random utility model, the expected maximum utility is a <strong>convex</strong> function of the representative utilities, and the choice probabilities are its gradients. The GEV formula is a special case.</p>
+<div id="thm-wdz" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1 (Williams-Daly-Zachary Theorem)</strong></span> Let <span class="math inline">\(U_{nj} = V_{nj} + \varepsilon_{nj}\)</span> for <span class="math inline">\(j\in\mathcal{J}\)</span> define a random utility model with continuous joint density for <span class="math inline">\((\varepsilon_{n1},\ldots,\varepsilon_{nJ})\)</span>. Define the <strong>social surplus function</strong>:</p>
+<p><span class="math display">\[W(V_{n1},\ldots,V_{nJ}) = \mathbb{E}\left[\max_{j\in\mathcal{J}} U_{nj}\right]\]</span></p>
+<p>Then:</p>
+<ol type="1">
+<li><span class="math inline">\(W\)</span> is convex in <span class="math inline">\((V_{n1},\ldots,V_{nJ})\)</span>.</li>
+<li>The choice probabilities are the gradients of <span class="math inline">\(W\)</span>: <span class="math display">\[P_{nj} = \frac{\partial W}{\partial V_{nj}}\]</span></li>
+</ol>
+</div>
+<p>This result says that the expected maximum utility plays the role of an <em>expenditure function</em> (or its dual) in the discrete choice setting, with the choice probabilities recovered by differentiation — exactly as <strong>Roy’s identity</strong> recovers demand functions from the indirect utility function in continuous consumer theory. The analogy is precise: in continuous demand, <span class="math inline">\(x_j = -\frac{\partial V/\partial p_j}{\partial V/\partial y}\)</span>; in discrete choice, <span class="math inline">\(P_j = \frac{\partial W}{\partial V_j}\)</span>. The social surplus function <span class="math inline">\(W\)</span> is the discrete choice analogue of the indirect utility function.</p>
+</section>
+<section id="mixed-multinomial-logit" class="level2">
+<h2 class="anchored" data-anchor-id="mixed-multinomial-logit">Mixed Multinomial Logit</h2>
+<p>The GEV models provide closed-form choice probabilities with richer substitution patterns than the basic MNL. But they still impose a specific parametric structure on the correlation among unobservables. The <strong>Mixed Multinomial Logit (MMNL)</strong> model — also known as the <strong>random coefficients logit</strong> — takes a different and more flexible approach: it allows the parameters of the utility function to vary randomly across individuals.</p>
+<section id="specification" class="level3">
+<h3 class="anchored" data-anchor-id="specification">Specification</h3>
+<p>In the MMNL, individual <span class="math inline">\(n\)</span>’s utility for alternative <span class="math inline">\(j\)</span> is:</p>
+<p><span class="math display">\[U_{nj} = V_{nj}(\boldsymbol{\beta}_n) + \varepsilon_{nj}\]</span></p>
+<p>where <span class="math inline">\(\varepsilon_{nj}\)</span> is iid Type I Extreme Value (as in the standard logit) and <span class="math inline">\(\boldsymbol{\beta}_n\)</span> is a vector of individual-specific taste parameters drawn from a mixing distribution <span class="math inline">\(f(\boldsymbol{\beta}|\boldsymbol{\theta})\)</span>. Conditional on <span class="math inline">\(\boldsymbol{\beta}_n\)</span>, the choice probabilities are standard logit:</p>
+<p><span class="math display">\[L_{nj}(\boldsymbol{\beta}) = \frac{e^{V_{nj}(\boldsymbol{\beta})}}{\sum_{k}e^{V_{nk}(\boldsymbol{\beta})}}\]</span></p>
+<p>The unconditional choice probability is obtained by integrating over the mixing distribution:</p>
+<p><span class="math display">\[P_{nj} = \int L_{nj}(\boldsymbol{\beta})f(\boldsymbol{\beta}|\boldsymbol{\theta})d\boldsymbol{\beta}\]</span></p>
+<p>This integral generally does not have a closed-form solution, which is why simulation methods (from the <a href="../lectures/simulation-methods.html">previous chapter</a>) are essential.</p>
+</section>
+<section id="why-mixed-logit-is-so-flexible" class="level3">
+<h3 class="anchored" data-anchor-id="why-mixed-logit-is-so-flexible">Why Mixed Logit Is So Flexible</h3>
+<p><span class="citation" data-cites="McFaddenTrain2000">McFadden and Train (<a href="../references.html#ref-McFaddenTrain2000" role="doc-biblioref">2000</a>)</span> proved a useful result: any RUM-consistent choice probabilities can be approximated arbitrarily closely by a MMNL model. To state this precisely, we need a slightly more formal definition of the random utility model.</p>
+<p>Consider a general RUM where the indirect utility of consumer <span class="math inline">\(n\)</span> for alternative <span class="math inline">\(j\)</span> is:</p>
+<p><span class="math display">\[U_{nj}^* = U^*(\mathbf{z}_j, \mathbf{s}_n, \varepsilon_j, \nu_n)\]</span></p>
+<p>Here <span class="math inline">\(\mathbf{z}_j\)</span> are observed choice characteristics (e.g.&nbsp;price, product attributes), <span class="math inline">\(\mathbf{s}_n\)</span> are observed consumer characteristics (e.g.&nbsp;income, demographics), <span class="math inline">\(\varepsilon_j\)</span> are unobserved product-level factors, and <span class="math inline">\(\nu_n\)</span> are unobserved consumer-level factors. The choice probabilities are obtained by integrating over the unobservables:</p>
+<p><span class="math display">\[P_{nj} = \Pr\left(U_{nj}^* \geq U_{nk}^*\ \forall\ k\neq j\ \Big|\ \mathbf{z}, \mathbf{s}_n\right) = \int \mathbf{1}\{U_{nj}^* \geq U_{nk}^*\ \forall\ k\neq j\}\ dF(\varepsilon,\nu)\]</span></p>
+<p><span class="citation" data-cites="McFaddenTrain2000">McFadden and Train (<a href="../references.html#ref-McFaddenTrain2000" role="doc-biblioref">2000</a>)</span> prove that a MMNL can approximate these choice probabilities arbitrarily well. Their approximation is built of a <strong>polynomial approximation</strong> to <span class="math inline">\(U^*_{n}\)</span>, leading to a MMNL with indirect utility given by:</p>
+<p><span class="math display">\[V_{nj}(\boldsymbol{\beta}) = \mathbf{x}_{nj}'\boldsymbol{\beta}\]</span></p>
+<p>where <span class="math inline">\(\mathbf{x}_{nj}\)</span> is a vector of polynomial basis functions in <span class="math inline">\((\mathbf{z}_j, \mathbf{s}_n)\)</span> and <span class="math inline">\(\boldsymbol{\beta}\)</span> is the random coefficient vector. The term <span class="math inline">\(\mathbf{x}_{nj}'\boldsymbol{\beta}\)</span> can be understood as being proportional to the underlying polynomial approximation to the true indirect utility <span class="math inline">\(U^*\)</span>.</p>
+<div id="thm-mmnl-approx" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 2 (McFadden-Train Approximation Theorem)</strong></span> Let <span class="math inline">\(\{P_{nj}^*\}\)</span> be any set of choice probabilities derived from a random utility model <span class="math inline">\(U^*(\mathbf{z}_j, \mathbf{s}_n, \varepsilon_j, \nu_n)\)</span> that satisfies mild regularity conditions. For any <span class="math inline">\(\delta &gt; 0\)</span>, there exists a MMNL specification — a choice of basis functions <span class="math inline">\(\mathbf{x}_{nj}(\mathbf{z}_j, \mathbf{s}_n)\)</span> and mixing distribution <span class="math inline">\(f(\boldsymbol{\beta}|\boldsymbol{\theta})\)</span> — such that the MMNL choice probabilities satisfy:</p>
+<p><span class="math display">\[\sup_{n,j}|P_{nj} - P_{nj}^*| &lt; \delta\]</span></p>
+</div>
+<p>The mixing distribution then generates the required correlation structure among utilities. This is analogous to the universal approximation theorems for neural networks, and the connection is made precise by the latent class version discussed below.</p>
+<p>This result makes the MMNL an attractive “default” specification when the analyst does not have strong prior information about the correlation structure. In practice, common choices for <span class="math inline">\(f\)</span> include:</p>
+<ul>
+<li><strong>Normal</strong>: <span class="math inline">\(\boldsymbol{\beta}_n\sim\mathcal{N}(\mathbf{b},\mathbf{\Sigma})\)</span>, where <span class="math inline">\(\mathbf{b}\)</span> and <span class="math inline">\(\mathbf{\Sigma}\)</span> are the parameters to be estimated.</li>
+<li><strong>Log-normal</strong>: <span class="math inline">\(\log\boldsymbol{\beta}_n\sim\mathcal{N}(\mathbf{b},\mathbf{\Sigma})\)</span>, useful when coefficients should have a particular sign (e.g.&nbsp;price coefficients should be negative).</li>
+<li><strong>Discrete (latent class)</strong>: <span class="math inline">\(\boldsymbol{\beta}_n\)</span> takes one of <span class="math inline">\(K\)</span> values <span class="math inline">\(\boldsymbol{\beta}^{1},\ldots,\boldsymbol{\beta}^{K}\)</span> with probabilities <span class="math inline">\(\pi_1,\ldots,\pi_K\)</span>. See the next section.</li>
+</ul>
+</section>
+<section id="latent-class-models" class="level3">
+<h3 class="anchored" data-anchor-id="latent-class-models">Latent Class Models</h3>
+<p>An important special case of the MMNL arises when the mixing distribution is <strong>discrete</strong>. Suppose there are <span class="math inline">\(K\)</span> latent classes (or types), each with its own parameter vector <span class="math inline">\(\boldsymbol{\beta}^k\)</span> and class probability <span class="math inline">\(\pi_k\)</span>:</p>
+<p><span class="math display">\[P_{nj} = \sum_{k=1}^{K}\pi_k L_{nj}(\boldsymbol{\beta}^k)\]</span></p>
+<p>where <span class="math inline">\(\pi_k &gt; 0\)</span> and <span class="math inline">\(\sum_k\pi_k = 1\)</span>. This is a <strong>finite mixture of logits</strong>. The parameters to estimate are <span class="math inline">\(\{(\pi_k,\boldsymbol{\beta}^k)\}_{k=1}^K\)</span>, and the number of classes <span class="math inline">\(K\)</span> is typically selected by information criteria (BIC) or cross-validation.</p>
+<p>The latent class model has an interesting interpretation. For each observation, the model computes <span class="math inline">\(K\)</span> different sets of logit probabilities (one per class) and then averages them with weights <span class="math inline">\(\pi_k\)</span>. This is formally identical to a <strong>single-layer feedforward neural network</strong>: the “hidden layer” consists of the <span class="math inline">\(K\)</span> class-specific logit models, and the “output layer” combines them with the mixing weights. The universal approximation result of <span class="citation" data-cites="McFaddenTrain2000">McFadden and Train (<a href="../references.html#ref-McFaddenTrain2000" role="doc-biblioref">2000</a>)</span> can be understood through this lens — just as neural networks with enough hidden units can approximate any function, latent class logit models with enough classes can approximate any set of RUM-consistent choice probabilities.</p>
+</section>
+</section>
+<section id="estimation" class="level2">
+<h2 class="anchored" data-anchor-id="estimation">Estimation</h2>
+<section id="maximum-likelihood-for-the-mnl" class="level3">
+<h3 class="anchored" data-anchor-id="maximum-likelihood-for-the-mnl">Maximum Likelihood for the MNL</h3>
+<p>For the multinomial logit, the log-likelihood takes a simple form. If individual <span class="math inline">\(n\)</span> chooses alternative <span class="math inline">\(d_n\)</span>, the contribution to the log-likelihood is:</p>
+<p><span class="math display">\[\ell_n(\theta) = \log P_{n,d_n} = V_{n,d_n} - \log\sum_{j=1}^{J}e^{V_{nj}}\]</span></p>
+<p>The MNL log-likelihood is globally concave, so estimation is straightforward:</p>
+<p><span class="math display">\[\hat{\theta}_{MLE} = \arg\max_{\theta}\sum_{n=1}^{N}\ell_n(\theta)\]</span></p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: MNL Estimation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="exm-mnl-estimation" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3</strong></span> Let’s simulate data from a simple MNL model and estimate the parameters by maximum likelihood.</p>
+<div id="550d41ab" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span>, <span class="bu">Random</span>, <span class="bu">Optim</span>, <span class="bu">LinearAlgebra</span>, <span class="bu">ForwardDiff</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">321</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># True parameters</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="fl">4</span>           <span class="co"># number of alternatives</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="fl">2000</span>        <span class="co"># number of individuals</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="fl">2</span>           <span class="co"># number of covariates</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>β_true <span class="op">=</span> [<span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.3</span>]       <span class="co"># coefficients on covariates</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>α_true <span class="op">=</span> [<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">0.5</span>]  <span class="co"># alternative-specific constants (alt 1 normalized to 0)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate data</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> <span class="fu">randn</span>(N, J, K)   <span class="co"># alternative-specific covariates</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>V <span class="op">=</span> <span class="fu">zeros</span>(N, J)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>N, j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>J</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    V[n, j] <span class="op">=</span> (j <span class="op">&lt;=</span> <span class="fl">3</span> ? α_true[j] <span class="op">:</span> <span class="fl">0.0</span>) <span class="op">+</span> <span class="fu">sum</span>(X[n, j, <span class="op">:</span>] <span class="op">.*</span> β_true)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw choices</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>ε <span class="op">=</span> <span class="fu">-log</span>.(<span class="fu">-log</span>.(<span class="fu">rand</span>(N, J)))  <span class="co"># Type I EV draws</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>U <span class="op">=</span> V <span class="op">.+</span> ε</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>choices <span class="op">=</span> [<span class="fu">argmax</span>(U[n, <span class="op">:</span>]) for n <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>N]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Log-likelihood</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">log_likelihood</span>(θ, X, choices)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    J <span class="op">=</span> <span class="fu">size</span>(X, <span class="fl">2</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> <span class="fu">size</span>(X, <span class="fl">3</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    α <span class="op">=</span> <span class="fu">vcat</span>(θ[<span class="fl">1</span><span class="op">:</span>J<span class="op">-</span><span class="fl">1</span>], <span class="fl">0.0</span>)  <span class="co"># normalize last ASC to 0</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    β <span class="op">=</span> θ[J<span class="op">:</span>J<span class="op">+</span>K<span class="op">-</span><span class="fl">1</span>]</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="fu">axes</span>(X, <span class="fl">1</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        V <span class="op">=</span> [α[j] <span class="op">+</span> <span class="fu">sum</span>(X[n, j, <span class="op">:</span>] <span class="op">.*</span> β) for j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>J]</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        logsum <span class="op">=</span> <span class="fu">log</span>(<span class="fu">sum</span>(<span class="fu">exp</span>.(V <span class="op">.-</span> <span class="fu">maximum</span>(V)))) <span class="op">+</span> <span class="fu">maximum</span>(V)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        ll <span class="op">+=</span> V[choices[n]] <span class="op">-</span> logsum</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ll</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>θ<span class="fl">0</span> <span class="op">=</span> <span class="fu">zeros</span>(J <span class="op">-</span> <span class="fl">1</span> <span class="op">+</span> K)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> <span class="fu">optimize</span>(θ <span class="op">-&gt;</span> <span class="fu">-log_likelihood</span>(θ, X, choices), θ<span class="fl">0</span>, <span class="fu">Newton</span>(), autodiff<span class="op">=:</span>forward)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>θ_hat <span class="op">=</span> res.minimizer</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"True vs Estimated Parameters:"</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"  ASC:  true = </span><span class="sc">$</span>(α_true)<span class="st">  est = </span><span class="sc">$</span>(<span class="fu">round</span>.(θ_hat[<span class="fl">1</span><span class="op">:</span>J<span class="op">-</span><span class="fl">1</span>], digits<span class="op">=</span><span class="fl">3</span>))<span class="st">"</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"  β:    true = </span><span class="sc">$</span>(β_true)<span class="st">   est = </span><span class="sc">$</span>(<span class="fu">round</span>.(θ_hat[J<span class="op">:</span><span class="kw">end</span>], digits<span class="op">=</span><span class="fl">3</span>))<span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>True vs Estimated Parameters:
+  ASC:  true = [0.0, 1.0, -0.5]  est = [0.111, 1.066, -0.345]
+  β:    true = [0.5, -0.3]   est = [0.504, -0.305]</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-mmnl-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="sec-mmnl-estimation">Simulated Maximum Likelihood for Mixed Logit</h3>
+<p>For the MMNL, the choice probability involves an integral that does not have a closed form:</p>
+<p><span class="math display">\[P_{nj} = \int L_{nj}(\boldsymbol{\beta})f(\boldsymbol{\beta}|\boldsymbol{\theta})d\boldsymbol{\beta}\]</span></p>
+<p>We approximate this by simulation. Draw <span class="math inline">\(R\)</span> values <span class="math inline">\(\boldsymbol{\beta}^1,\ldots,\boldsymbol{\beta}^R\)</span> from <span class="math inline">\(f(\cdot|\boldsymbol{\theta})\)</span> and compute:</p>
+<p><span class="math display">\[\hat{P}_{nj} = \frac{1}{R}\sum_{r=1}^{R}L_{nj}(\boldsymbol{\beta}^r)\]</span></p>
+<p>The <strong>simulated log-likelihood</strong> is:</p>
+<p><span class="math display">\[\hat{\ell}(\boldsymbol{\theta}) = \sum_{n=1}^{N}\log\hat{P}_{n,d_n}\]</span></p>
+<p>This is exactly the maximum simulated likelihood (MSL) estimator from the <a href="../lectures/simulation-methods.html">simulation chapter</a>. Recall the key subtlety: because <span class="math inline">\(\log\)</span> is concave, <span class="math inline">\(\mathbb{E}[\log\hat{P}]\leq\log P\)</span>, so the simulated log-likelihood is biased downward. Consistency requires <span class="math inline">\(R\rightarrow\infty\)</span> with <span class="math inline">\(\sqrt{N}/R\rightarrow 0\)</span>.</p>
+<p>An important practical advantage of the MMNL is that the integrand <span class="math inline">\(L_{nj}(\boldsymbol{\beta})\)</span> is a smooth function of <span class="math inline">\(\boldsymbol{\beta}\)</span>, which means the simulated probability <span class="math inline">\(\hat{P}_{nj}\)</span> is a smooth function of the parameters <span class="math inline">\(\boldsymbol{\theta}\)</span>. This is in contrast to the non-differentiability problems that arise when simulating models with discrete outcomes (as discussed in the simulation chapter). The MMNL is therefore well-suited to gradient-based optimization.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Simulated MLE for Mixed Logit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="exm-mmnl-estimation" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4</strong></span> Let’s simulate data from a mixed logit (with normally distributed random coefficients) and estimate the parameters by simulated maximum likelihood.</p>
+<div id="fade984b" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">42</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># True parameters</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="fl">1000</span>     <span class="co"># individuals</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>T_obs <span class="op">=</span> <span class="fl">1</span>    <span class="co"># choice occasions per individual</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="fl">3</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>β_mean_true <span class="op">=</span> [<span class="fl">1.0</span>, <span class="op">-</span><span class="fl">0.5</span>]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>β_sd_true <span class="op">=</span> [<span class="fl">0.5</span>, <span class="fl">0.3</span>]      <span class="co"># standard deviations of random coefficients</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Each individual has T choice occasions with different X but same β_n</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> <span class="fu">randn</span>(N, T_obs, J, <span class="fl">2</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>β_ind <span class="op">=</span> <span class="fu">hcat</span>([β_mean_true <span class="op">.+</span> β_sd_true <span class="op">.*</span> <span class="fu">randn</span>(<span class="fl">2</span>) for _ <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>N]<span class="op">...</span>)<span class="ch">'</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>choices <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Int</span>, N, T_obs)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>N, t <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>T_obs</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> [<span class="fu">sum</span>(X[n, t, j, <span class="op">:</span>] <span class="op">.*</span> β_ind[n, <span class="op">:</span>]) for j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>J]</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    ε <span class="op">=</span> <span class="fu">-log</span>.(<span class="fu">-log</span>.(<span class="fu">rand</span>(J)))</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    choices[n, t] <span class="op">=</span> <span class="fu">argmax</span>(V <span class="op">.+</span> ε)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We pre-draw and fix the simulation draws outside the likelihood function. This ensures that the simulated likelihood is a smooth, deterministic function of <span class="math inline">\(\boldsymbol{\theta}\)</span> — there is no simulation noise across evaluations — and allows gradient-based optimization.</p>
+<div id="f51285fe" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>R <span class="op">=</span> <span class="fl">200</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sim_draws <span class="op">=</span> <span class="fu">randn</span>(N, R, <span class="fl">2</span>)   <span class="co"># fixed draws: N individuals × R simulations × K coefficients</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">sim_log_likelihood_panel</span>(θ, X, choices, draws)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    N, T, J, K <span class="op">=</span> <span class="fu">size</span>(X)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> θ[<span class="fl">1</span><span class="op">:</span>K]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> <span class="fu">exp</span>.(θ[K<span class="op">+</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>K])  <span class="co"># ensure positive std devs</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> <span class="fu">zero</span>(<span class="fu">eltype</span>(θ))</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> <span class="fu">size</span>(draws, <span class="fl">2</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>N</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        P_sim <span class="op">=</span> <span class="fu">zero</span>(<span class="fu">eltype</span>(θ))</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> r <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>R</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>            β_r <span class="op">=</span> b <span class="op">.+</span> s <span class="op">.*</span> <span class="pp">@view</span>(draws[n, r, <span class="op">:</span>])</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>            logP <span class="op">=</span> <span class="fu">zero</span>(<span class="fu">eltype</span>(θ))</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> t <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>T</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                V <span class="op">=</span> [<span class="fu">sum</span>(X[n, t, j, <span class="op">:</span>] <span class="op">.*</span> β_r) for j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>J]</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>                maxV <span class="op">=</span> <span class="fu">maximum</span>(V)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>                logP <span class="op">+=</span> V[choices[n, t]] <span class="op">-</span> maxV <span class="op">-</span> <span class="fu">log</span>(<span class="fu">sum</span>(<span class="fu">exp</span>.(V <span class="op">.-</span> maxV)))</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>            P_sim <span class="op">+=</span> <span class="fu">exp</span>(logP)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        ll <span class="op">+=</span> <span class="fu">log</span>(P_sim <span class="op">/</span> R)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ll</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="co"># First, get good starting values from a standard (homogeneous) MNL</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">mnl_ll_panel</span>(b, X, choices)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    N, T, J, K <span class="op">=</span> <span class="fu">size</span>(X)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> <span class="fu">zero</span>(<span class="fu">eltype</span>(b))</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>N, t <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>T</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        V <span class="op">=</span> [<span class="fu">sum</span>(X[n, t, j, <span class="op">:</span>] <span class="op">.*</span> b) for j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>J]</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>        maxV <span class="op">=</span> <span class="fu">maximum</span>(V)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>        ll <span class="op">+=</span> V[choices[n, t]] <span class="op">-</span> maxV <span class="op">-</span> <span class="fu">log</span>(<span class="fu">sum</span>(<span class="fu">exp</span>.(V <span class="op">.-</span> maxV)))</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ll</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>res_mnl <span class="op">=</span> <span class="fu">optimize</span>(b <span class="op">-&gt;</span> <span class="fu">-mnl_ll_panel</span>(b, X, choices), <span class="fu">zeros</span>(<span class="fl">2</span>), <span class="fu">Newton</span>(), autodiff<span class="op">=:</span>forward)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>b_start <span class="op">=</span> res_mnl.minimizer</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize: means at MNL estimates, std devs at a small positive value</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>θ<span class="fl">0</span> <span class="op">=</span> [b_start; <span class="fu">log</span>(<span class="fl">0.1</span>); <span class="fu">log</span>(<span class="fl">0.1</span>)]</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> <span class="fu">optimize</span>(θ <span class="op">-&gt;</span> <span class="fu">-sim_log_likelihood_panel</span>(θ, X, choices, sim_draws),</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>               θ<span class="fl">0</span>, <span class="fu">LBFGS</span>(), autodiff<span class="op">=:</span>forward,</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>               Optim.<span class="fu">Options</span>(iterations<span class="op">=</span><span class="fl">500</span>))</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>θ_hat_mmnl <span class="op">=</span> res.minimizer</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"True vs Estimated Parameters:"</span>)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"  β_mean: true = </span><span class="sc">$</span>(β_mean_true)<span class="st">  est = </span><span class="sc">$</span>(<span class="fu">round</span>.(θ_hat_mmnl[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>], digits<span class="op">=</span><span class="fl">3</span>))<span class="st">"</span>)</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"  β_sd:   true = </span><span class="sc">$</span>(β_sd_true)<span class="st">   est = </span><span class="sc">$</span>(<span class="fu">round</span>.(<span class="fu">exp</span>.(θ_hat_mmnl[<span class="fl">3</span><span class="op">:</span><span class="fl">4</span>]), digits<span class="op">=</span><span class="fl">3</span>))<span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>True vs Estimated Parameters:
+  β_mean: true = [1.0, -0.5]  est = [0.901, -0.46]
+  β_sd:   true = [0.5, 0.3]   est = [0.472, 0.643]</code></pre>
+</div>
+</div>
+<p>Several details matter here. First, the simulation draws are pre-drawn and held fixed, making the objective a smooth deterministic function of the parameters. Second, we use <strong>L-BFGS</strong> with automatic differentiation rather than Nelder-Mead: because the logit probability is a smooth function of <span class="math inline">\(\boldsymbol{\beta}\)</span> and hence of <span class="math inline">\(\boldsymbol{\theta}\)</span>, the simulated likelihood is differentiable and gradient-based methods are both faster and more reliable. Third, we initialize the means at the MNL estimates and the standard deviations at a small positive value — starting from the homogeneous model and “growing” the heterogeneity. Finally, with panel data, the key identifying variation comes from observing the <em>same</em> individual make different choices across occasions: the pattern of choices reveals each individual’s coefficients, and the distribution of these patterns across individuals identifies the mixing distribution.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Discussion: Choosing the Mixing Distribution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The choice of mixing distribution <span class="math inline">\(f(\boldsymbol{\beta}|\boldsymbol{\theta})\)</span> involves important trade-offs:</p>
+<ol type="1">
+<li><strong>Continuous vs.&nbsp;discrete mixing.</strong> Continuous distributions (normal, log-normal) are parsimonious and can capture smooth heterogeneity. Discrete distributions (latent class) are nonparametric in the sense that they do not impose a functional form on the heterogeneity distribution, but they require choosing <span class="math inline">\(K\)</span>.</li>
+<li><strong>Support restrictions.</strong> If economic theory implies that a coefficient must have a particular sign (e.g.&nbsp;negative price coefficient), a log-normal distribution enforces this while a normal distribution does not.</li>
+<li><strong>Flexibility vs.&nbsp;parsimony.</strong> A full covariance matrix <span class="math inline">\(\mathbf{\Sigma}\)</span> for normally distributed coefficients has <span class="math inline">\(K(K+1)/2\)</span> parameters, which can be large. In practice, many applications assume diagonal <span class="math inline">\(\mathbf{\Sigma}\)</span> (independent random coefficients) and only allow a few key coefficients to be random.</li>
+</ol>
+<p>The <span class="citation" data-cites="McFaddenTrain2000">McFadden and Train (<a href="../references.html#ref-McFaddenTrain2000" role="doc-biblioref">2000</a>)</span> approximation theorem guarantees that <em>some</em> mixing distribution works. It does not tell us how to find it. In practice, the choice is guided by a combination of theory, diagnostic checks, and computational tractability. See <span class="citation" data-cites="Train2009">Train (<a href="../references.html#ref-Train2009" role="doc-biblioref">2009</a>)</span> for an extensive practical discussion.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>This chapter introduced the foundational framework for discrete choice econometrics:</p>
+<ol type="1">
+<li>The <strong>Random Utility Model</strong> provides the behavioral foundation: individuals maximize utility, and randomness in choices arises from the econometrician’s incomplete information.</li>
+<li>The <strong>multinomial probit</strong> allows flexible substitution patterns through correlated normal errors, with estimation via the <strong>GHK simulator</strong>.</li>
+<li>The <strong>GEV family</strong> generates closed-form, RUM-consistent choice probabilities. The multinomial logit (iid errors, IIA) is the simplest case; the nested logit, cross-nested logit, and paired combinatorial logit allow richer substitution patterns through structured error correlations.</li>
+<li>The <strong>Williams-Daly-Zachary theorem</strong> connects choice probabilities to the expected maximum utility — the discrete choice analogue of Roy’s identity — providing a foundation for welfare analysis.</li>
+<li>The <strong>Mixed Multinomial Logit</strong> allows arbitrary substitution patterns by introducing random coefficients. The <span class="citation" data-cites="McFaddenTrain2000">McFadden and Train (<a href="../references.html#ref-McFaddenTrain2000" role="doc-biblioref">2000</a>)</span> theorem shows that it can approximate any RUM. Estimation requires simulation methods from the <a href="../lectures/simulation-methods.html">previous chapter</a>.</li>
+</ol>
+<p>In the next chapter, we extend these ideas to <strong>dynamic</strong> settings where individuals make sequences of discrete choices over time, introducing the additional challenge of modeling expectations about the future.</p>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-DalyZachary1978" class="csl-entry" role="listitem">
+Daly, Andrew, and Stanley Zachary. 1978. <span>“Improved Multiple Choice Models.”</span> <em>Determinants of Travel Choice</em>, 335–57.
+</div>
+<div id="ref-Koppelman2006" class="csl-entry" role="listitem">
+Koppelman, Frank S, and Chieh-Hua Wen. 2000. <span>“A Closed Form Paired Combinatorial Logit Model.”</span> <em>Transportation Research Part B</em> 34 (2): 93–109.
+</div>
+<div id="ref-McFadden1974" class="csl-entry" role="listitem">
+McFadden, Daniel. 1974. <span>“Conditional Logit Analysis of Qualitative Choice Behavior.”</span> <em>Frontiers in Econometrics</em>, 105–42.
+</div>
+<div id="ref-McFadden1978" class="csl-entry" role="listitem">
+———. 1978. <span>“Modelling the Choice of Residential Location.”</span> <em>Transportation Research Record</em> 672: 72–77.
+</div>
+<div id="ref-McFaddenTrain2000" class="csl-entry" role="listitem">
+McFadden, Daniel, and Kenneth Train. 2000. <span>“Mixed MNL Models for Discrete Response.”</span> <em>Journal of Applied Econometrics</em> 15 (5): 447–70.
+</div>
+<div id="ref-Train2009" class="csl-entry" role="listitem">
+Train, Kenneth E. 2009. <em>Discrete Choice Methods with Simulation</em>. 2nd ed. Cambridge University Press.
+</div>
+<div id="ref-Vovsha1997" class="csl-entry" role="listitem">
+Vovsha, Peter. 1997. <span>“Application of Cross-Nested Logit Model to Mode Choice in Tel Aviv, Israel, Metropolitan Area.”</span> <em>Transportation Research Record</em> 1607: 6–15.
+</div>
+<div id="ref-Williams1977" class="csl-entry" role="listitem">
+Williams, H C W L. 1977. <span>“On the Formation of Travel Demand Models and Economic Evaluation Measures of User Benefit.”</span> <em>Environment and Planning A</em> 9 (3): 285–344.
+</div>
+</div>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

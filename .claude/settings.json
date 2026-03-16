@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(julia --project=. test_mmnl.jl)",
+      "Bash(julia test_nested.jl)",
+      "Bash(julia test_cnl.jl)"
+    ]
+  }
+}
