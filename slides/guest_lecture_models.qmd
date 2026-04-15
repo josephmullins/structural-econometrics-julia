@@ -1,0 +1,554 @@
+---
+title: "Why Can Models Do? A Guide for Policy Practitioners"
+author: "Joseph Mullins"
+format:
+  revealjs:
+    theme: solarized
+    slide-number: true
+    chalkboard: true
+    incremental: true
+    width: 1280
+    height: 720
+bibliography: ../references.bib
+execute:
+  echo: false
+  freeze: auto
+---
+
+<style>
+.callout .callout-body p {
+  font-size: 1.3em;
+}
+</style>
+
+## The Course So Far
+
+- You've learned about evidence-based decision making
+- You know why we need rigorous evidence: intuition and anecdotes aren't enough
+- You've seen how **randomized experiments** and **quasi-experiments** help us measure the effects of policies
+
+. . .
+
+**Today's question:** What happens when the policy you're considering *hasn't been tried before*?
+
+## What Experiments Tell Us
+
+Experiments are the gold standard for answering:
+
+> "What was the effect of *this specific policy* on *this specific population*?"
+
+. . .
+
+That's incredibly valuable. But policymakers usually face a different question...
+
+## What Policymakers Actually Need
+
+> "What *would happen* if we implemented *this new policy* on *our population*?"
+
+. . .
+
+- The policy you're designing may not match any past experiment exactly
+- Your population may differ from the one that was studied
+- You may want to compare several options that have never been tried
+- You may wonder about the willingess to pay for certain policies
+
+. . .
+
+This is the gap that economic models fill.
+
+# A Simple Example: The Market for Bananas
+
+## Three Policies Under Consideration
+
+The government is considering **three policies** to promote banana consumption:
+
+:::{.nonincremental}
+
+1. A **10% demand subsidy** --- consumers pay 10% less
+2. A **20% demand subsidy** --- consumers pay 20% less
+3. A **15% supply-side subsidy** --- producers' receive 15% more
+
+:::
+
+. . .
+
+Two questions:
+
+- What does each policy do to the **price and quantity** of bananas?
+- How much are consumers **willing to pay** for each one?
+
+## One solution: run an Experiment
+
+- Suppose we run an RCT for **Policy 1**:
+$$q_{m} = \beta_0 + \beta_1 Z_{m} + \epsilon_{m}$$
+$$p_{m} = \alpha_0 + \alpha_1 Z_{m} + \eta_{m}$$
+where $Z_{m}\in\{0,1\}$ indicates treatment and $(p,q)$ are (log) price and quantity.
+- This gives us clean estimates of the % effect of subsidy on prices ($\alpha_1$) and quantities ($\beta_1$).
+- But do $\alpha_1$ and $\beta_1$ tell us anything about **Policies 2 and 3**? Could we extrapolate with these results?
+
+## Looking at the Data
+
+Suppose we look at prices and quantities across all our markets.
+
+```{julia}
+#| label: fig-cloud
+#| fig-cap: "Each dot is a market. No obvious relationship between price and quantity."
+#| fig-align: center
+
+using Plots, Random, Logging
+Random.seed!(42)
+
+solarized_bg = RGB(253/255, 246/255, 227/255)
+
+n = 80
+d_shift = 2.5 * randn(n)
+s_shift = 2.5 * randn(n)
+
+P_eq = 5.0 .+ (d_shift .- s_shift) ./ 2
+Q_eq = 2.0 .+ 1.2 .* P_eq .+ s_shift
+
+scatter(Q_eq, P_eq,
+    color=:black, ms=5, alpha=0.6, legend=false,
+    xlabel="Quantity", ylabel="Price",
+    xlim=(0, 22), ylim=(0, 12),
+    left_margin=5Plots.mm, bottom_margin=5Plots.mm,
+    background_color=solarized_bg,
+    tickfontsize=12, guidefontsize=14)
+```
+
+## Why Is It a Cloud?
+
+Prices and quantities are **jointly determined** by supply and demand. 
+
+```{julia}
+#| label: fig-animation
+#| fig-cap: "Supply and demand shift across markets, tracing out equilibrium points."
+#| fig-align: center
+
+Random.seed!(123)
+
+eq_prices = Float64[]
+eq_quantities = Float64[]
+
+# Pre-generate alternating shifts: demand moves on odd frames, supply on even
+n_frames = 30
+b_d = 0.8   # demand slope
+b_s = 1.2   # supply slope
+
+# Starting positions
+a_d_vals = Float64[12.0]
+a_s_vals = Float64[2.0]
+for i in 2:n_frames
+    if isodd(i)
+        # Demand shifts, supply stays
+        push!(a_d_vals, 12 + 2.5*randn())
+        push!(a_s_vals, a_s_vals[end])
+    else
+        # Supply shifts, demand stays
+        push!(a_d_vals, a_d_vals[end])
+        push!(a_s_vals, 2 + 2.5*randn())
+    end
+end
+
+anim = @animate for i in 1:n_frames
+    a_d = a_d_vals[i]
+    a_s = a_s_vals[i]
+
+    P_star = (a_d - a_s) / (b_s + b_d)
+    Q_star = a_s + b_s * P_star
+
+    push!(eq_prices, P_star)
+    push!(eq_quantities, Q_star)
+
+    Q_range = range(0, 22, length=100)
+    P_supply = (Q_range .- a_s) ./ b_s
+    P_demand = (a_d .- Q_range) ./ b_d
+
+    p = plot(Q_range, P_supply, color=:indianred, lw=2.5, label="Supply",
+        xlim=(0, 22), ylim=(0, 12),
+        xlabel="Quantity", ylabel="Price",
+        legend=:topright,
+        left_margin=5Plots.mm, bottom_margin=5Plots.mm,
+        background_color=solarized_bg,
+        tickfontsize=12, guidefontsize=14)
+    plot!(Q_range, P_demand, color=:steelblue, lw=2.5, label="Demand")
+    scatter!(eq_quantities, eq_prices,
+        color=:black, ms=4, alpha=0.5, label=nothing)
+    scatter!([Q_star], [P_star],
+        color=:green, ms=8, marker=:star5, label="Equilibrium")
+end
+
+with_logger(NullLogger()) do
+    gif(anim, fps=0.5)
+end
+```
+
+## Point 1
+
+:::{.callout-note icon="false"}
+# Lesson
+
+Sometimes we need a model to make sense of the data and identify deep causal objects of interest.
+
+:::
+
+## A Simple Theory {.smaller}
+
+A simple economic model:
+
+:::{.nonincremental}
+
+- **Consumers** choose how many bananas to buy: $\max_{Q} U(Q,X)$ subject to $PQ + X \leq Y$
+- **Producers** choose how many to supply: $\max_{Q} PQ - C(Q)$ in a competitive market
+
+:::
+
+. . .
+
+The right $U$ and $C$ generate linear supply and demand across markets:
+
+$$q_{m}^{D} = \kappa_0 - \kappa_1 p_{m} + \zeta_{m} \qquad \text{(demand)}$$
+$$q_{m}^{S} = \gamma_0 + \gamma_1 p_{m} + \xi_{m} \qquad \text{(supply)}$$
+
+where $\kappa_1$ and $\gamma_1$ are the **demand and supply elasticities** and $(\zeta_m, \xi_m)$ are unobserved shifters. The market clears: $q_m^D = q_m^S$.
+
+. . .
+
+- This generates the cloud we just saw
+- The **elasticities** are the deep parameters --- they govern how the market responds to *any* price change
+
+## Using the Experiment to Identify the Model {.smaller}
+
+The 10% demand subsidy shifts the demand curve. From the experimental estimates $\alpha_1$ and $\beta_1$, we can recover the structural elasticities.
+
+```{julia}
+#| label: fig-experiment
+#| fig-cap: "The subsidy shifts demand. Comparing treatment and control traces out the supply response."
+#| fig-align: center
+
+Q_range = range(0, 22, length=100)
+
+# In logs, demand: q = κ₀ - κ₁p, supply: q = γ₀ + γ₁p
+# We plot in levels for visual clarity using consistent parameters
+# Demand: Q = 12 - 0.8P => P = (12 - Q)/0.8
+# Supply: Q = 2 + 1.2P => P = (Q - 2)/1.2
+P_demand_0 = (12.0 .- Q_range) ./ 0.8
+P_supply_0 = (Q_range .- 2.0) ./ 1.2
+
+# 10% demand subsidy: in log terms, shifts demand right by -log(0.9) ≈ 0.105
+# In levels, this is a uniform rightward shift: Q_new = Q_old + shift at each P
+# Equivalently: same demand curve but shifted right
+subsidy_shift = -log(0.9) * 10  # scale to level units
+P_demand_sub = (12.0 + subsidy_shift .- Q_range) ./ 0.8
+
+# Equilibria
+P_eq_0 = (12.0 - 2.0) / (0.8 + 1.2)
+Q_eq_0 = 2.0 + 1.2 * P_eq_0
+P_eq_1 = (12.0 + subsidy_shift - 2.0) / (0.8 + 1.2)
+Q_eq_1 = 2.0 + 1.2 * P_eq_1
+
+p = plot(Q_range, P_supply_0, color=:indianred, lw=3, label="Supply",
+    xlabel="Quantity", ylabel="Price",
+    xlim=(0, 22), ylim=(0, 12),
+    left_margin=5Plots.mm, bottom_margin=5Plots.mm,
+    background_color=solarized_bg,
+    tickfontsize=11, guidefontsize=13,
+    legend=:topright)
+plot!(Q_range, P_demand_0, color=:steelblue, lw=3, label="Demand")
+plot!(Q_range, P_demand_sub, color=:steelblue, lw=3, ls=:dash,
+    label="Demand (10% subsidy)")
+scatter!([Q_eq_0], [P_eq_0], color=:black, ms=9, label="Control")
+scatter!([Q_eq_1], [P_eq_1], color=:orange, ms=9, marker=:star5, label="Treatment")
+plot!([Q_eq_0, Q_eq_1], [P_eq_0, P_eq_1],
+    color=:gray, lw=2, ls=:dot, arrow=true, label=nothing)
+p
+```
+
+## Recovering the Deep Parameters {.smaller}
+
+Recall: $\alpha_1$ is the effect of the consumer subsidy on log price; $\beta_1$ is the effect on log quantity.
+
+. . .
+
+**Producers** see a price change of $\alpha_1$, so the **supply elasticity** is:
+
+$$\gamma_1 = \frac{\beta_1}{\alpha_1}$$
+
+. . .
+
+**Consumers** see a price change of $\alpha_1 + \log(0.9)$ (market price moved, *plus* the 10% subsidy), so the **demand elasticity** is:
+
+$$\kappa_1 = -\frac{\beta_1}{\alpha_1 + \log(0.9)}$$
+
+. . .
+
+With $\gamma_1$ and $\kappa_1$, we can forecast the equilibrium effects of **any** price change --- including policies we haven't tested.
+
+## Extrapolation and Interpolation {.smaller}
+
+With the elasticities in hand, we can forecast **all three policies**:
+
+:::{.nonincremental}
+
+| | Policy 1 | Policy 2 | Policy 3 |
+|---|---|---|---|
+| **What it does** | 10% demand subsidy | 20% demand subsidy | 10% supply subsidy |
+| **What shifts** | Demand | Demand | Supply |
+| **Can we forecast?** | Directly estimated | Same curve, bigger shift | Different curve, already estimated |
+
+:::
+
+. . .
+
+- Policy 2 is an **extrapolation**: same type of shift, different magnitude
+- Policy 3 shifts a *different curve* --- the experiment alone tells us nothing about it, but the model connects them because both work through **known changes to prices**
+- We can actually forecast the effects of all policies with *any* source of variation in supply and demand.
+
+. . .
+
+We call this *well-articulated variation*: when a policy's effect can be traced through the model without needing new parameters.
+
+## Point 2
+
+:::{.callout-note icon="false"}
+# Lesson
+
+Economic models can jointly interpret many sources of variation for the purposes of policy and prediction.
+:::
+
+## Revealed Preference and Welfare
+
+- The experiment tells us quantities changed. But is the subsidy **worth what it costs**?
+- In estimating the demand curve, we implicitly estimated consumers' **utility** $U$ --- how they value bananas relative to everything else.
+- This is **revealed preference**: assuming people know what they like, their choices will reveal it to us
+- We can calculate each consumer's **willingness to pay** for the subsidy
+- We can compare costs to government against benefits to consumers
+
+. . .
+
+This lets us evaluate policies without assuming we know what's good for people better than they do.
+
+## Point 3
+
+:::{.callout-note icon="false"}
+# Lesson
+Economic models allow us to make welfare statements using **revealed preference**.
+:::
+
+## Three Lessons from Bananas
+
+:::{.nonincremental}
+
+1. **We needed the model to interpret the data.** Prices and quantities alone were a meaningless cloud. The theory of supply and demand identified the deep parameters that govern behavior.
+
+2. **The model let us go beyond the experiment.** One experiment gave us enough to forecast three policies --- including one on the supply side with no direct experimental analogue.
+
+3. **The model let us measure welfare.** Not just "did quantities change?" but "are consumers better off, and by how much?"
+
+:::
+
+. . .
+
+Now let's see this at work in a real policy setting.
+
+# The General Idea
+
+## Preferences, Constraints, and Policy
+
+```{mermaid}
+%%| fig-width: 10
+%%| fig-responsive: false
+flowchart LR
+    subgraph pref ["<b>Preferences</b>"]
+        direction TB
+        P1["How people rank<br>different outcomes"]
+    end
+
+    subgraph constraints ["<b>Constraints</b>"]
+        direction TB
+        C1["Available choices given<br>prices and endowments"]
+    end
+
+    G["<b>Government policy</b><br>Taxes, subsidies,<br>transfers, regulations"]
+
+    pref --> D(("<b>Decision</b><br>Maximize preferences<br>subject to constraints"))
+    constraints --> D
+    G --> |"changes prices<br>and endowments"| constraints
+
+    style P1 fill:#268bd2,color:#fff,stroke:none
+    style C1 fill:#6c71c4,color:#fff,stroke:none
+    style D fill:#b58900,color:#fff,stroke:none
+    style G fill:#dc322f,color:#fff,stroke:none
+    style pref fill:none,stroke:#268bd2,stroke-width:2px
+    style constraints fill:none,stroke:#6c71c4,stroke-width:2px
+```
+
+- In the banana example: **preferences** = consumer utility $U$; **constraints** = prices and income; **policy** = the subsidy, which changes prices
+- Models are especially powerful when policies work through **known changes to prices and endowments** --- *well-articulated variation*
+
+## Applying This to Welfare Policy {.smaller}
+
+```{mermaid}
+%%| fig-width: 10
+%%| fig-responsive: false
+flowchart LR
+    subgraph pref ["<b>Preferences</b>"]
+        direction TB
+        P1["Value of consumption<br>vs. leisure"]
+        P2["Value of time<br>with children"]
+        P3["Cost of working<br>and childcare"]
+    end
+
+    subgraph constraints ["<b>Budget constraint</b>"]
+        direction TB
+        W["<b>Wages</b><br>Job opportunities"]
+        R["<b>Policy rules</b><br>Transfers, phase-outs,<br>work requirements"]
+    end
+
+    pref --> D(("<b>Decision</b><br>Work? How much?<br>Participate?"))
+    constraints --> D
+    D --> H["<b>Outcomes</b><br>Earnings, consumption,<br>child development"]
+
+    style P1 fill:#268bd2,color:#fff,stroke:none
+    style P2 fill:#268bd2,color:#fff,stroke:none
+    style P3 fill:#268bd2,color:#fff,stroke:none
+    style W fill:#6c71c4,color:#fff,stroke:none
+    style R fill:#dc322f,color:#fff,stroke:none
+    style D fill:#b58900,color:#fff,stroke:none
+    style H fill:#859900,color:#fff,stroke:none
+    style pref fill:none,stroke:#268bd2,stroke-width:2px
+    style constraints fill:none,stroke:#6c71c4,stroke-width:2px
+```
+
+- Individuals choose how much to **work** and whether to **participate** based on their preferences, given policy rules and labor market opportunities
+- Welfare policies give **transfers** (endowments) and shape the **returns to work** (prices) --- well-articulated variation
+
+# Welfare Reform: The Application
+
+## The Setting
+
+In the 1990s, the US overhauled its welfare system.
+
+- Before the national reform, **different states ran different experiments**
+- Each tested a different bundle of rules:
+  - Work requirements
+  - Time limits on benefits
+  - Earnings disregards (how much you can earn before losing benefits)
+
+. . .
+
+Each experiment was well-designed and carefully evaluated.
+
+## What Each Experiment Told Us
+
+Each experiment answered a narrow question:
+
+> "This bundle of rules, applied to this population, had these effects on employment, earnings, and child outcomes."
+
+. . .
+
+For example:
+
+- Minnesota's MFIP: generous earnings disregard + mandatory services
+- Connecticut's Jobs First: strict time limits + generous earnings disregard
+- Florida's FTP: time limits + modest earnings disregard
+
+. . .
+
+Each experiment is like testing **one subsidy** in **one market**.
+
+## The Policymaker's Problem
+
+You're a state official designing a new welfare program.
+
+- None of these experiments match your proposed rules exactly
+- Your state's population differs from Minnesota's or Connecticut's
+- You want to know about a **specific combination** of rules
+
+. . .
+
+Just as with bananas: the experiment on *one* policy doesn't directly tell you about a *different* policy on a *different* population.
+
+## What the Model Does
+
+The same logic as the banana example, applied to a richer setting:
+
+- Each welfare experiment **shifts the budget constraint** in a known way
+- Fitting a model to *all* the experiments simultaneously recovers the **deep parameters**: how people trade off income, leisure, time with children, and the costs of working
+- With those parameters, we can forecast the effects of *any* new combination of rules
+
+. . .
+
+Different experiments provide different information (just like the demand and supply subsidies) and the model connects them through a common framework.
+
+## An Example From My Research
+
+In @Mullins2026, I did exactly this:
+
+- Took data from **multiple welfare reform experiments** across US states
+- Estimated a model of maternal labor supply and children's development
+- Used it to evaluate new policy designs
+
+. . .
+
+Key finding: across sites, time limits were primarily responsible for reductions in welfare dependence, while work requirements were the chief source of employment gains.
+
+. . .
+
+**That insight was impossible to get from the experiments alone.**
+
+## Where Models Reach Their Limits
+
+Not every policy fits this framework.
+
+- If a policy works through a **channel the model doesn't represent** --- social norms, information, neighborhood effects --- you can't just plug it in
+- You'd need to extend the model or build a different one
+- A key requirement is that the variation you want to study is well-articulated inside the model.
+
+. . .
+
+Part of the economist's job is knowing which questions a given model can and can't handle.
+
+# How Do We Know the Model Is Right?
+
+## A Fair Question
+
+You might be thinking:
+
+> "This sounds like you're just making assumptions and running with them."
+
+. . .
+
+That's a fair concern. Here are some points to keep in mind...
+
+## Models Are Disciplined by Data
+
+- Models are **estimated**, not assumed --- parameters are chosen to match real data
+- They can be **tested** against evidence not used in estimation: estimate on some experiments, check predictions against others
+    -  In my welfare reform paper, the model was estimated on a subset of experiments and validated against the rest.
+
+## Models Are Transparent About Assumptions
+
+- Every model involves assumptions --- but so does every research design
+- Assumptions are **written down explicitly**
+- You can ask: "What if this assumption is wrong? How much does it matter?"
+- A model lets you be explicit about how you are getting from existing evidence to a conclusion about future policies.
+- This is more transparent than informal reasoning, where assumptions are implicit. 
+- Especially important when policy goal is to improve welfare. How do we know this is what people prefer?
+
+## Recap
+
+:::{.nonincremental}
+
+1. **Models help interpret data**: without structure, even simple data can be impossible to read
+2. **Models extrapolate and interpolate**: especially when policies work through known changes to prices and endowments
+3. **Models enable welfare calculations**: not just "what changed?" but "are people better off?"
+4. **Models are disciplined by data**: estimated, testable, and transparent (if done well)
+
+:::
+
+## Thank You
+
+Questions?
+
+## References
