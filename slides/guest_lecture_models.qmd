@@ -1,5 +1,5 @@
 ---
-title: "Why Can Models Do? A Guide for Policy Practitioners"
+title: "What Can Models Do? A Guide for Policy Practitioners"
 author: "Joseph Mullins"
 format:
   revealjs:
